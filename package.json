@@ -1,4 +1,18 @@
 {
-  "name": "atmerchant",
-  "packageManager": "yarn@4.3.1"
+  "name": "@nosh/atmerchant",
+  "workspaces": {
+    "packages": [
+      "apps/*",
+      "packages/*"
+    ]
+  },
+  "scripts": {
+    "lexgen": "yarn workspace lexicon lexgen",
+    "format": "npx @biomejs/biome check",
+    "format:fix": "npx @biomejs/biome check --fix"
+  },
+  "packageManager": "yarn@4.3.1",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4"
+  }
 }
