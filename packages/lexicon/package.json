@@ -2,7 +2,7 @@
   "name": "lexicon",
   "packageManager": "yarn@4.3.1",
   "scripts": {
-    "lexgen": "lex gen-api  ./src ../../lexicons/xyz/noshdelivery/*"
+    "lexgen": "lex gen-api ./src ../../lexicons/xyz/noshdelivery/*/* --yes"
   },
   "devDependencies": {
     "@atproto/lex-cli": "^0.7.1"

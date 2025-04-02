@@ -1,0 +1,28 @@
+{
+  "lexicon": 1,
+  "id": "xyz.noshdelivery.catalog.catalog",
+  "description": "todo",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "merchant"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "merchant": {
+            "type": "ref",
+            "ref": "xyz.noshdelivery.merchant.merchant"
+          }
+        }
+      }
+    }
+  }
+}
