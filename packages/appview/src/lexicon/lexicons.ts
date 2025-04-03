@@ -206,6 +206,37 @@ export const schemaDict = {
       },
     },
   },
+  XyzNoshdeliveryMerchantGetMerchants: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.merchant.getMerchants',
+    defs: {
+      main: {
+        type: 'query',
+        description: 'Get all merchants',
+        parameters: {
+          type: 'params',
+          properties: {},
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['merchants'],
+            properties: {
+              merchants: {
+                type: 'array',
+                items: {
+                  type: 'string',
+                  minLength: 1,
+                  maxLength: 128,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   XyzNoshdeliveryMerchantMerchant: {
     lexicon: 1,
     id: 'xyz.noshdelivery.merchant.merchant',
@@ -1210,6 +1241,7 @@ export const ids = {
   XyzNoshdeliveryCatalogCategory: 'xyz.noshdelivery.catalog.category',
   XyzNoshdeliveryCatalogDefs: 'xyz.noshdelivery.catalog.defs',
   XyzNoshdeliveryCatalogItem: 'xyz.noshdelivery.catalog.item',
+  XyzNoshdeliveryMerchantGetMerchants: 'xyz.noshdelivery.merchant.getMerchants',
   XyzNoshdeliveryMerchantMerchant: 'xyz.noshdelivery.merchant.merchant',
   ComAtprotoLabelDefs: 'com.atproto.label.defs',
   ComAtprotoRepoApplyWrites: 'com.atproto.repo.applyWrites',

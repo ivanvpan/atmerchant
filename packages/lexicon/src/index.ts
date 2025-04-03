@@ -13,6 +13,7 @@ import * as XyzNoshdeliveryCatalogCatalog from './types/xyz/noshdelivery/catalog
 import * as XyzNoshdeliveryCatalogCategory from './types/xyz/noshdelivery/catalog/category.js'
 import * as XyzNoshdeliveryCatalogDefs from './types/xyz/noshdelivery/catalog/defs.js'
 import * as XyzNoshdeliveryCatalogItem from './types/xyz/noshdelivery/catalog/item.js'
+import * as XyzNoshdeliveryMerchantGetMerchants from './types/xyz/noshdelivery/merchant/getMerchants.js'
 import * as XyzNoshdeliveryMerchantMerchant from './types/xyz/noshdelivery/merchant/merchant.js'
 import * as ComAtprotoLabelDefs from './types/com/atproto/label/defs.js'
 import * as ComAtprotoRepoApplyWrites from './types/com/atproto/repo/applyWrites.js'
@@ -32,6 +33,7 @@ export * as XyzNoshdeliveryCatalogCatalog from './types/xyz/noshdelivery/catalog
 export * as XyzNoshdeliveryCatalogCategory from './types/xyz/noshdelivery/catalog/category.js'
 export * as XyzNoshdeliveryCatalogDefs from './types/xyz/noshdelivery/catalog/defs.js'
 export * as XyzNoshdeliveryCatalogItem from './types/xyz/noshdelivery/catalog/item.js'
+export * as XyzNoshdeliveryMerchantGetMerchants from './types/xyz/noshdelivery/merchant/getMerchants.js'
 export * as XyzNoshdeliveryMerchantMerchant from './types/xyz/noshdelivery/merchant/merchant.js'
 export * as ComAtprotoLabelDefs from './types/com/atproto/label/defs.js'
 export * as ComAtprotoRepoApplyWrites from './types/com/atproto/repo/applyWrites.js'
@@ -301,6 +303,18 @@ export class XyzNoshdeliveryMerchantNS {
   constructor(client: XrpcClient) {
     this._client = client
     this.merchant = new MerchantRecord(client)
+  }
+
+  getMerchants(
+    params?: XyzNoshdeliveryMerchantGetMerchants.QueryParams,
+    opts?: XyzNoshdeliveryMerchantGetMerchants.CallOptions,
+  ): Promise<XyzNoshdeliveryMerchantGetMerchants.Response> {
+    return this._client.call(
+      'xyz.noshdelivery.merchant.getMerchants',
+      params,
+      undefined,
+      opts,
+    )
   }
 }
 

@@ -4,6 +4,7 @@ This will write the following files:
 [93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/xyz/noshdelivery/catalog/category.ts
 [93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/xyz/noshdelivery/catalog/defs.ts
 [93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/xyz/noshdelivery/catalog/item.ts
+[92m[+ add][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/xyz/noshdelivery/merchant/getMerchants.ts
 [93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/xyz/noshdelivery/merchant/merchant.ts
 [93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/com/atproto/label/defs.ts
 [93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/com/atproto/repo/applyWrites.ts

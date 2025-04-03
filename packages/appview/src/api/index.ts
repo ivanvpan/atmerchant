@@ -1,10 +1,10 @@
 import type { AppContext } from '#/context'
 import type { Server } from '#/lexicon'
-import createItem from './lexicons/createItem'
+import getMerchants from './lexicon/merchant/getMerchants'
 
 export * as health from './health'
 
 export default function (server: Server, ctx: AppContext) {
-  createItem(server, ctx)
+  getMerchants(server, ctx)
   return server
 }
