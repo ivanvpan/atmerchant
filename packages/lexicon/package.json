@@ -1,6 +1,7 @@
 {
   "name": "@nosh/lexicon",
   "packageManager": "yarn@4.3.1",
+  "main": "./src/index.ts",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lexgen": "lex gen-api ./src ../../lexicons/xyz/noshdelivery/*/* ../../lexicons/com/atproto/*/* --yes"
