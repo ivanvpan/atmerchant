@@ -12,20 +12,20 @@ import {
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'xyz.noshdelivery.merchant.merchant'
+const id = 'com.atproto.repo.strongRef'
 
-export interface Record {
-  $type: 'xyz.noshdelivery.merchant.merchant'
-  name: string
-  [k: string]: unknown
+export interface Main {
+  $type?: 'com.atproto.repo.strongRef'
+  uri: string
+  cid: string
 }
 
-const hashRecord = 'main'
+const hashMain = 'main'
 
-export function isRecord<V>(v: V) {
-  return is$typed(v, id, hashRecord)
+export function isMain<V>(v: V) {
+  return is$typed(v, id, hashMain)
 }
 
-export function validateRecord<V>(v: V) {
-  return validate<Record & V>(v, id, hashRecord, true)
+export function validateMain<V>(v: V) {
+  return validate<Main & V>(v, id, hashMain)
 }

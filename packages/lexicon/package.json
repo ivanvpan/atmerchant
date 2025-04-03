@@ -2,9 +2,15 @@
   "name": "lexicon",
   "packageManager": "yarn@4.3.1",
   "scripts": {
-    "lexgen": "lex gen-api ./src ../../lexicons/xyz/noshdelivery/*/* --yes"
+    "typecheck": "tsc --noEmit",
+    "lexgen": "lex gen-api ./src ../../lexicons/xyz/noshdelivery/*/* ../../lexicons/com/atproto/*/* --yes"
   },
   "devDependencies": {
-    "@atproto/lex-cli": "^0.7.1"
+    "@atproto/lex-cli": "^0.7.1",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@atproto/xrpc": "^0.6.12",
+    "multiformats": "^13.3.2"
   }
 }

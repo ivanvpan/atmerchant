@@ -12,20 +12,20 @@ import {
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'xyz.noshdelivery.merchant.merchant'
+const id = 'com.atproto.repo.defs'
 
-export interface Record {
-  $type: 'xyz.noshdelivery.merchant.merchant'
-  name: string
-  [k: string]: unknown
+export interface CommitMeta {
+  $type?: 'com.atproto.repo.defs#commitMeta'
+  cid: string
+  rev: string
 }
 
-const hashRecord = 'main'
+const hashCommitMeta = 'commitMeta'
 
-export function isRecord<V>(v: V) {
-  return is$typed(v, id, hashRecord)
+export function isCommitMeta<V>(v: V) {
+  return is$typed(v, id, hashCommitMeta)
 }
 
-export function validateRecord<V>(v: V) {
-  return validate<Record & V>(v, id, hashRecord, true)
+export function validateCommitMeta<V>(v: V) {
+  return validate<CommitMeta & V>(v, id, hashCommitMeta)
 }
