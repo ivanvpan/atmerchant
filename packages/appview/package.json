@@ -1,8 +1,28 @@
 {
   "name": "@nosh/appview",
   "packageManager": "yarn@4.3.1",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/index.ts | pino-pretty",
+    "typecheck": "tsc --noEmit",
+    "lexgen": "lex gen-server ./src/lexicon ../../lexicons/xyz/noshdelivery/*/* ../../lexicons/com/atproto/*/* --yes"
+  },
   "devDependencies": {
     "@atproto/lex-cli": "^0.7.1",
+    "@types/compression": "^1",
+    "@types/cors": "^2",
+    "@types/express": "^5",
+    "@types/node": "^22.14.0",
+    "pino-pretty": "^13.0.0",
+    "tsx": "^4.19.3",
     "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@atproto/xrpc-server": "^0.7.15",
+    "compression": "^1.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "envalid": "^8.0.0",
+    "express": "^5.1.0",
+    "pino": "^9.6.0"
   }
 }
