@@ -13,7 +13,8 @@ export const schemaDict = {
   XyzNoshdeliveryCatalogCatalog: {
     lexicon: 1,
     id: 'xyz.noshdelivery.catalog.catalog',
-    description: 'todo',
+    description:
+      'Merchant can have multiple catalogs with disjoint or overlaping schedules. Categories have catalogs as their roots.',
     defs: {
       main: {
         type: 'record',
@@ -28,9 +29,59 @@ export const schemaDict = {
               maxLength: 128,
             },
             merchant: {
-              type: 'ref',
-              ref: 'lex:xyz.noshdelivery.merchant.merchant',
+              type: 'string',
+              format: 'at-uri',
             },
+            availabilityPeriods: {
+              type: 'array',
+              items: {
+                type: 'ref',
+                ref: 'lex:xyz.noshdelivery.catalog.catalog#availabilityPeriod',
+              },
+            },
+          },
+        },
+      },
+      availabilityPeriod: {
+        type: 'object',
+        properties: {
+          start: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.catalog.catalog#availabilityTimeOfDay',
+          },
+          end: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.catalog.catalog#availabilityTimeOfDay',
+          },
+          daysOfWeek: {
+            type: 'array',
+            items: {
+              type: 'string',
+              enum: [
+                'MONDAY',
+                'TUESDAY',
+                'WEDNESDAY',
+                'THURSDAY',
+                'FRIDAY',
+                'SATURDAY',
+                'SUNDAY',
+              ],
+            },
+          },
+        },
+      },
+      availabilityTimeOfDay: {
+        type: 'object',
+        properties: {
+          localHour: {
+            type: 'integer',
+            minimum: 0,
+            maximum: 23,
+          },
+          localMinute: {
+            type: 'integer',
+            minimum: 0,
+            maximum: 59,
           },
         },
       },
@@ -46,17 +97,55 @@ export const schemaDict = {
         key: 'tid',
         record: {
           type: 'object',
-          required: ['name', 'catalog'],
+          required: ['name', 'parentCatalogOrCategory'],
           properties: {
             name: {
               type: 'string',
               minLength: 1,
               maxLength: 128,
             },
-            catalog: {
+            parentCatalogOrCategory: {
               type: 'ref',
-              ref: 'lex:xyz.noshdelivery.catalog.catalog',
+              ref: 'lex:xyz.noshdelivery.catalog.category#catalogOrCategoryRefWithOrdinal',
             },
+          },
+        },
+      },
+      catalogOrCategoryRefWithOrdinal: {
+        type: 'object',
+        required: ['categoryOrCatalog'],
+        properties: {
+          categoryOrCatalog: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          ordinal: {
+            type: 'integer',
+            default: 999999999,
+            description:
+              'The order in which this item should appear in the category.',
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryCatalogDefs: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.catalog.defs',
+    defs: {
+      price: {
+        type: 'object',
+        required: ['currency', 'amount'],
+        properties: {
+          currency: {
+            type: 'string',
+            maxLength: 3,
+          },
+          amount: {
+            type: 'integer',
+            description:
+              'The amount in the smallest unit of the currency. For example cents',
+            minimum: 0,
           },
         },
       },
@@ -72,21 +161,46 @@ export const schemaDict = {
         key: 'tid',
         record: {
           type: 'object',
-          required: ['name'],
+          required: ['name', 'price', 'categories'],
           properties: {
+            sku: {
+              type: 'string',
+              maxLength: 64,
+            },
             name: {
               type: 'string',
               minLength: 1,
               maxLength: 128,
             },
-            category: {
+            categories: {
               type: 'array',
-              description: 'References to all categories this item belongs to',
+              description:
+                'References to all categories this item is included in.',
               items: {
                 type: 'ref',
-                ref: 'lex:xyz.noshdelivery.catalog.category',
+                ref: 'lex:xyz.noshdelivery.catalog.item#categoryRefWithOrdinal',
               },
             },
+            price: {
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.catalog.defs#price',
+            },
+          },
+        },
+      },
+      categoryRefWithOrdinal: {
+        type: 'object',
+        required: ['category'],
+        properties: {
+          category: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          ordinal: {
+            type: 'integer',
+            default: 999999999,
+            description:
+              'The order in which this item should appear in the category.',
           },
         },
       },
@@ -150,6 +264,7 @@ export function validate(
 export const ids = {
   XyzNoshdeliveryCatalogCatalog: 'xyz.noshdelivery.catalog.catalog',
   XyzNoshdeliveryCatalogCategory: 'xyz.noshdelivery.catalog.category',
+  XyzNoshdeliveryCatalogDefs: 'xyz.noshdelivery.catalog.defs',
   XyzNoshdeliveryCatalogItem: 'xyz.noshdelivery.catalog.item',
   XyzNoshdeliveryMerchantMerchant: 'xyz.noshdelivery.merchant.merchant',
 } as const

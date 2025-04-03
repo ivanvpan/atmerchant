@@ -1,0 +1,24 @@
+{
+  "lexicon": 1,
+  "id": "xyz.noshdelivery.catalog.defs",
+  "defs": {
+    "price": {
+      "type": "object",
+      "required": [
+        "currency",
+        "amount"
+      ],
+      "properties": {
+        "currency": {
+          "type": "string",
+          "maxLength": 3
+        },
+        "amount": {
+          "type": "integer",
+          "description": "The amount in the smallest unit of the currency. For example cents",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

@@ -7,11 +7,13 @@ import { CID } from 'multiformats/cid'
 import { OmitKey, Un$Typed } from './util.js'
 import * as XyzNoshdeliveryCatalogCatalog from './types/xyz/noshdelivery/catalog/catalog.js'
 import * as XyzNoshdeliveryCatalogCategory from './types/xyz/noshdelivery/catalog/category.js'
+import * as XyzNoshdeliveryCatalogDefs from './types/xyz/noshdelivery/catalog/defs.js'
 import * as XyzNoshdeliveryCatalogItem from './types/xyz/noshdelivery/catalog/item.js'
 import * as XyzNoshdeliveryMerchantMerchant from './types/xyz/noshdelivery/merchant/merchant.js'
 
 export * as XyzNoshdeliveryCatalogCatalog from './types/xyz/noshdelivery/catalog/catalog.js'
 export * as XyzNoshdeliveryCatalogCategory from './types/xyz/noshdelivery/catalog/category.js'
+export * as XyzNoshdeliveryCatalogDefs from './types/xyz/noshdelivery/catalog/defs.js'
 export * as XyzNoshdeliveryCatalogItem from './types/xyz/noshdelivery/catalog/item.js'
 export * as XyzNoshdeliveryMerchantMerchant from './types/xyz/noshdelivery/merchant/merchant.js'
 

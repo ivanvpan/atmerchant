@@ -10,7 +10,7 @@
         "type": "object",
         "required": [
           "name",
-          "catalog"
+          "parentCatalogOrCategory"
         ],
         "properties": {
           "name": {
@@ -18,10 +18,27 @@
             "minLength": 1,
             "maxLength": 128
           },
-          "catalog": {
+          "parentCatalogOrCategory": {
             "type": "ref",
-            "ref": "xyz.noshdelivery.catalog.catalog"
+            "ref": "#catalogOrCategoryRefWithOrdinal"
           }
+        }
+      }
+    },
+    "catalogOrCategoryRefWithOrdinal": {
+      "type": "object",
+      "required": [
+        "categoryOrCatalog"
+      ],
+      "properties": {
+        "categoryOrCatalog": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "ordinal": {
+          "type": "integer",
+          "default": 999999999,
+          "description": "The order in which this item should appear in the category."
         }
       }
     }

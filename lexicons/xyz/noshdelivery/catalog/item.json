@@ -9,22 +9,49 @@
       "record": {
         "type": "object",
         "required": [
-          "name"
+          "name",
+          "price",
+          "categories"
         ],
         "properties": {
+          "sku": {
+            "type": "string",
+            "maxLength": 64
+          },
           "name": {
             "type": "string",
             "minLength": 1,
             "maxLength": 128
           },
-          "category": {
+          "categories": {
             "type": "array",
-            "description": "References to all categories this item belongs to",
+            "description": "References to all categories this item is included in.",
             "items": {
               "type": "ref",
-              "ref": "xyz.noshdelivery.catalog.category"
+              "ref": "#categoryRefWithOrdinal"
             }
+          },
+          "price": {
+            "type": "ref",
+            "ref": "xyz.noshdelivery.catalog.defs#price"
           }
+        }
+      }
+    },
+    "categoryRefWithOrdinal": {
+      "type": "object",
+      "required": [
+        "category"
+      ],
+      "properties": {
+        "category": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "ordinal": {
+          "type": "integer",
+          "default": 999999999,
+          "description": "The order in which this item should appear in the category."
         }
       }
     }
