@@ -7,13 +7,14 @@
     ]
   },
   "scripts": {
-    "typecheck": "yarn workspace lexicon typecheck",
-    "lexgen": "yarn workspace lexicon lexgen",
+    "typecheck": "turbo typecheck",
+    "lexgen": "turbo lexgen",
     "format": "npx @biomejs/biome check",
     "format:fix": "npx @biomejs/biome check --fix"
   },
   "packageManager": "yarn@4.3.1",
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4"
+    "@biomejs/biome": "^1.9.4",
+    "turbo": "^2.5.0"
   }
 }

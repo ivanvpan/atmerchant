@@ -156,11 +156,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nosh/appview@workspace:packages/appview":
+  version: 0.0.0-use.local
+  resolution: "@nosh/appview@workspace:packages/appview"
+  dependencies:
+    "@atproto/lex-cli": "npm:^0.7.1"
+    typescript: "npm:^5.8.2"
+  languageName: unknown
+  linkType: soft
+
 "@nosh/atmerchant@workspace:.":
   version: 0.0.0-use.local
   resolution: "@nosh/atmerchant@workspace:."
   dependencies:
     "@biomejs/biome": "npm:^1.9.4"
+    turbo: "npm:^2.5.0"
+  languageName: unknown
+  linkType: soft
+
+"@nosh/lexicon@workspace:packages/lexicon":
+  version: 0.0.0-use.local
+  resolution: "@nosh/lexicon@workspace:packages/lexicon"
+  dependencies:
+    "@atproto/lex-cli": "npm:^0.7.1"
+    "@atproto/xrpc": "npm:^0.6.12"
+    multiformats: "npm:^13.3.2"
+    typescript: "npm:^5.8.2"
   languageName: unknown
   linkType: soft
 
@@ -273,17 +294,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lexicon@workspace:packages/lexicon":
-  version: 0.0.0-use.local
-  resolution: "lexicon@workspace:packages/lexicon"
-  dependencies:
-    "@atproto/lex-cli": "npm:^0.7.1"
-    "@atproto/xrpc": "npm:^0.6.12"
-    multiformats: "npm:^13.3.2"
-    typescript: "npm:^5.8.2"
-  languageName: unknown
-  linkType: soft
-
 "minimatch@npm:^9.0.4":
   version: 9.0.5
   resolution: "minimatch@npm:9.0.5"
@@ -356,6 +366,77 @@ __metadata:
     "@ts-morph/common": "npm:~0.25.0"
     code-block-writer: "npm:^13.0.3"
   checksum: 10c0/2a0813ba428a154966d4038901f6c32457a60870936b23778f2629433257f87d1881fc4ecae7b791a223a88c2edf96aaac9fb0f88bf34d3c652af8c09c4f43bc
+  languageName: node
+  linkType: hard
+
+"turbo-darwin-64@npm:2.5.0":
+  version: 2.5.0
+  resolution: "turbo-darwin-64@npm:2.5.0"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"turbo-darwin-arm64@npm:2.5.0":
+  version: 2.5.0
+  resolution: "turbo-darwin-arm64@npm:2.5.0"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"turbo-linux-64@npm:2.5.0":
+  version: 2.5.0
+  resolution: "turbo-linux-64@npm:2.5.0"
+  conditions: os=linux & cpu=x64
+  languageName: node
+  linkType: hard
+
+"turbo-linux-arm64@npm:2.5.0":
+  version: 2.5.0
+  resolution: "turbo-linux-arm64@npm:2.5.0"
+  conditions: os=linux & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"turbo-windows-64@npm:2.5.0":
+  version: 2.5.0
+  resolution: "turbo-windows-64@npm:2.5.0"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"turbo-windows-arm64@npm:2.5.0":
+  version: 2.5.0
+  resolution: "turbo-windows-arm64@npm:2.5.0"
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"turbo@npm:^2.5.0":
+  version: 2.5.0
+  resolution: "turbo@npm:2.5.0"
+  dependencies:
+    turbo-darwin-64: "npm:2.5.0"
+    turbo-darwin-arm64: "npm:2.5.0"
+    turbo-linux-64: "npm:2.5.0"
+    turbo-linux-arm64: "npm:2.5.0"
+    turbo-windows-64: "npm:2.5.0"
+    turbo-windows-arm64: "npm:2.5.0"
+  dependenciesMeta:
+    turbo-darwin-64:
+      optional: true
+    turbo-darwin-arm64:
+      optional: true
+    turbo-linux-64:
+      optional: true
+    turbo-linux-arm64:
+      optional: true
+    turbo-windows-64:
+      optional: true
+    turbo-windows-arm64:
+      optional: true
+  bin:
+    turbo: bin/turbo
+  checksum: 10c0/df4ca3e8fd1121702b8f3a2f64a4a02ab886e01236a72fe54ebd1b4e33368a9dd3cec393d7eb143a6173f96c70f4dba4f7abfff84a0b5535076fc662a746e0ac
   languageName: node
   linkType: hard
 

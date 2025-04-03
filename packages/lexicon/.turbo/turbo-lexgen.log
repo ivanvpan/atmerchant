@@ -1,0 +1,24 @@
+
+This will write the following files:
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/xyz/noshdelivery/catalog/catalog.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/xyz/noshdelivery/catalog/category.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/xyz/noshdelivery/catalog/defs.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/xyz/noshdelivery/catalog/item.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/xyz/noshdelivery/merchant/merchant.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/com/atproto/label/defs.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/com/atproto/repo/applyWrites.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/com/atproto/repo/createRecord.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/com/atproto/repo/defs.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/com/atproto/repo/deleteRecord.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/com/atproto/repo/describeRepo.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/com/atproto/repo/getRecord.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/com/atproto/repo/importRepo.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/com/atproto/repo/listMissingBlobs.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/com/atproto/repo/listRecords.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/com/atproto/repo/putRecord.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/com/atproto/repo/strongRef.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/types/com/atproto/repo/uploadBlob.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/util.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/lexicons.ts
+[93m[* mod][39m /home/ivp/repos/atproto/atmerchant/packages/lexicon/src/index.ts
+API generated.
