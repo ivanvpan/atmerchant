@@ -61,6 +61,10 @@ export const api = {
   getMerchants(params: XyzNoshdeliveryMerchantGetMerchants.InputSchema) {
     return agent.xyz.noshdelivery.merchant.getMerchants(params)
   },
+
+  createMerchant() {
+    return agent.xyz.noshdelivery.merchant.createMerchant(undefined)
+  },
 }
 
 export default api

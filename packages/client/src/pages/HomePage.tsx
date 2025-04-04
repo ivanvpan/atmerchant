@@ -1,6 +1,7 @@
 // import StatusForm from '#/components/MerchantForm'
 import StatusList from '#/components/MerchantList'
 import { useAuth } from '#/hooks/useAuth'
+import api from '#/services/api'
 
 const HomePage = () => {
   // const { user, loading, error } = useAuth()
@@ -46,6 +47,7 @@ const HomePage = () => {
           Merchants
         </h2>
         <StatusList />
+        <button type="button" onClick={() => api.createMerchant()}>Create</button>
       </div>
     </div>
   )

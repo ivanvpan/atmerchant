@@ -9,6 +9,7 @@ import {
   type StreamAuthVerifier,
 } from '@atproto/xrpc-server'
 import { schemas } from './lexicons.js'
+import * as XyzNoshdeliveryMerchantCreateMerchant from './types/xyz/noshdelivery/merchant/createMerchant.js'
 import * as XyzNoshdeliveryMerchantGetMerchants from './types/xyz/noshdelivery/merchant/getMerchants.js'
 import * as ComAtprotoRepoApplyWrites from './types/com/atproto/repo/applyWrites.js'
 import * as ComAtprotoRepoCreateRecord from './types/com/atproto/repo/createRecord.js'
@@ -72,6 +73,17 @@ export class XyzNoshdeliveryMerchantNS {
 
   constructor(server: Server) {
     this._server = server
+  }
+
+  createMerchant<AV extends AuthVerifier>(
+    cfg: ConfigOf<
+      AV,
+      XyzNoshdeliveryMerchantCreateMerchant.Handler<ExtractAuth<AV>>,
+      XyzNoshdeliveryMerchantCreateMerchant.HandlerReqCtx<ExtractAuth<AV>>
+    >,
+  ) {
+    const nsid = 'xyz.noshdelivery.merchant.createMerchant' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
   }
 
   getMerchants<AV extends AuthVerifier>(

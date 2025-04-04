@@ -14,6 +14,7 @@ import * as error from '#/error'
 // import { createFirehoseIngester, createJetstreamIngester } from '#/ingestors'
 import { createServer } from '#/lexicon'
 import { env } from '#/env'
+import { XRPCError } from '@atproto/xrpc-server'
 
 export class Server {
   constructor(
@@ -49,6 +50,7 @@ export class Server {
     const app = express()
     app.use(cors({ maxAge: 1000 * 60 * 60 * 24 }))
     app.use(compression())
+    // app.use(auth.createRouter(ctx))
     app.use(express.json())
     app.use(express.urlencoded({ extended: true }))
 
@@ -59,7 +61,16 @@ export class Server {
         jsonLimit: 100 * 1024, // 100kb
         textLimit: 100 * 1024, // 100kb
         // no blobs
-        blobLimit: 0,
+        // blobLimit: 0,
+      },
+      errorParser: (err: unknown) => {
+        console.log(err)
+        return new XRPCError(
+          500,
+          (err as Error).message || 'hello',
+          undefined,
+          (err as Error).stack?.split('\n'),
+        )
       },
     })
 

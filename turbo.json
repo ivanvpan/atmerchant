@@ -16,6 +16,8 @@
       ]
     },
     "typecheck": {},
-    "lexgen": {}
+    "lexgen": {
+      "cache": false
+    }
   }
 }
