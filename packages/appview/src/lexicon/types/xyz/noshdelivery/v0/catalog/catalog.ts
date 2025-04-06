@@ -17,9 +17,9 @@ const id = 'xyz.noshdelivery.v0.catalog.catalog'
 export interface Record {
   $type: 'xyz.noshdelivery.v0.catalog.catalog'
   externalId?: string
-  name?: string
+  name: string
   merchant: string
-  availabilityPeriods?: AvailabilityPeriod[]
+  availabilityPeriods: AvailabilityPeriod[]
   /** Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented. */
   childCollections?: string[]
   [k: string]: unknown

@@ -21,7 +21,7 @@ export const schemaDict = {
         key: 'tid',
         record: {
           type: 'object',
-          required: ['merchant'],
+          required: ['merchant', 'name', 'availabilityPeriods'],
           properties: {
             externalId: {
               type: 'string',
@@ -159,6 +159,95 @@ export const schemaDict = {
             description:
               'The amount in the smallest unit of the currency. For example cents.',
             minimum: 0,
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0CatalogGetFullCatalog: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.catalog.getFullCatalog',
+    defs: {
+      main: {
+        type: 'query',
+        description: 'Get a complete view of the catalog.',
+        parameters: {
+          type: 'params',
+          required: [],
+          properties: {},
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['merchant'],
+            properties: {
+              merchant: {
+                type: 'string',
+                format: 'at-uri',
+              },
+            },
+          },
+        },
+      },
+      catalogView: {
+        type: 'object',
+        required: ['uri', 'name'],
+        properties: {
+          uri: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          externalId: {
+            type: 'string',
+            maxLength: 64,
+          },
+          name: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 128,
+          },
+          availabilityPeriods: {
+            type: 'array',
+            items: {
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.catalog.getFullCatalog#availabilityPeriod',
+            },
+          },
+          childCollections: {
+            type: 'array',
+            description:
+              'Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented.',
+            items: {
+              type: 'string',
+              format: 'tid',
+            },
+          },
+        },
+      },
+      collectionView: {
+        type: 'object',
+        required: ['uri', 'name'],
+        properties: {
+          uri: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          externalId: {
+            type: 'string',
+            maxLength: 64,
+          },
+          name: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 128,
+          },
+          childCollections: {
+            type: 'array',
+            items: {
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.catalog.getFullCatalog#collectionView',
+            },
           },
         },
       },
@@ -1364,6 +1453,8 @@ export const ids = {
   XyzNoshdeliveryV0CatalogCatalog: 'xyz.noshdelivery.v0.catalog.catalog',
   XyzNoshdeliveryV0CatalogCollection: 'xyz.noshdelivery.v0.catalog.collection',
   XyzNoshdeliveryV0CatalogDefs: 'xyz.noshdelivery.v0.catalog.defs',
+  XyzNoshdeliveryV0CatalogGetFullCatalog:
+    'xyz.noshdelivery.v0.catalog.getFullCatalog',
   XyzNoshdeliveryV0CatalogItem: 'xyz.noshdelivery.v0.catalog.item',
   XyzNoshdeliveryV0CatalogModifier: 'xyz.noshdelivery.v0.catalog.modifier',
   XyzNoshdeliveryV0CatalogModifierGroup:

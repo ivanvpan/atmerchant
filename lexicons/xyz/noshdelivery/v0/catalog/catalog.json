@@ -9,7 +9,9 @@
       "record": {
         "type": "object",
         "required": [
-          "merchant"
+          "merchant",
+          "name",
+          "availabilityPeriods"
         ],
         "properties": {
           "externalId": {

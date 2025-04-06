@@ -1,0 +1,96 @@
+{
+  "lexicon": 1,
+  "id": "xyz.noshdelivery.v0.catalog.getFullCatalog",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a complete view of the catalog.",
+      "parameters": {
+        "type": "params",
+        "required": [],
+        "properties": {}
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "merchant"
+          ],
+          "properties": {
+            "merchant": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          }
+        }
+      }
+    },
+    "catalogView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "name"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "externalId": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "availabilityPeriods": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#availabilityPeriod"
+          }
+        },
+        "childCollections": {
+          "type": "array",
+          "description": "Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented.",
+          "items": {
+            "type": "string",
+            "format": "tid"
+          }
+        }
+      }
+    },
+    "collectionView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "name"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "externalId": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "childCollections": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#collectionView"
+          }
+        }
+      }
+    }
+  }
+}
