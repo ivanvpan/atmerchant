@@ -30,10 +30,10 @@
           },
           "items": {
             "type": "array",
-            "description": "The items in this collection. Ordered in the way they will be presented. TBD: do we need a URI at all or just a pkey?",
+            "description": "Pkeys of xyz.noshdelivery.v0.catalog.item records that are in this collection. Ordered in the way they will be presented.",
             "items": {
               "type": "string",
-              "format": "at-uri"
+              "format": "tid"
             }
           }
         }

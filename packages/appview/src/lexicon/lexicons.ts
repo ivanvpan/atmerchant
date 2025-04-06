@@ -10,6 +10,379 @@ import {
 import { type $Typed, is$typed, maybe$typed } from './util.js'
 
 export const schemaDict = {
+  XyzNoshdeliveryV0CatalogCatalog: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.catalog.catalog',
+    description:
+      'Merchant can have multiple catalogs with disjoint or overlaping schedules. Categories have catalogs as their roots.',
+    defs: {
+      main: {
+        type: 'record',
+        key: 'tid',
+        record: {
+          type: 'object',
+          required: ['merchant'],
+          properties: {
+            externalId: {
+              type: 'string',
+              maxLength: 64,
+            },
+            name: {
+              type: 'string',
+              minLength: 1,
+              maxLength: 128,
+            },
+            merchant: {
+              type: 'string',
+              format: 'at-uri',
+            },
+            availabilityPeriods: {
+              type: 'array',
+              items: {
+                type: 'ref',
+                ref: 'lex:xyz.noshdelivery.v0.catalog.catalog#availabilityPeriod',
+              },
+            },
+            childCollections: {
+              type: 'array',
+              description:
+                'Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented.',
+              items: {
+                type: 'string',
+                format: 'tid',
+              },
+            },
+          },
+        },
+      },
+      availabilityPeriod: {
+        type: 'object',
+        properties: {
+          start: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.v0.catalog.catalog#availabilityTimeOfDay',
+          },
+          end: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.v0.catalog.catalog#availabilityTimeOfDay',
+          },
+          daysOfWeek: {
+            type: 'array',
+            items: {
+              type: 'string',
+              enum: [
+                'MONDAY',
+                'TUESDAY',
+                'WEDNESDAY',
+                'THURSDAY',
+                'FRIDAY',
+                'SATURDAY',
+                'SUNDAY',
+              ],
+            },
+          },
+        },
+      },
+      availabilityTimeOfDay: {
+        type: 'object',
+        properties: {
+          localHour: {
+            type: 'integer',
+            minimum: 0,
+            maximum: 23,
+          },
+          localMinute: {
+            type: 'integer',
+            minimum: 0,
+            maximum: 59,
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0CatalogCollection: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.catalog.collection',
+    description: 'todo',
+    defs: {
+      main: {
+        type: 'record',
+        key: 'tid',
+        record: {
+          type: 'object',
+          required: ['name'],
+          properties: {
+            externalId: {
+              type: 'string',
+              maxLength: 64,
+            },
+            name: {
+              type: 'string',
+              minLength: 1,
+              maxLength: 128,
+            },
+            childCollections: {
+              type: 'array',
+              items: {
+                type: 'string',
+                format: 'at-uri',
+              },
+            },
+            items: {
+              type: 'array',
+              description:
+                'Pkeys of xyz.noshdelivery.v0.catalog.item records that are in this collection. Ordered in the way they will be presented.',
+              items: {
+                type: 'string',
+                format: 'tid',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0CatalogDefs: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.catalog.defs',
+    defs: {
+      priceMoney: {
+        type: 'object',
+        required: ['currency', 'amount'],
+        properties: {
+          currency: {
+            type: 'string',
+            maxLength: 3,
+          },
+          amount: {
+            type: 'integer',
+            description:
+              'The amount in the smallest unit of the currency. For example cents.',
+            minimum: 0,
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0CatalogItem: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.catalog.item',
+    defs: {
+      main: {
+        type: 'record',
+        key: 'tid',
+        record: {
+          type: 'object',
+          required: ['name', 'priceMoney'],
+          properties: {
+            externalId: {
+              type: 'string',
+              maxLength: 64,
+            },
+            name: {
+              type: 'string',
+              minLength: 1,
+              maxLength: 128,
+            },
+            priceMoney: {
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.catalog.defs#priceMoney',
+            },
+            modifierGroups: {
+              type: 'array',
+              description:
+                'Pkeys of xyz.noshdelivery.v0.catalog.modifierGroup records that belong in this item. Ordered in the way they will be presented.',
+              items: {
+                type: 'string',
+                format: 'tid',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0CatalogModifier: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.catalog.modifier',
+    defs: {
+      main: {
+        type: 'record',
+        key: 'tid',
+        record: {
+          type: 'object',
+          required: ['name', 'priceMoney'],
+          properties: {
+            externalId: {
+              type: 'string',
+              maxLength: 64,
+            },
+            name: {
+              type: 'string',
+              minLength: 1,
+              maxLength: 128,
+            },
+            priceMoney: {
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.catalog.defs#priceMoney',
+            },
+            childModifierGroups: {
+              type: 'array',
+              description:
+                'Pkeys of xyz.noshdelivery.v0.catalog.modifierGroup records that are children of this modifier. Ordered in the way they will be presented.',
+              items: {
+                type: 'string',
+                format: 'tid',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0CatalogModifierGroup: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.catalog.modifierGroup',
+    defs: {
+      main: {
+        type: 'record',
+        key: 'tid',
+        record: {
+          type: 'object',
+          required: ['name'],
+          properties: {
+            externalId: {
+              type: 'string',
+              maxLength: 64,
+            },
+            name: {
+              type: 'string',
+              minLength: 1,
+              maxLength: 128,
+            },
+            minimumSelection: {
+              type: 'integer',
+              description:
+                'Minimum number of options that must be selected from this group. 0 means it is optional.',
+              minimum: 0,
+              default: 0,
+            },
+            maximumSelection: {
+              type: 'integer',
+              description:
+                'Maximum number of options that can be selected from this group. 1 means it is a single select.',
+              minimum: 1,
+              default: 1,
+            },
+            maximumOfEachModifier: {
+              type: 'integer',
+              description:
+                'Quantity of each modifier you can at most select. For example if you were selecting a dozen donuts with at most 3 of each variety this would be set to 3 with maximum and minimum selections to 1and2. 0 means no limit up to group maximum.',
+              default: 1,
+            },
+            modifiers: {
+              type: 'array',
+              description:
+                'Pkeys of xyz.noshdelivery.v0.catalog.modifierGroup records that belong in this item. Ordered in the way they will be presented.',
+              items: {
+                type: 'string',
+                format: 'tid',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0MerchantCreateMerchant: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.merchant.createMerchant',
+    defs: {
+      main: {
+        type: 'procedure',
+        description: 'Create a new merchant with name.',
+        input: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: [],
+            properties: {},
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['name'],
+            properties: {
+              name: {
+                type: 'string',
+                minLength: 1,
+                maxLength: 128,
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0MerchantGetMerchants: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.merchant.getMerchants',
+    defs: {
+      main: {
+        type: 'query',
+        description: 'Get all merchants',
+        parameters: {
+          type: 'params',
+          properties: {},
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['merchants'],
+            properties: {
+              merchants: {
+                type: 'array',
+                items: {
+                  type: 'string',
+                  minLength: 1,
+                  maxLength: 128,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0MerchantMerchant: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.merchant.merchant',
+    description: 'todo',
+    defs: {
+      main: {
+        type: 'record',
+        key: 'tid',
+        record: {
+          type: 'object',
+          required: ['name'],
+          properties: {
+            externalId: {
+              type: 'string',
+              maxLength: 64,
+            },
+            name: {
+              type: 'string',
+              minLength: 1,
+              maxLength: 128,
+            },
+          },
+        },
+      },
+    },
+  },
   ComAtprotoLabelDefs: {
     lexicon: 1,
     id: 'com.atproto.label.defs',
@@ -988,6 +1361,18 @@ export function validate(
 }
 
 export const ids = {
+  XyzNoshdeliveryV0CatalogCatalog: 'xyz.noshdelivery.v0.catalog.catalog',
+  XyzNoshdeliveryV0CatalogCollection: 'xyz.noshdelivery.v0.catalog.collection',
+  XyzNoshdeliveryV0CatalogDefs: 'xyz.noshdelivery.v0.catalog.defs',
+  XyzNoshdeliveryV0CatalogItem: 'xyz.noshdelivery.v0.catalog.item',
+  XyzNoshdeliveryV0CatalogModifier: 'xyz.noshdelivery.v0.catalog.modifier',
+  XyzNoshdeliveryV0CatalogModifierGroup:
+    'xyz.noshdelivery.v0.catalog.modifierGroup',
+  XyzNoshdeliveryV0MerchantCreateMerchant:
+    'xyz.noshdelivery.v0.merchant.createMerchant',
+  XyzNoshdeliveryV0MerchantGetMerchants:
+    'xyz.noshdelivery.v0.merchant.getMerchants',
+  XyzNoshdeliveryV0MerchantMerchant: 'xyz.noshdelivery.v0.merchant.merchant',
   ComAtprotoLabelDefs: 'com.atproto.label.defs',
   ComAtprotoRepoApplyWrites: 'com.atproto.repo.applyWrites',
   ComAtprotoRepoCreateRecord: 'com.atproto.repo.createRecord',

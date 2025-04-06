@@ -8,9 +8,7 @@
       "record": {
         "type": "object",
         "required": [
-          "name",
-          "price",
-          "categories"
+          "name"
         ],
         "properties": {
           "externalId": {
@@ -36,14 +34,15 @@
           },
           "maximumOfEachModifier": {
             "type": "integer",
-            "description": "Quantity of each modifier you can at most select. For example if you were selecting a dozen donuts with at most 3 of each variety this would be set to 3 with maximum and minimum selections to 12. 0 means no limit up to group maximum.",
+            "description": "Quantity of each modifier you can at most select. For example if you were selecting a dozen donuts with at most 3 of each variety this would be set to 3 with maximum and minimum selections to 1and2. 0 means no limit up to group maximum.",
             "default": 1
           },
           "modifiers": {
             "type": "array",
+            "description": "Pkeys of xyz.noshdelivery.v0.catalog.modifierGroup records that belong in this item. Ordered in the way they will be presented.",
             "items": {
               "type": "string",
-              "format": "at-uri"
+              "format": "tid"
             }
           }
         }

@@ -2,10 +2,10 @@ import { AppContext } from '#/context'
 import { getSessionAgent } from '#/session'
 import { UpstreamFailureError } from '@atproto/xrpc-server'
 import { Server } from '#/lexicon'
-import { XyzNoshdeliveryMerchantMerchant } from '@nosh/lexicon'
+import { XyzNoshdeliveryV0MerchantMerchant } from '@nosh/lexicon'
 
 export default function (server: Server, ctx: AppContext) {
-  server.xyz.noshdelivery.merchant.getMerchants({
+  server.xyz.noshdelivery.v0.merchant.getMerchants({
     handler: async ({ params }) => {
       const agent = await getSessionAgent()
 
@@ -16,7 +16,7 @@ export default function (server: Server, ctx: AppContext) {
           collection: 'xyz.noshdelivery.merchant.merchant',
         })
         console.log('listRecords', data.records[0].value)
-        names = data.records.map((record) => (record.value as XyzNoshdeliveryMerchantMerchant.Record).name)
+        names = data.records.map((record) => (record.value as XyzNoshdeliveryV0MerchantMerchant.Record).name)
       } catch (err) {
         throw new UpstreamFailureError('Failed to write record')
       }

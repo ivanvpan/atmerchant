@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "xyz.noshdelivery.v0.catalog.item",
+  "id": "xyz.noshdelivery.v0.catalog.modifier",
   "defs": {
     "main": {
       "type": "record",
@@ -25,9 +25,9 @@
             "type": "ref",
             "ref": "xyz.noshdelivery.v0.catalog.defs#priceMoney"
           },
-          "modifierGroups": {
+          "childModifierGroups": {
             "type": "array",
-            "description": "Pkeys of xyz.noshdelivery.v0.catalog.modifierGroup records that belong in this item. Ordered in the way they will be presented.",
+            "description": "Pkeys of xyz.noshdelivery.v0.catalog.modifierGroup records that are children of this modifier. Ordered in the way they will be presented.",
             "items": {
               "type": "string",
               "format": "tid"

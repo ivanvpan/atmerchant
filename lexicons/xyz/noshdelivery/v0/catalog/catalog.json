@@ -34,10 +34,10 @@
           },
           "childCollections": {
             "type": "array",
-            "description": "The item collections in this catalog. Ordered in the way they will be presented.",
+            "description": "Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented.",
             "items": {
               "type": "string",
-              "format": "at-uri"
+              "format": "tid"
             }
           }
         }

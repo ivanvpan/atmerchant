@@ -1,6 +1,6 @@
 import {TID} from '@atproto/common'
 import { InvalidRequestError, UpstreamFailureError } from '@atproto/xrpc-server'
-import { XyzNoshdeliveryMerchantMerchant } from '@nosh/lexicon'
+import { XyzNoshdeliveryV0MerchantMerchant } from '@nosh/lexicon'
 import { AppContext } from '#/context'
 import { Server } from '#/lexicon'
 import { getSessionAgent } from '#/session'
@@ -8,7 +8,7 @@ import { getSessionAgent } from '#/session'
 
 export default function (server: Server, ctx: AppContext) {
   ctx.logger.info('Hello!')
-  server.xyz.noshdelivery.merchant.createMerchant({
+  server.xyz.noshdelivery.v0.merchant.createMerchant({
     handler: async ({ req, res }) => {
       ctx.logger.info('inside handler!')
 
@@ -24,7 +24,7 @@ export default function (server: Server, ctx: AppContext) {
         createdAt: new Date().toISOString(),
       }
 
-      const validation = XyzNoshdeliveryMerchantMerchant.validateRecord(record)
+      const validation = XyzNoshdeliveryV0MerchantMerchant.validateRecord(record)
 
       if (!validation.success) {
         throw new InvalidRequestError('Invalid status')

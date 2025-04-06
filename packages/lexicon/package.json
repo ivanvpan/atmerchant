@@ -4,7 +4,7 @@
   "main": "./src/index.ts",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "lexgen": "lex gen-api ./src ../../lexicons/xyz/noshdelivery/*/* ../../lexicons/com/atproto/*/* --yes"
+    "lexgen": "lex gen-api ./src ../../lexicons/xyz/noshdelivery/v0/*/* ../../lexicons/com/atproto/*/* --yes"
   },
   "devDependencies": {
     "@atproto/lex-cli": "^0.7.1",
