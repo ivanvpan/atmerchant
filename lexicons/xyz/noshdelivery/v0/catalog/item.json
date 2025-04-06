@@ -1,7 +1,6 @@
 {
   "lexicon": 1,
   "id": "xyz.noshdelivery.v0.catalog.item",
-  "description": "todo",
   "defs": {
     "main": {
       "type": "record",
@@ -14,7 +13,7 @@
           "categories"
         ],
         "properties": {
-          "sku": {
+          "externalId": {
             "type": "string",
             "maxLength": 64
           },
@@ -23,9 +22,9 @@
             "minLength": 1,
             "maxLength": 128
           },
-          "price": {
+          "priceMoney": {
             "type": "ref",
-            "ref": "xyz.noshdelivery.v0.catalog.defs#price"
+            "ref": "xyz.noshdelivery.v0.catalog.defs#priceMoney"
           }
         }
       }

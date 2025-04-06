@@ -2,7 +2,7 @@
   "lexicon": 1,
   "id": "xyz.noshdelivery.v0.catalog.defs",
   "defs": {
-    "price": {
+    "priceMoney": {
       "type": "object",
       "required": [
         "currency",
@@ -15,7 +15,7 @@
         },
         "amount": {
           "type": "integer",
-          "description": "The amount in the smallest unit of the currency. For example cents",
+          "description": "The amount in the smallest unit of the currency. For example cents.",
           "minimum": 0
         }
       }
