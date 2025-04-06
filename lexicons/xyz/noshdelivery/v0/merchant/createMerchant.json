@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "xyz.noshdelivery.merchant.createMerchant",
+  "id": "xyz.noshdelivery.v0.merchant.createMerchant",
   "defs": {
     "main": {
       "type": "procedure",

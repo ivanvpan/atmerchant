@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "xyz.noshdelivery.merchant.getMerchants",
+  "id": "xyz.noshdelivery.v0.merchant.getMerchants",
   "defs": {
     "main": {
       "type": "query",

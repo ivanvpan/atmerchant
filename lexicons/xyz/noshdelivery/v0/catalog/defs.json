@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "xyz.noshdelivery.catalog.defs",
+  "id": "xyz.noshdelivery.v0.catalog.defs",
   "defs": {
     "price": {
       "type": "object",

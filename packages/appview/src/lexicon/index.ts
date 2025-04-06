@@ -9,8 +9,6 @@ import {
   type StreamAuthVerifier,
 } from '@atproto/xrpc-server'
 import { schemas } from './lexicons.js'
-import * as XyzNoshdeliveryMerchantCreateMerchant from './types/xyz/noshdelivery/merchant/createMerchant.js'
-import * as XyzNoshdeliveryMerchantGetMerchants from './types/xyz/noshdelivery/merchant/getMerchants.js'
 import * as ComAtprotoRepoApplyWrites from './types/com/atproto/repo/applyWrites.js'
 import * as ComAtprotoRepoCreateRecord from './types/com/atproto/repo/createRecord.js'
 import * as ComAtprotoRepoDeleteRecord from './types/com/atproto/repo/deleteRecord.js'
@@ -28,73 +26,11 @@ export function createServer(options?: XrpcOptions): Server {
 
 export class Server {
   xrpc: XrpcServer
-  xyz: XyzNS
   com: ComNS
 
   constructor(options?: XrpcOptions) {
     this.xrpc = createXrpcServer(schemas, options)
-    this.xyz = new XyzNS(this)
     this.com = new ComNS(this)
-  }
-}
-
-export class XyzNS {
-  _server: Server
-  noshdelivery: XyzNoshdeliveryNS
-
-  constructor(server: Server) {
-    this._server = server
-    this.noshdelivery = new XyzNoshdeliveryNS(server)
-  }
-}
-
-export class XyzNoshdeliveryNS {
-  _server: Server
-  catalog: XyzNoshdeliveryCatalogNS
-  merchant: XyzNoshdeliveryMerchantNS
-
-  constructor(server: Server) {
-    this._server = server
-    this.catalog = new XyzNoshdeliveryCatalogNS(server)
-    this.merchant = new XyzNoshdeliveryMerchantNS(server)
-  }
-}
-
-export class XyzNoshdeliveryCatalogNS {
-  _server: Server
-
-  constructor(server: Server) {
-    this._server = server
-  }
-}
-
-export class XyzNoshdeliveryMerchantNS {
-  _server: Server
-
-  constructor(server: Server) {
-    this._server = server
-  }
-
-  createMerchant<AV extends AuthVerifier>(
-    cfg: ConfigOf<
-      AV,
-      XyzNoshdeliveryMerchantCreateMerchant.Handler<ExtractAuth<AV>>,
-      XyzNoshdeliveryMerchantCreateMerchant.HandlerReqCtx<ExtractAuth<AV>>
-    >,
-  ) {
-    const nsid = 'xyz.noshdelivery.merchant.createMerchant' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
-  getMerchants<AV extends AuthVerifier>(
-    cfg: ConfigOf<
-      AV,
-      XyzNoshdeliveryMerchantGetMerchants.Handler<ExtractAuth<AV>>,
-      XyzNoshdeliveryMerchantGetMerchants.HandlerReqCtx<ExtractAuth<AV>>
-    >,
-  ) {
-    const nsid = 'xyz.noshdelivery.merchant.getMerchants' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
   }
 }
 

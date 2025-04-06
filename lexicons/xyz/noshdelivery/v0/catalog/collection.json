@@ -1,0 +1,39 @@
+{
+  "lexicon": 1,
+  "id": "xyz.noshdelivery.v0.catalog.collection",
+  "description": "todo",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "childCollections": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "items": {
+            "type": "array",
+            "description": "The items in this collection. Ordered in the way they will be presented. TBD: do we need a URI at all or just a pkey?",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}

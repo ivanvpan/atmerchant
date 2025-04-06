@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "xyz.noshdelivery.catalog.catalog",
+  "id": "xyz.noshdelivery.v0.catalog.catalog",
   "description": "Merchant can have multiple catalogs with disjoint or overlaping schedules. Categories have catalogs as their roots.",
   "defs": {
     "main": {
@@ -26,6 +26,14 @@
             "items": {
               "type": "ref",
               "ref": "#availabilityPeriod"
+            }
+          },
+          "childCollections": {
+            "type": "array",
+            "description": "The item collections in this catalog. Ordered in the way they will be presented.",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
             }
           }
         }
