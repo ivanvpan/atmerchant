@@ -12,6 +12,7 @@ import { type OmitKey, type Un$Typed } from './util.js'
 import * as XyzNoshdeliveryV0CatalogCatalog from './types/xyz/noshdelivery/v0/catalog/catalog.js'
 import * as XyzNoshdeliveryV0CatalogCollection from './types/xyz/noshdelivery/v0/catalog/collection.js'
 import * as XyzNoshdeliveryV0CatalogDefs from './types/xyz/noshdelivery/v0/catalog/defs.js'
+import * as XyzNoshdeliveryV0CatalogGetCollectionsAndItems from './types/xyz/noshdelivery/v0/catalog/getCollectionsAndItems.js'
 import * as XyzNoshdeliveryV0CatalogGetFullCatalog from './types/xyz/noshdelivery/v0/catalog/getFullCatalog.js'
 import * as XyzNoshdeliveryV0CatalogItem from './types/xyz/noshdelivery/v0/catalog/item.js'
 import * as XyzNoshdeliveryV0CatalogModifier from './types/xyz/noshdelivery/v0/catalog/modifier.js'
@@ -36,6 +37,7 @@ import * as ComAtprotoRepoUploadBlob from './types/com/atproto/repo/uploadBlob.j
 export * as XyzNoshdeliveryV0CatalogCatalog from './types/xyz/noshdelivery/v0/catalog/catalog.js'
 export * as XyzNoshdeliveryV0CatalogCollection from './types/xyz/noshdelivery/v0/catalog/collection.js'
 export * as XyzNoshdeliveryV0CatalogDefs from './types/xyz/noshdelivery/v0/catalog/defs.js'
+export * as XyzNoshdeliveryV0CatalogGetCollectionsAndItems from './types/xyz/noshdelivery/v0/catalog/getCollectionsAndItems.js'
 export * as XyzNoshdeliveryV0CatalogGetFullCatalog from './types/xyz/noshdelivery/v0/catalog/getFullCatalog.js'
 export * as XyzNoshdeliveryV0CatalogItem from './types/xyz/noshdelivery/v0/catalog/item.js'
 export * as XyzNoshdeliveryV0CatalogModifier from './types/xyz/noshdelivery/v0/catalog/modifier.js'
@@ -120,6 +122,18 @@ export class XyzNoshdeliveryV0CatalogNS {
     this.item = new ItemRecord(client)
     this.modifier = new ModifierRecord(client)
     this.modifierGroup = new ModifierGroupRecord(client)
+  }
+
+  getCollectionsAndItems(
+    params?: XyzNoshdeliveryV0CatalogGetCollectionsAndItems.QueryParams,
+    opts?: XyzNoshdeliveryV0CatalogGetCollectionsAndItems.CallOptions,
+  ): Promise<XyzNoshdeliveryV0CatalogGetCollectionsAndItems.Response> {
+    return this._client.call(
+      'xyz.noshdelivery.v0.catalog.getCollectionsAndItems',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getFullCatalog(

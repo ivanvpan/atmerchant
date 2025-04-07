@@ -16,6 +16,7 @@ const id = 'xyz.noshdelivery.v0.catalog.collection'
 
 export interface Record {
   $type: 'xyz.noshdelivery.v0.catalog.collection'
+  /** An external ID that can be used to identify this object in an external system such as a warehousing system */
   externalId?: string
   name: string
   childCollections?: string[]

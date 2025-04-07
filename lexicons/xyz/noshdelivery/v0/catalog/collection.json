@@ -14,6 +14,7 @@
         "properties": {
           "externalId": {
             "type": "string",
+            "description": "An external ID that can be used to identify this object in an external system such as a warehousing system",
             "maxLength": 64
           },
           "name": {

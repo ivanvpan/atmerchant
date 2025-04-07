@@ -114,6 +114,8 @@ export const schemaDict = {
           properties: {
             externalId: {
               type: 'string',
+              description:
+                'An external ID that can be used to identify this object in an external system such as a warehousing system',
               maxLength: 64,
             },
             name: {
@@ -162,34 +164,6 @@ export const schemaDict = {
           },
         },
       },
-    },
-  },
-  XyzNoshdeliveryV0CatalogGetFullCatalog: {
-    lexicon: 1,
-    id: 'xyz.noshdelivery.v0.catalog.getFullCatalog',
-    defs: {
-      main: {
-        type: 'query',
-        description: 'Get a complete view of the catalog.',
-        parameters: {
-          type: 'params',
-          required: [],
-          properties: {},
-        },
-        output: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            required: ['merchant'],
-            properties: {
-              merchant: {
-                type: 'string',
-                format: 'at-uri',
-              },
-            },
-          },
-        },
-      },
       catalogView: {
         type: 'object',
         required: ['uri', 'name'],
@@ -211,7 +185,7 @@ export const schemaDict = {
             type: 'array',
             items: {
               type: 'ref',
-              ref: 'lex:xyz.noshdelivery.v0.catalog.getFullCatalog#availabilityPeriod',
+              ref: 'lex:xyz.noshdelivery.v0.catalog.defs#availabilityPeriod',
             },
           },
           childCollections: {
@@ -244,9 +218,264 @@ export const schemaDict = {
           },
           childCollections: {
             type: 'array',
+            description:
+              'Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented.',
             items: {
-              type: 'ref',
-              ref: 'lex:xyz.noshdelivery.v0.catalog.getFullCatalog#collectionView',
+              type: 'string',
+              format: 'tid',
+            },
+          },
+          items: {
+            type: 'array',
+            description:
+              'Pkeys of xyz.noshdelivery.v0.catalog.item records that belong in this collection. Ordered in the way they will be presented.',
+            items: {
+              type: 'string',
+              format: 'tid',
+            },
+          },
+        },
+      },
+      itemView: {
+        type: 'object',
+        required: ['uri', 'name'],
+        properties: {
+          uri: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          externalId: {
+            type: 'string',
+            maxLength: 64,
+          },
+          availableForSale: {
+            type: 'boolean',
+            description:
+              'The item is currently available for ordering at this location',
+            default: true,
+          },
+          name: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 128,
+          },
+          description: {
+            type: 'string',
+            maxLength: 1024,
+          },
+          priceMoney: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.v0.catalog.defs#priceMoney',
+          },
+          modifiersGroups: {
+            type: 'array',
+            description:
+              'Pkeys of xyz.noshdelivery.v0.catalog.modifierGroup records that belong in this collection. Ordered in the way they will be presented.',
+            items: {
+              type: 'string',
+              format: 'tid',
+            },
+          },
+        },
+      },
+      modifierGroupView: {
+        type: 'object',
+        required: [
+          'uri',
+          'name',
+          'minimumSelection',
+          'maximumSelection',
+          'maximumOfEachModifier',
+        ],
+        properties: {
+          uri: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          externalId: {
+            type: 'string',
+            maxLength: 64,
+          },
+          availableForSale: {
+            type: 'boolean',
+            description:
+              'The item is currently available for ordering at this location',
+            default: true,
+          },
+          name: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 128,
+          },
+          description: {
+            type: 'string',
+            maxLength: 256,
+          },
+          minimumSelection: {
+            type: 'integer',
+            description:
+              'Minimum number of options that must be selected from this group. 0 means it is optional.',
+            minimum: 0,
+            default: 0,
+          },
+          maximumSelection: {
+            type: 'integer',
+            description:
+              'Maximum number of options that can be selected from this group. 1 means it is a single select.',
+            minimum: 1,
+            default: 1,
+          },
+          maximumOfEachModifier: {
+            type: 'integer',
+            description:
+              'Quantity of each modifier you can at most select. For example if you were selecting a dozen donuts with at most 3 of each variety this would be set to 3 with maximum and minimum selections to 1and2. 0 means no limit up to group maximum.',
+            default: 1,
+          },
+          modifiers: {
+            type: 'array',
+            description:
+              'Pkeys of xyz.noshdelivery.v0.catalog.modifier records that belong in this collection. Ordered in the way they will be presented.',
+            items: {
+              type: 'string',
+              format: 'tid',
+            },
+          },
+        },
+      },
+      modifierView: {
+        type: 'object',
+        required: ['uri', 'name', 'priceMoney'],
+        properties: {
+          uri: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          externalId: {
+            type: 'string',
+            maxLength: 64,
+          },
+          availableForSale: {
+            type: 'boolean',
+            description:
+              'The item is currently available for ordering at this location',
+            default: true,
+          },
+          name: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 128,
+          },
+          description: {
+            type: 'string',
+            maxLength: 256,
+          },
+          priceMoney: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.v0.catalog.defs#priceMoney',
+          },
+          childModifierGroups: {
+            type: 'array',
+            description:
+              'Pkeys of xyz.noshdelivery.v0.catalog.modifierGroup records that are children of this modifier. Ordered in the way they will be presented.',
+            items: {
+              type: 'string',
+              format: 'tid',
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0CatalogGetCollectionsAndItems: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.catalog.getCollectionsAndItems',
+    defs: {
+      main: {
+        type: 'query',
+        description:
+          'Get a view of all catalogs with categories and items, but no modifiers. This is a reasonable call only on smaller catalogs such as restaurant menus.',
+        parameters: {
+          type: 'params',
+          required: [],
+          properties: {},
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['merchant'],
+            properties: {
+              merchant: {
+                type: 'string',
+                format: 'at-uri',
+              },
+              catalogs: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#catalogView',
+                },
+              },
+              collections: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#collectionView',
+                },
+              },
+              items: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#itemsView',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0CatalogGetFullCatalog: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.catalog.getFullCatalog',
+    defs: {
+      main: {
+        type: 'query',
+        description: 'Get all info about a specific item including modifiers.',
+        parameters: {
+          type: 'params',
+          required: [],
+          properties: {},
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['merchant'],
+            properties: {
+              merchant: {
+                type: 'string',
+                format: 'at-uri',
+              },
+              itemDetails: {
+                type: 'ref',
+                ref: 'lex:xyz.noshdelivery.v0.catalog.defs#itemView',
+              },
+              modifierGroups: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#modifierGroupView',
+                },
+              },
+              modifiers: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#modifierView',
+                },
+              },
             },
           },
         },
@@ -266,12 +495,24 @@ export const schemaDict = {
           properties: {
             externalId: {
               type: 'string',
+              description:
+                'An external ID that can be used to identify this object in an external system such as a warehousing system',
               maxLength: 64,
+            },
+            availableForSale: {
+              type: 'boolean',
+              description:
+                'The item is currently available for ordering at this location',
+              default: true,
             },
             name: {
               type: 'string',
               minLength: 1,
               maxLength: 128,
+            },
+            description: {
+              type: 'string',
+              maxLength: 1024,
             },
             priceMoney: {
               type: 'ref',
@@ -304,12 +545,24 @@ export const schemaDict = {
           properties: {
             externalId: {
               type: 'string',
+              description:
+                'An external ID that can be used to identify this object in an external system such as a warehousing system',
               maxLength: 64,
+            },
+            availableForSale: {
+              type: 'boolean',
+              description:
+                'The item is currently available for ordering at this location',
+              default: true,
             },
             name: {
               type: 'string',
               minLength: 1,
               maxLength: 128,
+            },
+            description: {
+              type: 'string',
+              maxLength: 256,
             },
             priceMoney: {
               type: 'ref',
@@ -342,12 +595,24 @@ export const schemaDict = {
           properties: {
             externalId: {
               type: 'string',
+              description:
+                'An external ID that can be used to identify this object in an external system such as a warehousing system',
               maxLength: 64,
+            },
+            availableForSale: {
+              type: 'boolean',
+              description:
+                'The item is currently available for ordering at this location',
+              default: true,
             },
             name: {
               type: 'string',
               minLength: 1,
               maxLength: 128,
+            },
+            description: {
+              type: 'string',
+              maxLength: 256,
             },
             minimumSelection: {
               type: 'integer',
@@ -359,7 +624,7 @@ export const schemaDict = {
             maximumSelection: {
               type: 'integer',
               description:
-                'Maximum number of options that can be selected from this group. 1 means it is a single select.',
+                'Maximum number of options that can be selected from this group. 1 means it is a single select (radio-button).',
               minimum: 1,
               default: 1,
             },
@@ -1453,6 +1718,8 @@ export const ids = {
   XyzNoshdeliveryV0CatalogCatalog: 'xyz.noshdelivery.v0.catalog.catalog',
   XyzNoshdeliveryV0CatalogCollection: 'xyz.noshdelivery.v0.catalog.collection',
   XyzNoshdeliveryV0CatalogDefs: 'xyz.noshdelivery.v0.catalog.defs',
+  XyzNoshdeliveryV0CatalogGetCollectionsAndItems:
+    'xyz.noshdelivery.v0.catalog.getCollectionsAndItems',
   XyzNoshdeliveryV0CatalogGetFullCatalog:
     'xyz.noshdelivery.v0.catalog.getFullCatalog',
   XyzNoshdeliveryV0CatalogItem: 'xyz.noshdelivery.v0.catalog.item',

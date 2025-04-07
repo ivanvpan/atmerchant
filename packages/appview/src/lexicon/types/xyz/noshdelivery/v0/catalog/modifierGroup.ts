@@ -16,11 +16,15 @@ const id = 'xyz.noshdelivery.v0.catalog.modifierGroup'
 
 export interface Record {
   $type: 'xyz.noshdelivery.v0.catalog.modifierGroup'
+  /** An external ID that can be used to identify this object in an external system such as a warehousing system */
   externalId?: string
+  /** The item is currently available for ordering at this location */
+  availableForSale: boolean
   name: string
+  description?: string
   /** Minimum number of options that must be selected from this group. 0 means it is optional. */
   minimumSelection: number
-  /** Maximum number of options that can be selected from this group. 1 means it is a single select. */
+  /** Maximum number of options that can be selected from this group. 1 means it is a single select (radio-button). */
   maximumSelection: number
   /** Quantity of each modifier you can at most select. For example if you were selecting a dozen donuts with at most 3 of each variety this would be set to 3 with maximum and minimum selections to 1and2. 0 means no limit up to group maximum. */
   maximumOfEachModifier: number

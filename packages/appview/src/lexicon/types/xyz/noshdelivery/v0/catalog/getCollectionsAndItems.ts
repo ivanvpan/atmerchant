@@ -15,7 +15,7 @@ import type * as XyzNoshdeliveryV0CatalogDefs from './defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'xyz.noshdelivery.v0.catalog.getFullCatalog'
+const id = 'xyz.noshdelivery.v0.catalog.getCollectionsAndItems'
 
 export interface QueryParams {}
 
@@ -23,9 +23,9 @@ export type InputSchema = undefined
 
 export interface OutputSchema {
   merchant: string
-  itemDetails?: XyzNoshdeliveryV0CatalogDefs.ItemView
-  modifierGroups?: XyzNoshdeliveryV0CatalogDefs.ModifierGroupView[]
-  modifiers?: XyzNoshdeliveryV0CatalogDefs.ModifierView[]
+  catalogs?: XyzNoshdeliveryV0CatalogDefs.CatalogView[]
+  collections?: XyzNoshdeliveryV0CatalogDefs.CollectionView[]
+  items?: XyzNoshdeliveryV0CatalogDefs.ItemsView[]
 }
 
 export type HandlerInput = undefined

@@ -17,8 +17,12 @@ const id = 'xyz.noshdelivery.v0.catalog.modifier'
 
 export interface Record {
   $type: 'xyz.noshdelivery.v0.catalog.modifier'
+  /** An external ID that can be used to identify this object in an external system such as a warehousing system */
   externalId?: string
+  /** The item is currently available for ordering at this location */
+  availableForSale: boolean
   name: string
+  description?: string
   priceMoney: XyzNoshdeliveryV0CatalogDefs.PriceMoney
   /** Pkeys of xyz.noshdelivery.v0.catalog.modifierGroup records that are children of this modifier. Ordered in the way they will be presented. */
   childModifierGroups?: string[]

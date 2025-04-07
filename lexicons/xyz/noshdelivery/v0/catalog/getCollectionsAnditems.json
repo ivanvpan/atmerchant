@@ -1,0 +1,51 @@
+{
+  "lexicon": 1,
+  "id": "xyz.noshdelivery.v0.catalog.getCollectionsAndItems",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a view of all catalogs with categories and items, but no modifiers. This is a reasonable call only on smaller catalogs such as restaurant menus.",
+      "parameters": {
+        "type": "params",
+        "required": [],
+        "properties": {}
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "merchant"
+          ],
+          "properties": {
+            "merchant": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "catalogs": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "xyz.noshdelivery.v0.catalog.defs#catalogView"
+              }
+            },
+            "collections": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "xyz.noshdelivery.v0.catalog.defs#collectionView"
+              }
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "xyz.noshdelivery.v0.catalog.defs#itemsView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
