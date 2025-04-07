@@ -9,6 +9,7 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../../util'
+import type * as XyzNoshdeliveryV0CatalogDefs from './defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
@@ -19,7 +20,7 @@ export interface Record {
   externalId?: string
   name: string
   merchant: string
-  availabilityPeriods: AvailabilityPeriod[]
+  availabilityPeriods: XyzNoshdeliveryV0CatalogDefs.AvailabilityPeriod[]
   /** Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented. */
   childCollections?: string[]
   [k: string]: unknown
@@ -33,44 +34,4 @@ export function isRecord<V>(v: V) {
 
 export function validateRecord<V>(v: V) {
   return validate<Record & V>(v, id, hashRecord, true)
-}
-
-export interface AvailabilityPeriod {
-  $type?: 'xyz.noshdelivery.v0.catalog.catalog#availabilityPeriod'
-  start?: AvailabilityTimeOfDay
-  end?: AvailabilityTimeOfDay
-  daysOfWeek?:
-    | 'MONDAY'
-    | 'TUESDAY'
-    | 'WEDNESDAY'
-    | 'THURSDAY'
-    | 'FRIDAY'
-    | 'SATURDAY'
-    | 'SUNDAY'[]
-}
-
-const hashAvailabilityPeriod = 'availabilityPeriod'
-
-export function isAvailabilityPeriod<V>(v: V) {
-  return is$typed(v, id, hashAvailabilityPeriod)
-}
-
-export function validateAvailabilityPeriod<V>(v: V) {
-  return validate<AvailabilityPeriod & V>(v, id, hashAvailabilityPeriod)
-}
-
-export interface AvailabilityTimeOfDay {
-  $type?: 'xyz.noshdelivery.v0.catalog.catalog#availabilityTimeOfDay'
-  localHour?: number
-  localMinute?: number
-}
-
-const hashAvailabilityTimeOfDay = 'availabilityTimeOfDay'
-
-export function isAvailabilityTimeOfDay<V>(v: V) {
-  return is$typed(v, id, hashAvailabilityTimeOfDay)
-}
-
-export function validateAvailabilityTimeOfDay<V>(v: V) {
-  return validate<AvailabilityTimeOfDay & V>(v, id, hashAvailabilityTimeOfDay)
 }

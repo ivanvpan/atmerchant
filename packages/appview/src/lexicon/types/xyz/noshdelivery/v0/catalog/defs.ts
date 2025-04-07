@@ -149,3 +149,43 @@ export function isModifierView<V>(v: V) {
 export function validateModifierView<V>(v: V) {
   return validate<ModifierView & V>(v, id, hashModifierView)
 }
+
+export interface AvailabilityPeriod {
+  $type?: 'xyz.noshdelivery.v0.catalog.defs#availabilityPeriod'
+  start?: AvailabilityTimeOfDay
+  end?: AvailabilityTimeOfDay
+  daysOfWeek?:
+    | 'MONDAY'
+    | 'TUESDAY'
+    | 'WEDNESDAY'
+    | 'THURSDAY'
+    | 'FRIDAY'
+    | 'SATURDAY'
+    | 'SUNDAY'[]
+}
+
+const hashAvailabilityPeriod = 'availabilityPeriod'
+
+export function isAvailabilityPeriod<V>(v: V) {
+  return is$typed(v, id, hashAvailabilityPeriod)
+}
+
+export function validateAvailabilityPeriod<V>(v: V) {
+  return validate<AvailabilityPeriod & V>(v, id, hashAvailabilityPeriod)
+}
+
+export interface AvailabilityTimeOfDay {
+  $type?: 'xyz.noshdelivery.v0.catalog.defs#availabilityTimeOfDay'
+  localHour?: number
+  localMinute?: number
+}
+
+const hashAvailabilityTimeOfDay = 'availabilityTimeOfDay'
+
+export function isAvailabilityTimeOfDay<V>(v: V) {
+  return is$typed(v, id, hashAvailabilityTimeOfDay)
+}
+
+export function validateAvailabilityTimeOfDay<V>(v: V) {
+  return validate<AvailabilityTimeOfDay & V>(v, id, hashAvailabilityTimeOfDay)
+}

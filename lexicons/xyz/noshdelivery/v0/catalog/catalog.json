@@ -31,7 +31,7 @@
             "type": "array",
             "items": {
               "type": "ref",
-              "ref": "xyz.noshdelivery.v0.catalog.catalog#availabilityPeriod"
+              "ref": "xyz.noshdelivery.v0.catalog.defs#availabilityPeriod"
             }
           },
           "childCollections": {
@@ -42,49 +42,6 @@
               "format": "tid"
             }
           }
-        }
-      }
-    },
-    "availabilityPeriod": {
-      "type": "object",
-      "properties": {
-        "start": {
-          "type": "ref",
-          "ref": "#availabilityTimeOfDay"
-        },
-        "end": {
-          "type": "ref",
-          "ref": "#availabilityTimeOfDay"
-        },
-        "daysOfWeek": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "MONDAY",
-              "TUESDAY",
-              "WEDNESDAY",
-              "THURSDAY",
-              "FRIDAY",
-              "SATURDAY",
-              "SUNDAY"
-            ]
-          }
-        }
-      }
-    },
-    "availabilityTimeOfDay": {
-      "type": "object",
-      "properties": {
-        "localHour": {
-          "type": "integer",
-          "minimum": 0,
-          "maximum": 23
-        },
-        "localMinute": {
-          "type": "integer",
-          "minimum": 0,
-          "maximum": 59
         }
       }
     }

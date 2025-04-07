@@ -40,7 +40,7 @@ export const schemaDict = {
               type: 'array',
               items: {
                 type: 'ref',
-                ref: 'lex:xyz.noshdelivery.v0.catalog.catalog#availabilityPeriod',
+                ref: 'lex:xyz.noshdelivery.v0.catalog.defs#availabilityPeriod',
               },
             },
             childCollections: {
@@ -52,49 +52,6 @@ export const schemaDict = {
                 format: 'tid',
               },
             },
-          },
-        },
-      },
-      availabilityPeriod: {
-        type: 'object',
-        properties: {
-          start: {
-            type: 'ref',
-            ref: 'lex:xyz.noshdelivery.v0.catalog.catalog#availabilityTimeOfDay',
-          },
-          end: {
-            type: 'ref',
-            ref: 'lex:xyz.noshdelivery.v0.catalog.catalog#availabilityTimeOfDay',
-          },
-          daysOfWeek: {
-            type: 'array',
-            items: {
-              type: 'string',
-              enum: [
-                'MONDAY',
-                'TUESDAY',
-                'WEDNESDAY',
-                'THURSDAY',
-                'FRIDAY',
-                'SATURDAY',
-                'SUNDAY',
-              ],
-            },
-          },
-        },
-      },
-      availabilityTimeOfDay: {
-        type: 'object',
-        properties: {
-          localHour: {
-            type: 'integer',
-            minimum: 0,
-            maximum: 23,
-          },
-          localMinute: {
-            type: 'integer',
-            minimum: 0,
-            maximum: 59,
           },
         },
       },
@@ -403,6 +360,49 @@ export const schemaDict = {
               type: 'string',
               format: 'tid',
             },
+          },
+        },
+      },
+      availabilityPeriod: {
+        type: 'object',
+        properties: {
+          start: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.v0.catalog.defs#availabilityTimeOfDay',
+          },
+          end: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.v0.catalog.defs#availabilityTimeOfDay',
+          },
+          daysOfWeek: {
+            type: 'array',
+            items: {
+              type: 'string',
+              enum: [
+                'MONDAY',
+                'TUESDAY',
+                'WEDNESDAY',
+                'THURSDAY',
+                'FRIDAY',
+                'SATURDAY',
+                'SUNDAY',
+              ],
+            },
+          },
+        },
+      },
+      availabilityTimeOfDay: {
+        type: 'object',
+        properties: {
+          localHour: {
+            type: 'integer',
+            minimum: 0,
+            maximum: 23,
+          },
+          localMinute: {
+            type: 'integer',
+            minimum: 0,
+            maximum: 59,
           },
         },
       },
