@@ -31,6 +31,16 @@
             "type": "string",
             "maxLength": 1024
           },
+          "media": {
+            "type": "array",
+            "items": {
+              "type": "union",
+              "refs": [
+                "xyz.noshdelivery.v0.media.image",
+                "xyz.noshdelivery.v0.media.video"
+              ]
+            }
+          },
           "priceMoney": {
             "type": "ref",
             "ref": "xyz.noshdelivery.v0.catalog.defs#priceMoney"

@@ -63,11 +63,13 @@ export class XyzNoshdeliveryNS {
 export class XyzNoshdeliveryV0NS {
   _server: Server
   catalog: XyzNoshdeliveryV0CatalogNS
+  media: XyzNoshdeliveryV0MediaNS
   merchant: XyzNoshdeliveryV0MerchantNS
 
   constructor(server: Server) {
     this._server = server
     this.catalog = new XyzNoshdeliveryV0CatalogNS(server)
+    this.media = new XyzNoshdeliveryV0MediaNS(server)
     this.merchant = new XyzNoshdeliveryV0MerchantNS(server)
   }
 }
@@ -101,6 +103,14 @@ export class XyzNoshdeliveryV0CatalogNS {
   ) {
     const nsid = 'xyz.noshdelivery.v0.catalog.getFullCatalog' // @ts-ignore
     return this._server.xrpc.method(nsid, cfg)
+  }
+}
+
+export class XyzNoshdeliveryV0MediaNS {
+  _server: Server
+
+  constructor(server: Server) {
+    this._server = server
   }
 }
 

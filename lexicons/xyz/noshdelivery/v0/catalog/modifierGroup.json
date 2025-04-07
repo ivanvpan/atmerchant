@@ -30,6 +30,16 @@
             "type": "string",
             "maxLength": 256
           },
+          "media": {
+            "type": "array",
+            "items": {
+              "type": "union",
+              "refs": [
+                "xyz.noshdelivery.v0.media.image",
+                "xyz.noshdelivery.v0.media.video"
+              ]
+            }
+          },
           "minimumSelection": {
             "type": "integer",
             "description": "Minimum number of options that must be selected from this group. 0 means it is optional.",

@@ -130,6 +130,16 @@ export const schemaDict = {
                 format: 'at-uri',
               },
             },
+            media: {
+              type: 'array',
+              items: {
+                type: 'union',
+                refs: [
+                  'lex:xyz.noshdelivery.v0.media.image',
+                  'lex:xyz.noshdelivery.v0.media.video',
+                ],
+              },
+            },
             items: {
               type: 'array',
               description:
@@ -514,6 +524,16 @@ export const schemaDict = {
               type: 'string',
               maxLength: 1024,
             },
+            media: {
+              type: 'array',
+              items: {
+                type: 'union',
+                refs: [
+                  'lex:xyz.noshdelivery.v0.media.image',
+                  'lex:xyz.noshdelivery.v0.media.video',
+                ],
+              },
+            },
             priceMoney: {
               type: 'ref',
               ref: 'lex:xyz.noshdelivery.v0.catalog.defs#priceMoney',
@@ -614,6 +634,16 @@ export const schemaDict = {
               type: 'string',
               maxLength: 256,
             },
+            media: {
+              type: 'array',
+              items: {
+                type: 'union',
+                refs: [
+                  'lex:xyz.noshdelivery.v0.media.image',
+                  'lex:xyz.noshdelivery.v0.media.video',
+                ],
+              },
+            },
             minimumSelection: {
               type: 'integer',
               description:
@@ -643,6 +673,145 @@ export const schemaDict = {
                 format: 'tid',
               },
             },
+          },
+        },
+      },
+    },
+  },
+  AppBskyEmbedDefs: {
+    lexicon: 1,
+    id: 'app.bsky.embed.defs',
+    defs: {
+      aspectRatio: {
+        type: 'object',
+        description:
+          'width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.',
+        required: ['width', 'height'],
+        properties: {
+          width: {
+            type: 'integer',
+            minimum: 1,
+          },
+          height: {
+            type: 'integer',
+            minimum: 1,
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0MediaImage: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.media.image',
+    description: 'A set of images embedded in a Bluesky record (eg, a post).',
+    defs: {
+      main: {
+        type: 'object',
+        required: ['image', 'alt'],
+        properties: {
+          image: {
+            type: 'blob',
+            description: 'The image file. Limited to 10mb.',
+            accept: ['image/*'],
+            maxSize: 10000000,
+          },
+          alt: {
+            type: 'string',
+            description:
+              'Alt text description of the image, for accessibility.',
+          },
+          aspectRatio: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.v0.media.defs#aspectRatio',
+          },
+        },
+      },
+      imageView: {
+        type: 'object',
+        required: ['thumb', 'fullsize', 'alt'],
+        properties: {
+          thumb: {
+            type: 'string',
+            format: 'uri',
+            description:
+              'Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.',
+          },
+          fullsize: {
+            type: 'string',
+            format: 'uri',
+            description:
+              'Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.',
+          },
+          alt: {
+            type: 'string',
+            description:
+              'Alt text description of the image, for accessibility.',
+          },
+          aspectRatio: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.v0.media.defs#aspectRatio',
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0MediaVideo: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.media.video',
+    description: 'A video attached to a merchant or a menu object.',
+    defs: {
+      main: {
+        type: 'object',
+        required: ['video'],
+        properties: {
+          video: {
+            type: 'blob',
+            description:
+              'The mp4 video file. May be up to 100mb, formerly limited to 50mb.',
+            accept: ['video/mp4'],
+            maxSize: 100000000,
+          },
+          captions: {
+            type: 'array',
+            items: {
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.media.video#caption',
+            },
+            maxLength: 20,
+          },
+          alt: {
+            type: 'string',
+            description:
+              'Alt text description of the video, for accessibility.',
+            maxGraphemes: 1000,
+            maxLength: 10000,
+          },
+          aspectRatio: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.v0.media.defs#aspectRatio',
+          },
+        },
+      },
+      videoView: {
+        type: 'object',
+        required: ['uri', 'thumbnail'],
+        properties: {
+          uri: {
+            type: 'string',
+            format: 'cid',
+          },
+          thumbnail: {
+            type: 'string',
+            format: 'uri',
+          },
+          alt: {
+            type: 'string',
+            maxGraphemes: 1000,
+            maxLength: 10000,
+          },
+          aspectRatio: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.v0.media.defs#aspectRatio',
           },
         },
       },
@@ -1726,6 +1895,9 @@ export const ids = {
   XyzNoshdeliveryV0CatalogModifier: 'xyz.noshdelivery.v0.catalog.modifier',
   XyzNoshdeliveryV0CatalogModifierGroup:
     'xyz.noshdelivery.v0.catalog.modifierGroup',
+  AppBskyEmbedDefs: 'app.bsky.embed.defs',
+  XyzNoshdeliveryV0MediaImage: 'xyz.noshdelivery.v0.media.image',
+  XyzNoshdeliveryV0MediaVideo: 'xyz.noshdelivery.v0.media.video',
   XyzNoshdeliveryV0MerchantCreateMerchant:
     'xyz.noshdelivery.v0.merchant.createMerchant',
   XyzNoshdeliveryV0MerchantGetMerchants:

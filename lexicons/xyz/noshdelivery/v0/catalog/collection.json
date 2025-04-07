@@ -29,6 +29,16 @@
               "format": "at-uri"
             }
           },
+          "media": {
+            "type": "array",
+            "items": {
+              "type": "union",
+              "refs": [
+                "xyz.noshdelivery.v0.media.image",
+                "xyz.noshdelivery.v0.media.video"
+              ]
+            }
+          },
           "items": {
             "type": "array",
             "description": "Pkeys of xyz.noshdelivery.v0.catalog.item records that are in this collection. Ordered in the way they will be presented.",

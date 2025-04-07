@@ -9,6 +9,8 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../../util'
+import type * as XyzNoshdeliveryV0MediaImage from '../media/image.js'
+import type * as XyzNoshdeliveryV0MediaVideo from '../media/video.js'
 
 const is$typed = _is$typed,
   validate = _validate
@@ -20,6 +22,11 @@ export interface Record {
   externalId?: string
   name: string
   childCollections?: string[]
+  media?: (
+    | $Typed<XyzNoshdeliveryV0MediaImage.Main>
+    | $Typed<XyzNoshdeliveryV0MediaVideo.Main>
+    | { $type: string }
+  )[]
   /** Pkeys of xyz.noshdelivery.v0.catalog.item records that are in this collection. Ordered in the way they will be presented. */
   items?: string[]
   [k: string]: unknown

@@ -17,6 +17,9 @@ import * as XyzNoshdeliveryV0CatalogGetFullCatalog from './types/xyz/noshdeliver
 import * as XyzNoshdeliveryV0CatalogItem from './types/xyz/noshdelivery/v0/catalog/item.js'
 import * as XyzNoshdeliveryV0CatalogModifier from './types/xyz/noshdelivery/v0/catalog/modifier.js'
 import * as XyzNoshdeliveryV0CatalogModifierGroup from './types/xyz/noshdelivery/v0/catalog/modifierGroup.js'
+import * as AppBskyEmbedDefs from './types/app/bsky/embed/defs.js'
+import * as XyzNoshdeliveryV0MediaImage from './types/xyz/noshdelivery/v0/media/image.js'
+import * as XyzNoshdeliveryV0MediaVideo from './types/xyz/noshdelivery/v0/media/video.js'
 import * as XyzNoshdeliveryV0MerchantCreateMerchant from './types/xyz/noshdelivery/v0/merchant/createMerchant.js'
 import * as XyzNoshdeliveryV0MerchantGetMerchants from './types/xyz/noshdelivery/v0/merchant/getMerchants.js'
 import * as XyzNoshdeliveryV0MerchantMerchant from './types/xyz/noshdelivery/v0/merchant/merchant.js'
@@ -42,6 +45,9 @@ export * as XyzNoshdeliveryV0CatalogGetFullCatalog from './types/xyz/noshdeliver
 export * as XyzNoshdeliveryV0CatalogItem from './types/xyz/noshdelivery/v0/catalog/item.js'
 export * as XyzNoshdeliveryV0CatalogModifier from './types/xyz/noshdelivery/v0/catalog/modifier.js'
 export * as XyzNoshdeliveryV0CatalogModifierGroup from './types/xyz/noshdelivery/v0/catalog/modifierGroup.js'
+export * as AppBskyEmbedDefs from './types/app/bsky/embed/defs.js'
+export * as XyzNoshdeliveryV0MediaImage from './types/xyz/noshdelivery/v0/media/image.js'
+export * as XyzNoshdeliveryV0MediaVideo from './types/xyz/noshdelivery/v0/media/video.js'
 export * as XyzNoshdeliveryV0MerchantCreateMerchant from './types/xyz/noshdelivery/v0/merchant/createMerchant.js'
 export * as XyzNoshdeliveryV0MerchantGetMerchants from './types/xyz/noshdelivery/v0/merchant/getMerchants.js'
 export * as XyzNoshdeliveryV0MerchantMerchant from './types/xyz/noshdelivery/v0/merchant/merchant.js'
@@ -98,11 +104,13 @@ export class XyzNoshdeliveryNS {
 export class XyzNoshdeliveryV0NS {
   _client: XrpcClient
   catalog: XyzNoshdeliveryV0CatalogNS
+  media: XyzNoshdeliveryV0MediaNS
   merchant: XyzNoshdeliveryV0MerchantNS
 
   constructor(client: XrpcClient) {
     this._client = client
     this.catalog = new XyzNoshdeliveryV0CatalogNS(client)
+    this.media = new XyzNoshdeliveryV0MediaNS(client)
     this.merchant = new XyzNoshdeliveryV0MerchantNS(client)
   }
 }
@@ -474,6 +482,14 @@ export class ModifierGroupRecord {
       { collection: 'xyz.noshdelivery.v0.catalog.modifierGroup', ...params },
       { headers },
     )
+  }
+}
+
+export class XyzNoshdeliveryV0MediaNS {
+  _client: XrpcClient
+
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 }
 
