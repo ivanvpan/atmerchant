@@ -17,7 +17,10 @@ const is$typed = _is$typed,
   validate = _validate
 const id = 'xyz.noshdelivery.v0.catalog.getFullCatalog'
 
-export interface QueryParams {}
+export interface QueryParams {
+  /** The URI of the item to get. */
+  uri?: string
+}
 
 export type InputSchema = undefined
 

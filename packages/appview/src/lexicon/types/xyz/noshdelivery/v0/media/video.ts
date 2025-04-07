@@ -17,9 +17,8 @@ const id = 'xyz.noshdelivery.v0.media.video'
 
 export interface Main {
   $type?: 'xyz.noshdelivery.v0.media.video'
-  /** The mp4 video file. May be up to 100mb, formerly limited to 50mb. */
+  /** The mp4 video file. May be up to 100mb. */
   video: BlobRef
-  captions?: Caption[]
   /** Alt text description of the video, for accessibility. */
   alt?: string
   aspectRatio?: XyzNoshdeliveryV0MediaDefs.AspectRatio

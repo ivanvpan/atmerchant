@@ -17,7 +17,10 @@ const is$typed = _is$typed,
   validate = _validate
 const id = 'xyz.noshdelivery.v0.catalog.getCollectionsAndItems'
 
-export interface QueryParams {}
+export interface QueryParams {
+  /** The URI of the merchant whose catalogs to get. */
+  merchantUri?: string
+}
 
 export type InputSchema = undefined
 
@@ -25,7 +28,7 @@ export interface OutputSchema {
   merchant: string
   catalogs?: XyzNoshdeliveryV0CatalogDefs.CatalogView[]
   collections?: XyzNoshdeliveryV0CatalogDefs.CollectionView[]
-  items?: XyzNoshdeliveryV0CatalogDefs.ItemsView[]
+  items?: XyzNoshdeliveryV0CatalogDefs.ItemView[]
 }
 
 export type HandlerInput = undefined

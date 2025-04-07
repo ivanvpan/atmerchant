@@ -77,6 +77,10 @@
           "minLength": 1,
           "maxLength": 128
         },
+        "media": {
+          "type": "ref",
+          "ref": "xyz.noshdelivery.v0.media.defs#mediaView"
+        },
         "childCollections": {
           "type": "array",
           "description": "Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented.",
@@ -124,6 +128,10 @@
           "type": "string",
           "maxLength": 1024
         },
+        "media": {
+          "type": "ref",
+          "ref": "xyz.noshdelivery.v0.media.defs#mediaView"
+        },
         "priceMoney": {
           "type": "ref",
           "ref": "xyz.noshdelivery.v0.catalog.defs#priceMoney"
@@ -169,6 +177,10 @@
         "description": {
           "type": "string",
           "maxLength": 256
+        },
+        "media": {
+          "type": "ref",
+          "ref": "xyz.noshdelivery.v0.media.defs#mediaView"
         },
         "minimumSelection": {
           "type": "integer",

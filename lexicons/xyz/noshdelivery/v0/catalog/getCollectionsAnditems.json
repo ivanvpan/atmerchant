@@ -8,7 +8,13 @@
       "parameters": {
         "type": "params",
         "required": [],
-        "properties": {}
+        "properties": {
+          "merchantUri": {
+            "type": "string",
+            "description": "The URI of the merchant whose catalogs to get.",
+            "format": "at-uri"
+          }
+        }
       },
       "output": {
         "encoding": "application/json",
@@ -40,7 +46,7 @@
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "xyz.noshdelivery.v0.catalog.defs#itemsView"
+                "ref": "xyz.noshdelivery.v0.catalog.defs#itemView"
               }
             }
           }

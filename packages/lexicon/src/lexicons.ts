@@ -14,7 +14,7 @@ export const schemaDict = {
     lexicon: 1,
     id: 'xyz.noshdelivery.v0.catalog.catalog',
     description:
-      'Merchant can have multiple catalogs with disjoint or overlaping schedules. Categories have catalogs as their roots.',
+      'Merchant can have multiple catalogs with disjoint or overlaping schedules. Collections are nested with catalogs at the roots.',
     defs: {
       main: {
         type: 'record',
@@ -226,6 +226,10 @@ export const schemaDict = {
             minLength: 1,
             maxLength: 128,
           },
+          media: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.v0.media.defs#mediaView',
+          },
           childCollections: {
             type: 'array',
             description:
@@ -272,6 +276,10 @@ export const schemaDict = {
           description: {
             type: 'string',
             maxLength: 1024,
+          },
+          media: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.v0.media.defs#mediaView',
           },
           priceMoney: {
             type: 'ref',
@@ -320,6 +328,10 @@ export const schemaDict = {
           description: {
             type: 'string',
             maxLength: 256,
+          },
+          media: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.v0.media.defs#mediaView',
           },
           minimumSelection: {
             type: 'integer',
@@ -407,7 +419,13 @@ export const schemaDict = {
         parameters: {
           type: 'params',
           required: [],
-          properties: {},
+          properties: {
+            merchantUri: {
+              type: 'string',
+              description: 'The URI of the merchant whose catalogs to get.',
+              format: 'at-uri',
+            },
+          },
         },
         output: {
           encoding: 'application/json',
@@ -437,7 +455,7 @@ export const schemaDict = {
                 type: 'array',
                 items: {
                   type: 'ref',
-                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#itemsView',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#itemView',
                 },
               },
             },
@@ -456,7 +474,13 @@ export const schemaDict = {
         parameters: {
           type: 'params',
           required: [],
-          properties: {},
+          properties: {
+            uri: {
+              type: 'string',
+              description: 'The URI of the item to get.',
+              format: 'at-uri',
+            },
+          },
         },
         output: {
           encoding: 'application/json',
@@ -678,9 +702,9 @@ export const schemaDict = {
       },
     },
   },
-  AppBskyEmbedDefs: {
+  XyzNoshdeliveryV0MediaDefs: {
     lexicon: 1,
-    id: 'app.bsky.embed.defs',
+    id: 'xyz.noshdelivery.v0.media.defs',
     defs: {
       aspectRatio: {
         type: 'object',
@@ -696,6 +720,16 @@ export const schemaDict = {
             type: 'integer',
             minimum: 1,
           },
+        },
+      },
+      mediaView: {
+        type: 'array',
+        items: {
+          type: 'union',
+          refs: [
+            'lex:xyz.noshdelivery.v0.media.image#imageView',
+            'lex:xyz.noshdelivery.v0.media.video#videoView',
+          ],
         },
       },
     },
@@ -766,18 +800,9 @@ export const schemaDict = {
         properties: {
           video: {
             type: 'blob',
-            description:
-              'The mp4 video file. May be up to 100mb, formerly limited to 50mb.',
+            description: 'The mp4 video file. May be up to 100mb.',
             accept: ['video/mp4'],
             maxSize: 100000000,
-          },
-          captions: {
-            type: 'array',
-            items: {
-              type: 'ref',
-              ref: 'lex:xyz.noshdelivery.v0.media.video#caption',
-            },
-            maxLength: 20,
           },
           alt: {
             type: 'string',
@@ -1895,7 +1920,7 @@ export const ids = {
   XyzNoshdeliveryV0CatalogModifier: 'xyz.noshdelivery.v0.catalog.modifier',
   XyzNoshdeliveryV0CatalogModifierGroup:
     'xyz.noshdelivery.v0.catalog.modifierGroup',
-  AppBskyEmbedDefs: 'app.bsky.embed.defs',
+  XyzNoshdeliveryV0MediaDefs: 'xyz.noshdelivery.v0.media.defs',
   XyzNoshdeliveryV0MediaImage: 'xyz.noshdelivery.v0.media.image',
   XyzNoshdeliveryV0MediaVideo: 'xyz.noshdelivery.v0.media.video',
   XyzNoshdeliveryV0MerchantCreateMerchant:

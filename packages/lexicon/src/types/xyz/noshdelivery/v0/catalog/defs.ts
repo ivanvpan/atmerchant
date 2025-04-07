@@ -9,6 +9,7 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../../util'
+import type * as XyzNoshdeliveryV0MediaDefs from '../media/defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
@@ -56,6 +57,7 @@ export interface CollectionView {
   uri: string
   externalId?: string
   name: string
+  media?: XyzNoshdeliveryV0MediaDefs.MediaView
   /** Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented. */
   childCollections?: string[]
   /** Pkeys of xyz.noshdelivery.v0.catalog.item records that belong in this collection. Ordered in the way they will be presented. */
@@ -80,6 +82,7 @@ export interface ItemView {
   availableForSale: boolean
   name: string
   description?: string
+  media?: XyzNoshdeliveryV0MediaDefs.MediaView
   priceMoney?: PriceMoney
   /** Pkeys of xyz.noshdelivery.v0.catalog.modifierGroup records that belong in this collection. Ordered in the way they will be presented. */
   modifiersGroups?: string[]
@@ -103,6 +106,7 @@ export interface ModifierGroupView {
   availableForSale: boolean
   name: string
   description?: string
+  media?: XyzNoshdeliveryV0MediaDefs.MediaView
   /** Minimum number of options that must be selected from this group. 0 means it is optional. */
   minimumSelection: number
   /** Maximum number of options that can be selected from this group. 1 means it is a single select. */
