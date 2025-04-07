@@ -31,14 +31,8 @@
             "maxLength": 256
           },
           "media": {
-            "type": "array",
-            "items": {
-              "type": "union",
-              "refs": [
-                "xyz.noshdelivery.v0.media.image",
-                "xyz.noshdelivery.v0.media.video"
-              ]
-            }
+            "type": "ref",
+            "ref": "xyz.noshdelivery.v0.media.defs#mediaView"
           },
           "minimumSelection": {
             "type": "integer",

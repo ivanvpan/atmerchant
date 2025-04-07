@@ -22,6 +22,7 @@
     },
     "mediaView": {
       "type": "array",
+      "description": "Array of media associated with a merchant or a menu object. The first item in the array is the cover in the UI.",
       "items": {
         "type": "union",
         "refs": [

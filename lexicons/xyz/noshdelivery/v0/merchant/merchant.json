@@ -16,6 +16,17 @@
             "type": "string",
             "maxLength": 64
           },
+          "media": {
+            "type": "array",
+            "description": "Media associated with this merchant. The first item in the array is the cover.",
+            "items": {
+              "type": "union",
+              "refs": [
+                "xyz.noshdelivery.v0.media.image",
+                "xyz.noshdelivery.v0.media.video"
+              ]
+            }
+          },
           "name": {
             "type": "string",
             "minLength": 1,
