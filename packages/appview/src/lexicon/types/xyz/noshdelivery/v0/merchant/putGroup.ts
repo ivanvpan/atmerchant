@@ -22,7 +22,7 @@ export interface QueryParams {}
 
 export interface InputSchema {
   externalId?: string
-  name?: string
+  name: string
   logo?: XyzNoshdeliveryV0MediaImage.Main
 }
 

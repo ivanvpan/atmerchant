@@ -1057,7 +1057,7 @@ export const schemaDict = {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: [],
+            required: ['name'],
             properties: {
               externalId: {
                 type: 'string',

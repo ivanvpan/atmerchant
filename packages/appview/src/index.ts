@@ -15,6 +15,7 @@ import * as error from '#/error'
 import { createServer } from '#/lexicon'
 import { env } from '#/env'
 import { XRPCError } from '@atproto/xrpc-server'
+import { createDb } from './db'
 
 export class Server {
   constructor(
@@ -28,7 +29,7 @@ export class Server {
     const logger = pino({ name: 'server start' })
 
     // Set up the SQLite database
-    // const db = createDb(DB_PATH)
+    const db = createDb('./db.sqlite')
     // await migrateToLatest(db)
 
     // Create the atproto utilities
@@ -38,6 +39,7 @@ export class Server {
     // // Alternative: const ingester = await createFirehoseIngester(db, baseIdResolver)
     // const resolver = createBidirectionalResolver(baseIdResolver)
     const ctx = {
+      db,
       // ingester,
       logger,
       // oauthClient,

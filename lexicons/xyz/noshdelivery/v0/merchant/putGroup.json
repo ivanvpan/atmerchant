@@ -9,7 +9,7 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": [],
+          "required": ["name"],
           "properties": {
             "externalId": {
               "type": "string",
@@ -31,9 +31,7 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": [
-            "group"
-          ],
+          "required": ["group"],
           "properties": {
             "group": {
               "type": "ref",

@@ -16,10 +16,7 @@ const agent = new AtpAgent({
   },
 })
 
-export async function getSessionAgent(
-  req: IncomingMessage | Request,
-  res: ServerResponse | Response,
-) {
+export async function getSessionAgent() {
   if (!session) {
     const result = await agent.login({
       identifier: 'ivanp@fastmail.fm',

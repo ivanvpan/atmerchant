@@ -9,7 +9,7 @@ export default function (server: Server, ctx: AppContext) {
     handler: async ({ input, req, res }) => {
       ctx.logger.info('inside handler!')
 
-      const agent = await getSessionAgent(req, res)
+      const agent = await getSessionAgent()
       agent.assertDid
 
       console.log('input', JSON.stringify(input))
