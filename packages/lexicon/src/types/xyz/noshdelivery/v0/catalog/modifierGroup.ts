@@ -9,8 +9,7 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../../util'
-import type * as XyzNoshdeliveryV0MediaImage from '../media/image.js'
-import type * as XyzNoshdeliveryV0MediaVideo from '../media/video.js'
+import type * as XyzNoshdeliveryV0MediaDefs from '../media/defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
@@ -24,11 +23,7 @@ export interface Record {
   availableForSale: boolean
   name: string
   description?: string
-  media?: (
-    | $Typed<XyzNoshdeliveryV0MediaImage.Main>
-    | $Typed<XyzNoshdeliveryV0MediaVideo.Main>
-    | { $type: string }
-  )[]
+  media?: XyzNoshdeliveryV0MediaDefs.MediaView
   /** Minimum number of options that must be selected from this group. 0 means it is optional. */
   minimumSelection: number
   /** Maximum number of options that can be selected from this group. 1 means it is a single select (radio-button). */

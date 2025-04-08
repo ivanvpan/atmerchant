@@ -19,7 +19,7 @@ export interface Record {
   $type: 'xyz.noshdelivery.v0.catalog.catalog'
   externalId?: string
   name: string
-  merchant: string
+  merchantLocation: string
   availabilityPeriods: XyzNoshdeliveryV0CatalogDefs.AvailabilityPeriod[]
   /** Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented. */
   childCollections?: string[]

@@ -9,15 +9,17 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../../util'
+import type * as XyzNoshdeliveryV0MediaImage from '../media/image.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'xyz.noshdelivery.v0.merchant.merchant'
+const id = 'xyz.noshdelivery.v0.merchant.group'
 
 export interface Record {
-  $type: 'xyz.noshdelivery.v0.merchant.merchant'
+  $type: 'xyz.noshdelivery.v0.merchant.group'
   externalId?: string
   name: string
+  logo?: XyzNoshdeliveryV0MediaImage.Main
   [k: string]: unknown
 }
 

@@ -21,8 +21,12 @@
       }
     },
     "groupView": {
-      "type": "view",
+      "type": "object",
       "description": "A view of a merchant group",
+      "required": [
+        "uri",
+        "name"
+      ],
       "properties": {
         "uri": {
           "type": "string",
@@ -40,6 +44,37 @@
         "logo": {
           "type": "ref",
           "ref": "xyz.noshdelivery.v0.media.image#imageView"
+        }
+      }
+    },
+    "locationView": {
+      "type": "object",
+      "description": "A view of a merchant location",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "externalId": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "timezone": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "address": {
+          "type": "ref",
+          "ref": "community.lexicon.location.address"
+        },
+        "coordinates": {
+          "type": "ref",
+          "ref": "community.lexicon.location.geo"
         }
       }
     }

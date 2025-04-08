@@ -20,9 +20,13 @@ import * as XyzNoshdeliveryV0CatalogModifierGroup from './types/xyz/noshdelivery
 import * as XyzNoshdeliveryV0MediaDefs from './types/xyz/noshdelivery/v0/media/defs.js'
 import * as XyzNoshdeliveryV0MediaImage from './types/xyz/noshdelivery/v0/media/image.js'
 import * as XyzNoshdeliveryV0MediaVideo from './types/xyz/noshdelivery/v0/media/video.js'
-import * as XyzNoshdeliveryV0MerchantCreateMerchant from './types/xyz/noshdelivery/v0/merchant/createMerchant.js'
-import * as XyzNoshdeliveryV0MerchantGetMerchants from './types/xyz/noshdelivery/v0/merchant/getMerchants.js'
-import * as XyzNoshdeliveryV0MerchantMerchant from './types/xyz/noshdelivery/v0/merchant/merchant.js'
+import * as XyzNoshdeliveryV0MerchantDefs from './types/xyz/noshdelivery/v0/merchant/defs.js'
+import * as XyzNoshdeliveryV0MerchantGroup from './types/xyz/noshdelivery/v0/merchant/group.js'
+import * as XyzNoshdeliveryV0MerchantListGroups from './types/xyz/noshdelivery/v0/merchant/listGroups.js'
+import * as XyzNoshdeliveryV0MerchantListLocations from './types/xyz/noshdelivery/v0/merchant/listLocations.js'
+import * as XyzNoshdeliveryV0MerchantLocation from './types/xyz/noshdelivery/v0/merchant/location.js'
+import * as XyzNoshdeliveryV0MerchantPutGroup from './types/xyz/noshdelivery/v0/merchant/putGroup.js'
+import * as XyzNoshdeliveryV0MerchantPutLocation from './types/xyz/noshdelivery/v0/merchant/putLocation.js'
 import * as ComAtprotoLabelDefs from './types/com/atproto/label/defs.js'
 import * as ComAtprotoRepoApplyWrites from './types/com/atproto/repo/applyWrites.js'
 import * as ComAtprotoRepoCreateRecord from './types/com/atproto/repo/createRecord.js'
@@ -36,6 +40,8 @@ import * as ComAtprotoRepoListRecords from './types/com/atproto/repo/listRecords
 import * as ComAtprotoRepoPutRecord from './types/com/atproto/repo/putRecord.js'
 import * as ComAtprotoRepoStrongRef from './types/com/atproto/repo/strongRef.js'
 import * as ComAtprotoRepoUploadBlob from './types/com/atproto/repo/uploadBlob.js'
+import * as CommunityLexiconLocationAddress from './types/community/lexicon/location/address.js'
+import * as CommunityLexiconLocationGeo from './types/community/lexicon/location/geo.js'
 
 export * as XyzNoshdeliveryV0CatalogCatalog from './types/xyz/noshdelivery/v0/catalog/catalog.js'
 export * as XyzNoshdeliveryV0CatalogCollection from './types/xyz/noshdelivery/v0/catalog/collection.js'
@@ -48,9 +54,13 @@ export * as XyzNoshdeliveryV0CatalogModifierGroup from './types/xyz/noshdelivery
 export * as XyzNoshdeliveryV0MediaDefs from './types/xyz/noshdelivery/v0/media/defs.js'
 export * as XyzNoshdeliveryV0MediaImage from './types/xyz/noshdelivery/v0/media/image.js'
 export * as XyzNoshdeliveryV0MediaVideo from './types/xyz/noshdelivery/v0/media/video.js'
-export * as XyzNoshdeliveryV0MerchantCreateMerchant from './types/xyz/noshdelivery/v0/merchant/createMerchant.js'
-export * as XyzNoshdeliveryV0MerchantGetMerchants from './types/xyz/noshdelivery/v0/merchant/getMerchants.js'
-export * as XyzNoshdeliveryV0MerchantMerchant from './types/xyz/noshdelivery/v0/merchant/merchant.js'
+export * as XyzNoshdeliveryV0MerchantDefs from './types/xyz/noshdelivery/v0/merchant/defs.js'
+export * as XyzNoshdeliveryV0MerchantGroup from './types/xyz/noshdelivery/v0/merchant/group.js'
+export * as XyzNoshdeliveryV0MerchantListGroups from './types/xyz/noshdelivery/v0/merchant/listGroups.js'
+export * as XyzNoshdeliveryV0MerchantListLocations from './types/xyz/noshdelivery/v0/merchant/listLocations.js'
+export * as XyzNoshdeliveryV0MerchantLocation from './types/xyz/noshdelivery/v0/merchant/location.js'
+export * as XyzNoshdeliveryV0MerchantPutGroup from './types/xyz/noshdelivery/v0/merchant/putGroup.js'
+export * as XyzNoshdeliveryV0MerchantPutLocation from './types/xyz/noshdelivery/v0/merchant/putLocation.js'
 export * as ComAtprotoLabelDefs from './types/com/atproto/label/defs.js'
 export * as ComAtprotoRepoApplyWrites from './types/com/atproto/repo/applyWrites.js'
 export * as ComAtprotoRepoCreateRecord from './types/com/atproto/repo/createRecord.js'
@@ -64,15 +74,19 @@ export * as ComAtprotoRepoListRecords from './types/com/atproto/repo/listRecords
 export * as ComAtprotoRepoPutRecord from './types/com/atproto/repo/putRecord.js'
 export * as ComAtprotoRepoStrongRef from './types/com/atproto/repo/strongRef.js'
 export * as ComAtprotoRepoUploadBlob from './types/com/atproto/repo/uploadBlob.js'
+export * as CommunityLexiconLocationAddress from './types/community/lexicon/location/address.js'
+export * as CommunityLexiconLocationGeo from './types/community/lexicon/location/geo.js'
 
 export class AtpBaseClient extends XrpcClient {
   xyz: XyzNS
   com: ComNS
+  community: CommunityNS
 
   constructor(options: FetchHandler | FetchHandlerOptions) {
     super(options, schemas)
     this.xyz = new XyzNS(this)
     this.com = new ComNS(this)
+    this.community = new CommunityNS(this)
   }
 
   /** @deprecated use `this` instead */
@@ -495,39 +509,65 @@ export class XyzNoshdeliveryV0MediaNS {
 
 export class XyzNoshdeliveryV0MerchantNS {
   _client: XrpcClient
-  merchant: MerchantRecord
+  group: GroupRecord
+  location: LocationRecord
 
   constructor(client: XrpcClient) {
     this._client = client
-    this.merchant = new MerchantRecord(client)
+    this.group = new GroupRecord(client)
+    this.location = new LocationRecord(client)
   }
 
-  createMerchant(
-    data?: XyzNoshdeliveryV0MerchantCreateMerchant.InputSchema,
-    opts?: XyzNoshdeliveryV0MerchantCreateMerchant.CallOptions,
-  ): Promise<XyzNoshdeliveryV0MerchantCreateMerchant.Response> {
+  listGroups(
+    params?: XyzNoshdeliveryV0MerchantListGroups.QueryParams,
+    opts?: XyzNoshdeliveryV0MerchantListGroups.CallOptions,
+  ): Promise<XyzNoshdeliveryV0MerchantListGroups.Response> {
     return this._client.call(
-      'xyz.noshdelivery.v0.merchant.createMerchant',
+      'xyz.noshdelivery.v0.merchant.listGroups',
+      params,
+      undefined,
+      opts,
+    )
+  }
+
+  listLocations(
+    params?: XyzNoshdeliveryV0MerchantListLocations.QueryParams,
+    opts?: XyzNoshdeliveryV0MerchantListLocations.CallOptions,
+  ): Promise<XyzNoshdeliveryV0MerchantListLocations.Response> {
+    return this._client.call(
+      'xyz.noshdelivery.v0.merchant.listLocations',
+      params,
+      undefined,
+      opts,
+    )
+  }
+
+  putGroup(
+    data?: XyzNoshdeliveryV0MerchantPutGroup.InputSchema,
+    opts?: XyzNoshdeliveryV0MerchantPutGroup.CallOptions,
+  ): Promise<XyzNoshdeliveryV0MerchantPutGroup.Response> {
+    return this._client.call(
+      'xyz.noshdelivery.v0.merchant.putGroup',
       opts?.qp,
       data,
       opts,
     )
   }
 
-  getMerchants(
-    params?: XyzNoshdeliveryV0MerchantGetMerchants.QueryParams,
-    opts?: XyzNoshdeliveryV0MerchantGetMerchants.CallOptions,
-  ): Promise<XyzNoshdeliveryV0MerchantGetMerchants.Response> {
+  putLocation(
+    data?: XyzNoshdeliveryV0MerchantPutLocation.InputSchema,
+    opts?: XyzNoshdeliveryV0MerchantPutLocation.CallOptions,
+  ): Promise<XyzNoshdeliveryV0MerchantPutLocation.Response> {
     return this._client.call(
-      'xyz.noshdelivery.v0.merchant.getMerchants',
-      params,
-      undefined,
+      'xyz.noshdelivery.v0.merchant.putLocation',
+      opts?.qp,
+      data,
       opts,
     )
   }
 }
 
-export class MerchantRecord {
+export class GroupRecord {
   _client: XrpcClient
 
   constructor(client: XrpcClient) {
@@ -538,10 +578,10 @@ export class MerchantRecord {
     params: OmitKey<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
   ): Promise<{
     cursor?: string
-    records: { uri: string; value: XyzNoshdeliveryV0MerchantMerchant.Record }[]
+    records: { uri: string; value: XyzNoshdeliveryV0MerchantGroup.Record }[]
   }> {
     const res = await this._client.call('com.atproto.repo.listRecords', {
-      collection: 'xyz.noshdelivery.v0.merchant.merchant',
+      collection: 'xyz.noshdelivery.v0.merchant.group',
       ...params,
     })
     return res.data
@@ -552,10 +592,10 @@ export class MerchantRecord {
   ): Promise<{
     uri: string
     cid: string
-    value: XyzNoshdeliveryV0MerchantMerchant.Record
+    value: XyzNoshdeliveryV0MerchantGroup.Record
   }> {
     const res = await this._client.call('com.atproto.repo.getRecord', {
-      collection: 'xyz.noshdelivery.v0.merchant.merchant',
+      collection: 'xyz.noshdelivery.v0.merchant.group',
       ...params,
     })
     return res.data
@@ -566,10 +606,10 @@ export class MerchantRecord {
       ComAtprotoRepoCreateRecord.InputSchema,
       'collection' | 'record'
     >,
-    record: Un$Typed<XyzNoshdeliveryV0MerchantMerchant.Record>,
+    record: Un$Typed<XyzNoshdeliveryV0MerchantGroup.Record>,
     headers?: Record<string, string>,
   ): Promise<{ uri: string; cid: string }> {
-    const collection = 'xyz.noshdelivery.v0.merchant.merchant'
+    const collection = 'xyz.noshdelivery.v0.merchant.group'
     const res = await this._client.call(
       'com.atproto.repo.createRecord',
       undefined,
@@ -586,7 +626,72 @@ export class MerchantRecord {
     await this._client.call(
       'com.atproto.repo.deleteRecord',
       undefined,
-      { collection: 'xyz.noshdelivery.v0.merchant.merchant', ...params },
+      { collection: 'xyz.noshdelivery.v0.merchant.group', ...params },
+      { headers },
+    )
+  }
+}
+
+export class LocationRecord {
+  _client: XrpcClient
+
+  constructor(client: XrpcClient) {
+    this._client = client
+  }
+
+  async list(
+    params: OmitKey<ComAtprotoRepoListRecords.QueryParams, 'collection'>,
+  ): Promise<{
+    cursor?: string
+    records: { uri: string; value: XyzNoshdeliveryV0MerchantLocation.Record }[]
+  }> {
+    const res = await this._client.call('com.atproto.repo.listRecords', {
+      collection: 'xyz.noshdelivery.v0.merchant.location',
+      ...params,
+    })
+    return res.data
+  }
+
+  async get(
+    params: OmitKey<ComAtprotoRepoGetRecord.QueryParams, 'collection'>,
+  ): Promise<{
+    uri: string
+    cid: string
+    value: XyzNoshdeliveryV0MerchantLocation.Record
+  }> {
+    const res = await this._client.call('com.atproto.repo.getRecord', {
+      collection: 'xyz.noshdelivery.v0.merchant.location',
+      ...params,
+    })
+    return res.data
+  }
+
+  async create(
+    params: OmitKey<
+      ComAtprotoRepoCreateRecord.InputSchema,
+      'collection' | 'record'
+    >,
+    record: Un$Typed<XyzNoshdeliveryV0MerchantLocation.Record>,
+    headers?: Record<string, string>,
+  ): Promise<{ uri: string; cid: string }> {
+    const collection = 'xyz.noshdelivery.v0.merchant.location'
+    const res = await this._client.call(
+      'com.atproto.repo.createRecord',
+      undefined,
+      { collection, ...params, record: { ...record, $type: collection } },
+      { encoding: 'application/json', headers },
+    )
+    return res.data
+  }
+
+  async delete(
+    params: OmitKey<ComAtprotoRepoDeleteRecord.InputSchema, 'collection'>,
+    headers?: Record<string, string>,
+  ): Promise<void> {
+    await this._client.call(
+      'com.atproto.repo.deleteRecord',
+      undefined,
+      { collection: 'xyz.noshdelivery.v0.merchant.location', ...params },
       { headers },
     )
   }
@@ -732,5 +837,33 @@ export class ComAtprotoRepoNS {
       data,
       opts,
     )
+  }
+}
+
+export class CommunityNS {
+  _client: XrpcClient
+  lexicon: CommunityLexiconNS
+
+  constructor(client: XrpcClient) {
+    this._client = client
+    this.lexicon = new CommunityLexiconNS(client)
+  }
+}
+
+export class CommunityLexiconNS {
+  _client: XrpcClient
+  location: CommunityLexiconLocationNS
+
+  constructor(client: XrpcClient) {
+    this._client = client
+    this.location = new CommunityLexiconLocationNS(client)
+  }
+}
+
+export class CommunityLexiconLocationNS {
+  _client: XrpcClient
+
+  constructor(client: XrpcClient) {
+    this._client = client
   }
 }

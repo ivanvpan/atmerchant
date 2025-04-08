@@ -11,8 +11,10 @@ import {
 import { schemas } from './lexicons.js'
 import * as XyzNoshdeliveryV0CatalogGetCollectionsAndItems from './types/xyz/noshdelivery/v0/catalog/getCollectionsAndItems.js'
 import * as XyzNoshdeliveryV0CatalogGetFullCatalog from './types/xyz/noshdelivery/v0/catalog/getFullCatalog.js'
-import * as XyzNoshdeliveryV0MerchantCreateMerchant from './types/xyz/noshdelivery/v0/merchant/createMerchant.js'
-import * as XyzNoshdeliveryV0MerchantGetMerchants from './types/xyz/noshdelivery/v0/merchant/getMerchants.js'
+import * as XyzNoshdeliveryV0MerchantListGroups from './types/xyz/noshdelivery/v0/merchant/listGroups.js'
+import * as XyzNoshdeliveryV0MerchantListLocations from './types/xyz/noshdelivery/v0/merchant/listLocations.js'
+import * as XyzNoshdeliveryV0MerchantPutGroup from './types/xyz/noshdelivery/v0/merchant/putGroup.js'
+import * as XyzNoshdeliveryV0MerchantPutLocation from './types/xyz/noshdelivery/v0/merchant/putLocation.js'
 import * as ComAtprotoRepoApplyWrites from './types/com/atproto/repo/applyWrites.js'
 import * as ComAtprotoRepoCreateRecord from './types/com/atproto/repo/createRecord.js'
 import * as ComAtprotoRepoDeleteRecord from './types/com/atproto/repo/deleteRecord.js'
@@ -32,11 +34,13 @@ export class Server {
   xrpc: XrpcServer
   xyz: XyzNS
   com: ComNS
+  community: CommunityNS
 
   constructor(options?: XrpcOptions) {
     this.xrpc = createXrpcServer(schemas, options)
     this.xyz = new XyzNS(this)
     this.com = new ComNS(this)
+    this.community = new CommunityNS(this)
   }
 }
 
@@ -121,25 +125,47 @@ export class XyzNoshdeliveryV0MerchantNS {
     this._server = server
   }
 
-  createMerchant<AV extends AuthVerifier>(
+  listGroups<AV extends AuthVerifier>(
     cfg: ConfigOf<
       AV,
-      XyzNoshdeliveryV0MerchantCreateMerchant.Handler<ExtractAuth<AV>>,
-      XyzNoshdeliveryV0MerchantCreateMerchant.HandlerReqCtx<ExtractAuth<AV>>
+      XyzNoshdeliveryV0MerchantListGroups.Handler<ExtractAuth<AV>>,
+      XyzNoshdeliveryV0MerchantListGroups.HandlerReqCtx<ExtractAuth<AV>>
     >,
   ) {
-    const nsid = 'xyz.noshdelivery.v0.merchant.createMerchant' // @ts-ignore
+    const nsid = 'xyz.noshdelivery.v0.merchant.listGroups' // @ts-ignore
     return this._server.xrpc.method(nsid, cfg)
   }
 
-  getMerchants<AV extends AuthVerifier>(
+  listLocations<AV extends AuthVerifier>(
     cfg: ConfigOf<
       AV,
-      XyzNoshdeliveryV0MerchantGetMerchants.Handler<ExtractAuth<AV>>,
-      XyzNoshdeliveryV0MerchantGetMerchants.HandlerReqCtx<ExtractAuth<AV>>
+      XyzNoshdeliveryV0MerchantListLocations.Handler<ExtractAuth<AV>>,
+      XyzNoshdeliveryV0MerchantListLocations.HandlerReqCtx<ExtractAuth<AV>>
     >,
   ) {
-    const nsid = 'xyz.noshdelivery.v0.merchant.getMerchants' // @ts-ignore
+    const nsid = 'xyz.noshdelivery.v0.merchant.listLocations' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  putGroup<AV extends AuthVerifier>(
+    cfg: ConfigOf<
+      AV,
+      XyzNoshdeliveryV0MerchantPutGroup.Handler<ExtractAuth<AV>>,
+      XyzNoshdeliveryV0MerchantPutGroup.HandlerReqCtx<ExtractAuth<AV>>
+    >,
+  ) {
+    const nsid = 'xyz.noshdelivery.v0.merchant.putGroup' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  putLocation<AV extends AuthVerifier>(
+    cfg: ConfigOf<
+      AV,
+      XyzNoshdeliveryV0MerchantPutLocation.Handler<ExtractAuth<AV>>,
+      XyzNoshdeliveryV0MerchantPutLocation.HandlerReqCtx<ExtractAuth<AV>>
+    >,
+  ) {
+    const nsid = 'xyz.noshdelivery.v0.merchant.putLocation' // @ts-ignore
     return this._server.xrpc.method(nsid, cfg)
   }
 }
@@ -279,6 +305,34 @@ export class ComAtprotoRepoNS {
   ) {
     const nsid = 'com.atproto.repo.uploadBlob' // @ts-ignore
     return this._server.xrpc.method(nsid, cfg)
+  }
+}
+
+export class CommunityNS {
+  _server: Server
+  lexicon: CommunityLexiconNS
+
+  constructor(server: Server) {
+    this._server = server
+    this.lexicon = new CommunityLexiconNS(server)
+  }
+}
+
+export class CommunityLexiconNS {
+  _server: Server
+  location: CommunityLexiconLocationNS
+
+  constructor(server: Server) {
+    this._server = server
+    this.location = new CommunityLexiconLocationNS(server)
+  }
+}
+
+export class CommunityLexiconLocationNS {
+  _server: Server
+
+  constructor(server: Server) {
+    this._server = server
   }
 }
 

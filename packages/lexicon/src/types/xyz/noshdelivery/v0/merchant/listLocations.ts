@@ -10,17 +10,20 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../../util'
+import type * as XyzNoshdeliveryV0MerchantDefs from './defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'xyz.noshdelivery.v0.merchant.getMerchants'
+const id = 'xyz.noshdelivery.v0.merchant.listLocations'
 
-export interface QueryParams {}
+export interface QueryParams {
+  groupUri?: string
+}
 
 export type InputSchema = undefined
 
 export interface OutputSchema {
-  merchants: string[]
+  locations: XyzNoshdeliveryV0MerchantDefs.LocationView[]
 }
 
 export interface CallOptions {

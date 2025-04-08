@@ -11,27 +11,24 @@ import {
   type OmitKey,
 } from '../../../../../util'
 import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
-import type * as XyzNoshdeliveryV0CatalogDefs from './defs.js'
+import type * as XyzNoshdeliveryV0MerchantDefs from './defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'xyz.noshdelivery.v0.catalog.getCollectionsAndItems'
+const id = 'xyz.noshdelivery.v0.merchant.putLocation'
 
-export interface QueryParams {
-  /** The URI of the merchant whose catalogs to get. */
-  merchantUri?: string
-}
+export interface QueryParams {}
 
-export type InputSchema = undefined
+export interface InputSchema {}
 
 export interface OutputSchema {
-  merchantLocation: string
-  catalogs?: XyzNoshdeliveryV0CatalogDefs.CatalogView[]
-  collections?: XyzNoshdeliveryV0CatalogDefs.CollectionView[]
-  items?: XyzNoshdeliveryV0CatalogDefs.ItemView[]
+  location: XyzNoshdeliveryV0MerchantDefs.LocationView
 }
 
-export type HandlerInput = undefined
+export interface HandlerInput {
+  encoding: 'application/json'
+  body: InputSchema
+}
 
 export interface HandlerSuccess {
   encoding: 'application/json'

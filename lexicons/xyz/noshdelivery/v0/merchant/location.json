@@ -18,7 +18,7 @@
           "parentGroup": {
             "type": "string",
             "description": "The uri for the merchant group that this location belongs to.",
-            "ref": "at-uri"
+            "format": "at-uri"
           },
           "externalId": {
             "type": "string",

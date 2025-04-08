@@ -10,29 +10,25 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../../util'
-import type * as XyzNoshdeliveryV0CatalogDefs from './defs.js'
+import type * as XyzNoshdeliveryV0MerchantDefs from './defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'xyz.noshdelivery.v0.catalog.getFullCatalog'
+const id = 'xyz.noshdelivery.v0.merchant.putLocation'
 
-export interface QueryParams {
-  /** The URI of the item to get. */
-  uri?: string
-}
+export interface QueryParams {}
 
-export type InputSchema = undefined
+export interface InputSchema {}
 
 export interface OutputSchema {
-  merchantLocation: string
-  itemDetails: XyzNoshdeliveryV0CatalogDefs.ItemView
-  modifierGroups?: XyzNoshdeliveryV0CatalogDefs.ModifierGroupView[]
-  modifiers?: XyzNoshdeliveryV0CatalogDefs.ModifierView[]
+  location: XyzNoshdeliveryV0MerchantDefs.LocationView
 }
 
 export interface CallOptions {
   signal?: AbortSignal
   headers?: HeadersMap
+  qp?: QueryParams
+  encoding?: 'application/json'
 }
 
 export interface Response {

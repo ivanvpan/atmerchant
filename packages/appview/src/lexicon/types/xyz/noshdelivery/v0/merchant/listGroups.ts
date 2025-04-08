@@ -11,17 +11,18 @@ import {
   type OmitKey,
 } from '../../../../../util'
 import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
+import type * as XyzNoshdeliveryV0MerchantDefs from './defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'xyz.noshdelivery.v0.merchant.getMerchants'
+const id = 'xyz.noshdelivery.v0.merchant.listGroups'
 
 export interface QueryParams {}
 
 export type InputSchema = undefined
 
 export interface OutputSchema {
-  merchants: string[]
+  groups: XyzNoshdeliveryV0MerchantDefs.GroupView[]
 }
 
 export type HandlerInput = undefined

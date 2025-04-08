@@ -9,10 +9,7 @@
       "record": {
         "type": "object",
         "required": [
-          "name",
-          "timezone",
-          "address",
-          "coordinates"
+          "name"
         ],
         "properties": {
           "externalId": {

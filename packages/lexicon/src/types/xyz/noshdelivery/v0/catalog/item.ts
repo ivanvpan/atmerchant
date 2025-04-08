@@ -9,8 +9,7 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../../util'
-import type * as XyzNoshdeliveryV0MediaImage from '../media/image.js'
-import type * as XyzNoshdeliveryV0MediaVideo from '../media/video.js'
+import type * as XyzNoshdeliveryV0MediaDefs from '../media/defs.js'
 import type * as XyzNoshdeliveryV0CatalogDefs from './defs.js'
 
 const is$typed = _is$typed,
@@ -25,11 +24,7 @@ export interface Record {
   availableForSale: boolean
   name: string
   description?: string
-  media?: (
-    | $Typed<XyzNoshdeliveryV0MediaImage.Main>
-    | $Typed<XyzNoshdeliveryV0MediaVideo.Main>
-    | { $type: string }
-  )[]
+  media?: XyzNoshdeliveryV0MediaDefs.MediaView
   priceMoney: XyzNoshdeliveryV0CatalogDefs.PriceMoney
   /** Pkeys of xyz.noshdelivery.v0.catalog.modifierGroup records that belong in this item. Ordered in the way they will be presented. */
   modifierGroups?: string[]

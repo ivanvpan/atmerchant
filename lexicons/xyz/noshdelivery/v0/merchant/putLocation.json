@@ -23,7 +23,7 @@
           "properties": {
             "location": {
               "type": "ref",
-              "ref": "xyz.noshdelivery.v0.merchant.location:#locationView"
+              "ref": "xyz.noshdelivery.v0.merchant.defs#locationView"
             }
           }
         }

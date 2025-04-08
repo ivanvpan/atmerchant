@@ -10,29 +10,30 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../../util'
-import type * as XyzNoshdeliveryV0CatalogDefs from './defs.js'
+import type * as XyzNoshdeliveryV0MediaImage from '../media/image.js'
+import type * as XyzNoshdeliveryV0MerchantDefs from './defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'xyz.noshdelivery.v0.catalog.getFullCatalog'
+const id = 'xyz.noshdelivery.v0.merchant.putGroup'
 
-export interface QueryParams {
-  /** The URI of the item to get. */
-  uri?: string
+export interface QueryParams {}
+
+export interface InputSchema {
+  externalId?: string
+  name?: string
+  logo?: XyzNoshdeliveryV0MediaImage.Main
 }
 
-export type InputSchema = undefined
-
 export interface OutputSchema {
-  merchantLocation: string
-  itemDetails: XyzNoshdeliveryV0CatalogDefs.ItemView
-  modifierGroups?: XyzNoshdeliveryV0CatalogDefs.ModifierGroupView[]
-  modifiers?: XyzNoshdeliveryV0CatalogDefs.ModifierView[]
+  group: XyzNoshdeliveryV0MerchantDefs.GroupView
 }
 
 export interface CallOptions {
   signal?: AbortSignal
   headers?: HeadersMap
+  qp?: QueryParams
+  encoding?: 'application/json'
 }
 
 export interface Response {

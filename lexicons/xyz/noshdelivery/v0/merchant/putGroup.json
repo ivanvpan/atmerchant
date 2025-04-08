@@ -37,7 +37,7 @@
           "properties": {
             "group": {
               "type": "ref",
-              "ref": "xyz.noshdelivery.v0.merchant.defs:#groupView"
+              "ref": "xyz.noshdelivery.v0.merchant.defs#groupView"
             }
           }
         }

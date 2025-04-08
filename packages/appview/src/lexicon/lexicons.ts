@@ -21,7 +21,7 @@ export const schemaDict = {
         key: 'tid',
         record: {
           type: 'object',
-          required: ['merchant', 'name', 'availabilityPeriods'],
+          required: ['merchantLocation', 'name', 'availabilityPeriods'],
           properties: {
             externalId: {
               type: 'string',
@@ -32,7 +32,7 @@ export const schemaDict = {
               minLength: 1,
               maxLength: 128,
             },
-            merchant: {
+            merchantLocation: {
               type: 'string',
               format: 'at-uri',
             },
@@ -88,14 +88,8 @@ export const schemaDict = {
               },
             },
             media: {
-              type: 'array',
-              items: {
-                type: 'union',
-                refs: [
-                  'lex:xyz.noshdelivery.v0.media.image',
-                  'lex:xyz.noshdelivery.v0.media.video',
-                ],
-              },
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.media.defs#mediaView',
             },
             items: {
               type: 'array',
@@ -431,9 +425,9 @@ export const schemaDict = {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: ['merchant'],
+            required: ['merchantLocation'],
             properties: {
-              merchant: {
+              merchantLocation: {
                 type: 'string',
                 format: 'at-uri',
               },
@@ -486,9 +480,9 @@ export const schemaDict = {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: ['merchant'],
+            required: ['merchantLocation', 'itemDetails'],
             properties: {
-              merchant: {
+              merchantLocation: {
                 type: 'string',
                 format: 'at-uri',
               },
@@ -549,14 +543,8 @@ export const schemaDict = {
               maxLength: 1024,
             },
             media: {
-              type: 'array',
-              items: {
-                type: 'union',
-                refs: [
-                  'lex:xyz.noshdelivery.v0.media.image',
-                  'lex:xyz.noshdelivery.v0.media.video',
-                ],
-              },
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.media.defs#mediaView',
             },
             priceMoney: {
               type: 'ref',
@@ -659,14 +647,8 @@ export const schemaDict = {
               maxLength: 256,
             },
             media: {
-              type: 'array',
-              items: {
-                type: 'union',
-                refs: [
-                  'lex:xyz.noshdelivery.v0.media.image',
-                  'lex:xyz.noshdelivery.v0.media.video',
-                ],
-              },
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.media.defs#mediaView',
             },
             minimumSelection: {
               type: 'integer',
@@ -724,6 +706,8 @@ export const schemaDict = {
       },
       mediaView: {
         type: 'array',
+        description:
+          'Array of media associated with a merchant or a menu object. The first item in the array is the cover in the UI.',
         items: {
           type: 'union',
           refs: [
@@ -842,73 +826,87 @@ export const schemaDict = {
       },
     },
   },
-  XyzNoshdeliveryV0MerchantCreateMerchant: {
+  XyzNoshdeliveryV0MerchantDefs: {
     lexicon: 1,
-    id: 'xyz.noshdelivery.v0.merchant.createMerchant',
+    id: 'xyz.noshdelivery.v0.merchant.defs',
     defs: {
-      main: {
-        type: 'procedure',
-        description: 'Create a new merchant with name.',
-        input: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            required: [],
-            properties: {},
+      aspectRatio: {
+        type: 'object',
+        description:
+          'width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.',
+        required: ['width', 'height'],
+        properties: {
+          width: {
+            type: 'integer',
+            minimum: 1,
+          },
+          height: {
+            type: 'integer',
+            minimum: 1,
           },
         },
-        output: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            required: ['name'],
-            properties: {
-              name: {
-                type: 'string',
-                minLength: 1,
-                maxLength: 128,
-              },
-            },
+      },
+      groupView: {
+        type: 'object',
+        description: 'A view of a merchant group',
+        required: ['uri', 'name'],
+        properties: {
+          uri: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          externalId: {
+            type: 'string',
+            maxLength: 64,
+          },
+          name: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 128,
+          },
+          logo: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.v0.media.image#imageView',
+          },
+        },
+      },
+      locationView: {
+        type: 'object',
+        description: 'A view of a merchant location',
+        properties: {
+          uri: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          externalId: {
+            type: 'string',
+            maxLength: 64,
+          },
+          name: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 128,
+          },
+          timezone: {
+            type: 'string',
+            maxLength: 128,
+          },
+          address: {
+            type: 'ref',
+            ref: 'lex:community.lexicon.location.address',
+          },
+          coordinates: {
+            type: 'ref',
+            ref: 'lex:community.lexicon.location.geo',
           },
         },
       },
     },
   },
-  XyzNoshdeliveryV0MerchantGetMerchants: {
+  XyzNoshdeliveryV0MerchantGroup: {
     lexicon: 1,
-    id: 'xyz.noshdelivery.v0.merchant.getMerchants',
-    defs: {
-      main: {
-        type: 'query',
-        description: 'Get all merchants',
-        parameters: {
-          type: 'params',
-          properties: {},
-        },
-        output: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            required: ['merchants'],
-            properties: {
-              merchants: {
-                type: 'array',
-                items: {
-                  type: 'string',
-                  minLength: 1,
-                  maxLength: 128,
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  XyzNoshdeliveryV0MerchantMerchant: {
-    lexicon: 1,
-    id: 'xyz.noshdelivery.v0.merchant.merchant',
-    description: 'todo',
+    id: 'xyz.noshdelivery.v0.merchant.group',
+    description: 'A merchant group that is the parent company of locations',
     defs: {
       main: {
         type: 'record',
@@ -925,6 +923,199 @@ export const schemaDict = {
               type: 'string',
               minLength: 1,
               maxLength: 128,
+            },
+            logo: {
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.media.image',
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0MerchantListGroups: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.merchant.listGroups',
+    defs: {
+      main: {
+        type: 'query',
+        description: 'Get all merchants groups. More specific filtering TDB.',
+        parameters: {
+          type: 'params',
+          properties: {},
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['groups'],
+            properties: {
+              groups: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.merchant.defs#groupView',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0MerchantListLocations: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.merchant.listLocations',
+    defs: {
+      main: {
+        type: 'query',
+        description: 'Get all merchants in a group.',
+        parameters: {
+          type: 'params',
+          properties: {
+            groupUri: {
+              type: 'string',
+              format: 'at-uri',
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['locations'],
+            properties: {
+              locations: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.merchant.defs#locationView',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0MerchantLocation: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.merchant.location',
+    description: 'A specific physical location for a merchant.',
+    defs: {
+      main: {
+        type: 'record',
+        key: 'tid',
+        record: {
+          type: 'object',
+          required: ['name', 'timezone', 'address', 'coordinates'],
+          properties: {
+            parentGroup: {
+              type: 'string',
+              description:
+                'The uri for the merchant group that this location belongs to.',
+              format: 'at-uri',
+            },
+            externalId: {
+              type: 'string',
+              maxLength: 64,
+            },
+            name: {
+              type: 'string',
+              minLength: 1,
+              maxLength: 128,
+            },
+            timezone: {
+              type: 'string',
+              maxLength: 128,
+            },
+            address: {
+              type: 'ref',
+              ref: 'lex:community.lexicon.location.address',
+            },
+            coordinates: {
+              type: 'ref',
+              ref: 'lex:community.lexicon.location.geo',
+            },
+            media: {
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.media.defs#mediaView',
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0MerchantPutGroup: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.merchant.putGroup',
+    defs: {
+      main: {
+        type: 'procedure',
+        description: 'Create or update a merchant group.',
+        input: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: [],
+            properties: {
+              externalId: {
+                type: 'string',
+                maxLength: 64,
+              },
+              name: {
+                type: 'string',
+                minLength: 1,
+                maxLength: 128,
+              },
+              logo: {
+                type: 'ref',
+                ref: 'lex:xyz.noshdelivery.v0.media.image',
+              },
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['group'],
+            properties: {
+              group: {
+                type: 'ref',
+                ref: 'lex:xyz.noshdelivery.v0.merchant.defs#groupView',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0MerchantPutLocation: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.merchant.putLocation',
+    defs: {
+      main: {
+        type: 'procedure',
+        description: 'Create or update a merchant location.',
+        input: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: [],
+            properties: {},
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['location'],
+            properties: {
+              location: {
+                type: 'ref',
+                ref: 'lex:xyz.noshdelivery.v0.merchant.defs#locationView',
+              },
             },
           },
         },
@@ -1876,6 +2067,74 @@ export const schemaDict = {
       },
     },
   },
+  CommunityLexiconLocationAddress: {
+    lexicon: 1,
+    id: 'community.lexicon.location.address',
+    defs: {
+      main: {
+        type: 'object',
+        description: 'A physical location in the form of a street address.',
+        required: ['country'],
+        properties: {
+          country: {
+            type: 'string',
+            description:
+              'The ISO 3166 country code. Preferably the 2-letter code.',
+            minLength: 2,
+            maxLength: 10,
+          },
+          postalCode: {
+            type: 'string',
+            description: 'The postal code of the location.',
+          },
+          region: {
+            type: 'string',
+            description:
+              'The administrative region of the country. For example, a state in the USA.',
+          },
+          locality: {
+            type: 'string',
+            description:
+              'The locality of the region. For example, a city in the USA.',
+          },
+          street: {
+            type: 'string',
+            description: 'The street address.',
+          },
+          name: {
+            type: 'string',
+            description: 'The name of the location.',
+          },
+        },
+      },
+    },
+  },
+  CommunityLexiconLocationGeo: {
+    lexicon: 1,
+    id: 'community.lexicon.location.geo',
+    defs: {
+      main: {
+        type: 'object',
+        description: 'A physical location in the form of a WGS84 coordinate.',
+        required: ['latitude', 'longitude'],
+        properties: {
+          latitude: {
+            type: 'string',
+          },
+          longitude: {
+            type: 'string',
+          },
+          altitude: {
+            type: 'string',
+          },
+          name: {
+            type: 'string',
+            description: 'The name of the location.',
+          },
+        },
+      },
+    },
+  },
 } as const satisfies Record<string, LexiconDoc>
 export const schemas = Object.values(schemaDict) satisfies LexiconDoc[]
 export const lexicons: Lexicons = new Lexicons(schemas)
@@ -1923,11 +2182,16 @@ export const ids = {
   XyzNoshdeliveryV0MediaDefs: 'xyz.noshdelivery.v0.media.defs',
   XyzNoshdeliveryV0MediaImage: 'xyz.noshdelivery.v0.media.image',
   XyzNoshdeliveryV0MediaVideo: 'xyz.noshdelivery.v0.media.video',
-  XyzNoshdeliveryV0MerchantCreateMerchant:
-    'xyz.noshdelivery.v0.merchant.createMerchant',
-  XyzNoshdeliveryV0MerchantGetMerchants:
-    'xyz.noshdelivery.v0.merchant.getMerchants',
-  XyzNoshdeliveryV0MerchantMerchant: 'xyz.noshdelivery.v0.merchant.merchant',
+  XyzNoshdeliveryV0MerchantDefs: 'xyz.noshdelivery.v0.merchant.defs',
+  XyzNoshdeliveryV0MerchantGroup: 'xyz.noshdelivery.v0.merchant.group',
+  XyzNoshdeliveryV0MerchantListGroups:
+    'xyz.noshdelivery.v0.merchant.listGroups',
+  XyzNoshdeliveryV0MerchantListLocations:
+    'xyz.noshdelivery.v0.merchant.listLocations',
+  XyzNoshdeliveryV0MerchantLocation: 'xyz.noshdelivery.v0.merchant.location',
+  XyzNoshdeliveryV0MerchantPutGroup: 'xyz.noshdelivery.v0.merchant.putGroup',
+  XyzNoshdeliveryV0MerchantPutLocation:
+    'xyz.noshdelivery.v0.merchant.putLocation',
   ComAtprotoLabelDefs: 'com.atproto.label.defs',
   ComAtprotoRepoApplyWrites: 'com.atproto.repo.applyWrites',
   ComAtprotoRepoCreateRecord: 'com.atproto.repo.createRecord',
@@ -1941,4 +2205,6 @@ export const ids = {
   ComAtprotoRepoPutRecord: 'com.atproto.repo.putRecord',
   ComAtprotoRepoStrongRef: 'com.atproto.repo.strongRef',
   ComAtprotoRepoUploadBlob: 'com.atproto.repo.uploadBlob',
+  CommunityLexiconLocationAddress: 'community.lexicon.location.address',
+  CommunityLexiconLocationGeo: 'community.lexicon.location.geo',
 } as const

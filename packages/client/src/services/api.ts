@@ -1,5 +1,5 @@
 import * as Lexicon from '@nosh/lexicon'
-import type { XyzNoshdeliveryMerchantGetMerchants } from '@nosh/lexicon'
+import { schemaDict } from '@nosh/lexicon/src/lexicons'
 
 class StatusphereAgent extends Lexicon.AtpBaseClient {
   constructor() {
@@ -24,46 +24,23 @@ const agent = new StatusphereAgent()
 
 // API service
 export const api = {
-  // // Login
-  // async login(handle: string) {
-  //   const response = await fetch('/oauth/initiate', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     credentials: 'include',
-  //     body: JSON.stringify({ handle }),
-  //   })
-
-  //   if (!response.ok) {
-  //     const error = await response.json()
-  //     throw new Error(error.error || 'Login failed')
-  //   }
-
-  //   return response.json()
-  // },
-
-  // // Logout
-  // async logout() {
-  //   const response = await fetch('/oauth/logout', {
-  //     method: 'POST',
-  //     credentials: 'include',
-  //   })
-
-  //   if (!response.ok) {
-  //     throw new Error('Logout failed')
-  //   }
-
-  //   return response.json()
-  // },
-
   // Create status
-  getMerchants(params: XyzNoshdeliveryMerchantGetMerchants.InputSchema) {
-    return agent.xyz.noshdelivery.merchant.getMerchants(params)
+  listGroups(params: Lexicon.XyzNoshdeliveryV0MerchantListGroups.InputSchema) {
+    return agent.xyz.noshdelivery.v0.merchant.listGroups(params)
   },
 
-  createMerchant() {
-    return agent.xyz.noshdelivery.merchant.createMerchant(undefined)
+  createGroup({ name }: { name: string }) {
+    return agent.com.atproto.repo.applyWrites({
+      repo: 'did:plc:ufa7rl6agtfdqje6bant3wsb',
+      validate: false,
+      writes: [
+        {
+          $type: 'com.atproto.repo.applyWrites#create',
+          collection: schemaDict.XyzNoshdeliveryV0MerchantGroup.id,
+          value: { name },
+        },
+      ],
+    })
   },
 }
 

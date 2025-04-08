@@ -9,20 +9,24 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../../util'
-import type * as XyzNoshdeliveryV0CatalogDefs from './defs.js'
+import type * as CommunityLexiconLocationAddress from '../../../../community/lexicon/location/address.js'
+import type * as CommunityLexiconLocationGeo from '../../../../community/lexicon/location/geo.js'
+import type * as XyzNoshdeliveryV0MediaDefs from '../media/defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'xyz.noshdelivery.v0.catalog.catalog'
+const id = 'xyz.noshdelivery.v0.merchant.location'
 
 export interface Record {
-  $type: 'xyz.noshdelivery.v0.catalog.catalog'
+  $type: 'xyz.noshdelivery.v0.merchant.location'
+  /** The uri for the merchant group that this location belongs to. */
+  parentGroup?: string
   externalId?: string
   name: string
-  merchantLocation: string
-  availabilityPeriods: XyzNoshdeliveryV0CatalogDefs.AvailabilityPeriod[]
-  /** Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented. */
-  childCollections?: string[]
+  timezone: string
+  address: CommunityLexiconLocationAddress.Main
+  coordinates: CommunityLexiconLocationGeo.Main
+  media?: XyzNoshdeliveryV0MediaDefs.MediaView
   [k: string]: unknown
 }
 

@@ -24,7 +24,7 @@ export interface QueryParams {
 export type InputSchema = undefined
 
 export interface OutputSchema {
-  merchant: string
+  merchantLocation: string
   catalogs?: XyzNoshdeliveryV0CatalogDefs.CatalogView[]
   collections?: XyzNoshdeliveryV0CatalogDefs.CollectionView[]
   items?: XyzNoshdeliveryV0CatalogDefs.ItemView[]

@@ -16,18 +16,20 @@ const agent = new AtpAgent({
 })
 
 export async function getSessionAgent(
-  // req: IncomingMessage | Request,
-  // res: ServerResponse | Response,
-  // ctx: AppContext,
+  req: IncomingMessage | Request,
+  res: ServerResponse | Response,
 ) {
   if (!session) {
-    await agent.login({
+    const result = await agent.login({
       identifier: 'ivanp@fastmail.fm',
       password: '7SjHUpcEDuRvRBuP34LOv1HG',
     })
-  } else {
-    await agent.resumeSession(session)
+    console.log('login result', result)
   }
+  // } else {
+  //   const resumedSession = await agent.resumeSession(session)
+  //   console.log('resumed session', resumedSession)
+  // }
 
   return agent
 }

@@ -3,12 +3,12 @@ import { useQuery } from '@tanstack/react-query'
 
 import api from '#/services/api'
 
-const StatusList = () => {
+const GroupList = () => {
   // Use React Query to fetch and cache statuses
   const { data, isPending, isError, error } = useQuery({
     queryKey: ['statuses'],
     queryFn: async () => {
-      const { data } = await api.getMerchants(undefined)
+      const { data } = await api.listGroups(undefined)
       return data
     },
     placeholderData: (previousData) => previousData, // Use previous data while refetching
@@ -22,13 +22,13 @@ const StatusList = () => {
   }, [error])
 
   // Destructure data
-  const merchants = data?.merchants || []
+  const groups = data?.groups || []
 
   if (isPending && !data) {
     return (
       <div className="py-8 text-center">
         <div className="text-gray-500 dark:text-gray-400">
-          Loading merchants...
+          Loading merchant groups...
         </div>
       </div>
     )
@@ -42,7 +42,7 @@ const StatusList = () => {
     )
   }
 
-  if (merchants.length === 0) {
+  if (groups.length === 0) {
     return (
       <div className="py-4 text-center text-gray-500 dark:text-gray-400">
         No merchants yet.
@@ -54,12 +54,12 @@ const StatusList = () => {
   return (
     <div className="px-4">
       <div className="relative">
-        {merchants.map((merchant) =>
-          <div key={merchant}>{merchant}</div>
+        {groups.map((group) =>
+          <div key={group.uri}>{group.name}</div>
         )}
       </div>
     </div>
   )
 }
 
-export default StatusList
+export default GroupList
