@@ -21,7 +21,8 @@
         "schema": {
           "type": "object",
           "required": [
-            "merchant"
+            "merchantLocation",
+            "itemDetails"
           ],
           "properties": {
             "merchant": {

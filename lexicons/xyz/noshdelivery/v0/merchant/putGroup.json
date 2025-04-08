@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "xyz.noshdelivery.v0.merchant.putGroup",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create or update a merchant group.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [],
+          "properties": {
+            "externalId": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "logo": {
+              "type": "ref",
+              "ref": "xyz.noshdelivery.v0.media.image"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "group"
+          ],
+          "properties": {
+            "group": {
+              "type": "ref",
+              "ref": "xyz.noshdelivery.v0.merchant.defs:#groupView"
+            }
+          }
+        }
+      }
+    }
+  }
+}

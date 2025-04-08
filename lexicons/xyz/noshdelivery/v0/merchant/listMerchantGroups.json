@@ -1,10 +1,10 @@
 {
   "lexicon": 1,
-  "id": "xyz.noshdelivery.v0.merchant.getMerchants",
+  "id": "xyz.noshdelivery.v0.merchant.listGroups",
   "defs": {
     "main": {
       "type": "query",
-      "description": "Get all merchants",
+      "description": "Get all merchants groups. More specific filtering TDB.",
       "parameters": {
         "type": "params",
         "properties": {}
@@ -14,15 +14,14 @@
         "schema": {
           "type": "object",
           "required": [
-            "merchants"
+            "groups"
           ],
           "properties": {
-            "merchants": {
+            "groups": {
               "type": "array",
               "items": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 128
+                "type": "ref",
+                "ref": "xyz.noshdelivery.v0.merchant.defs:#groupView"
               }
             }
           }

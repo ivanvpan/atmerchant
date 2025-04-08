@@ -1,10 +1,10 @@
 {
   "lexicon": 1,
-  "id": "xyz.noshdelivery.v0.merchant.createMerchant",
+  "id": "xyz.noshdelivery.v0.merchant.putLocation",
   "defs": {
     "main": {
       "type": "procedure",
-      "description": "Create a new merchant with name.",
+      "description": "Create or update a merchant location.",
       "input": {
         "encoding": "application/json",
         "schema": {
@@ -18,13 +18,12 @@
         "schema": {
           "type": "object",
           "required": [
-            "name"
+            "location"
           ],
           "properties": {
-            "name": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
+            "location": {
+              "type": "ref",
+              "ref": "xyz.noshdelivery.v0.merchant.location:#locationView"
             }
           }
         }

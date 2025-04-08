@@ -9,7 +9,7 @@
       "record": {
         "type": "object",
         "required": [
-          "merchant",
+          "merchantLocation",
           "name",
           "availabilityPeriods"
         ],
@@ -23,7 +23,7 @@
             "minLength": 1,
             "maxLength": 128
           },
-          "merchant": {
+          "merchantLocation": {
             "type": "string",
             "format": "at-uri"
           },

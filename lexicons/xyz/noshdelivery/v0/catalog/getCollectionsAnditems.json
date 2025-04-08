@@ -21,10 +21,10 @@
         "schema": {
           "type": "object",
           "required": [
-            "merchant"
+            "merchantLocation"
           ],
           "properties": {
-            "merchant": {
+            "merchantLocation": {
               "type": "string",
               "format": "at-uri"
             },
