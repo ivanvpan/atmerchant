@@ -16,12 +16,13 @@ export default function (server: Server, ctx: AppContext) {
   server.xyz.noshdelivery.v0.merchant.listGroups({
     handler: async ({ req, res }) => {
       const groups = await ctx.db.selectFrom('merchant_group').selectAll().execute()
+      console.log('db groups', groups)
       return {
         encoding: 'application/json',
         body: {
             groups: groups.map((group) => ({
               uri: group.uri,
-              externalId: group.externalId,
+              externalId: group.externalId || undefined,
               name: group.name,
             })),
           },

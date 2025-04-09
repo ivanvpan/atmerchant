@@ -4,6 +4,7 @@ import { XyzNoshdeliveryV0MerchantGroup } from '@nosh/lexicon'
 import { AppContext } from '#/context'
 import { Server } from '#/lexicon'
 import { getSessionAgent } from '#/session'
+import { schemaDict } from '#/lexicon/lexicons'
 
 
 export default function (server: Server, ctx: AppContext) {
@@ -18,21 +19,21 @@ export default function (server: Server, ctx: AppContext) {
 
       const rkey = TID.nextStr()
       const record = {
-        $type: 'xyz.noshdelivery.merchant.group',
+        $type: schemaDict.XyzNoshdeliveryV0MerchantGroup.id,
         ...input.body,
-        createdAt: new Date().toISOString(),
       }
 
+      console.log('validating record', record)
       const validation = XyzNoshdeliveryV0MerchantGroup.validateRecord(record)
 
       if (!validation.success) {
-        throw new InvalidRequestError('Invalid status')
+        throw new InvalidRequestError('Invalid group record')
       }
 
       try {
         const response = await agent.com.atproto.repo.putRecord({
           repo: agent.assertDid,
-          collection: 'xyz.noshdelivery.merchant.group',
+          collection: schemaDict.XyzNoshdeliveryV0MerchantGroup.id,
           rkey,
           record: validation.value,
           validate: false,

@@ -15,7 +15,9 @@ import * as error from '#/error'
 import { createServer } from '#/lexicon'
 import { env } from '#/env'
 import { XRPCError } from '@atproto/xrpc-server'
-import { createDb } from './db'
+import { createDb, migrateToLatest } from './db'
+import { createFirehoseIngester } from './ingestors/firehose'
+import { createSyncRepoIngester } from './ingestors/syncRepo'
 
 export class Server {
   constructor(
@@ -30,17 +32,19 @@ export class Server {
 
     // Set up the SQLite database
     const db = createDb('./db.sqlite')
-    // await migrateToLatest(db)
+    await migrateToLatest(db)
 
     // Create the atproto utilities
     // const oauthClient = await createClient(db)
     // const baseIdResolver = createIdResolver()
     // const ingester = await createJetstreamIngester(db)
-    // // Alternative: const ingester = await createFirehoseIngester(db, baseIdResolver)
+    const ingester = await createFirehoseIngester(db, 'wss://shored.boats')
+    await createSyncRepoIngester()
+    ingester.start()
     // const resolver = createBidirectionalResolver(baseIdResolver)
     const ctx = {
       db,
-      // ingester,
+      ingester,
       logger,
       // oauthClient,
       // resolver,

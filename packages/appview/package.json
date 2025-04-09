@@ -21,6 +21,8 @@
     "@atproto/api": "^0.14.20",
     "@atproto/dev-env": "^0.3.114",
     "@atproto/xrpc-server": "^0.7.15",
+    "@ipld/car": "^5.4.0",
+    "@ipld/dag-cbor": "^9.2.2",
     "better-sqlite3": "^11.9.1",
     "compression": "^1.8.0",
     "cors": "^2.8.5",

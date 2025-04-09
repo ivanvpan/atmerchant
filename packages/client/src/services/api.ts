@@ -1,5 +1,4 @@
 import * as Lexicon from '@nosh/lexicon'
-import { schemaDict } from '@nosh/lexicon/src/lexicons'
 
 class StatusphereAgent extends Lexicon.AtpBaseClient {
   constructor() {
@@ -29,18 +28,8 @@ export const api = {
     return agent.xyz.noshdelivery.v0.merchant.listGroups(params)
   },
 
-  createGroup({ name }: { name: string }) {
-    return agent.com.atproto.repo.applyWrites({
-      repo: 'did:plc:ufa7rl6agtfdqje6bant3wsb',
-      validate: false,
-      writes: [
-        {
-          $type: 'com.atproto.repo.applyWrites#create',
-          collection: schemaDict.XyzNoshdeliveryV0MerchantGroup.id,
-          value: { name },
-        },
-      ],
-    })
+  putGroup(params: Lexicon.XyzNoshdeliveryV0MerchantPutGroup.InputSchema) {
+    return agent.xyz.noshdelivery.v0.merchant.putGroup(params)
   },
 }
 

@@ -2214,6 +2214,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ipld/car@npm:^5.4.0":
+  version: 5.4.0
+  resolution: "@ipld/car@npm:5.4.0"
+  dependencies:
+    "@ipld/dag-cbor": "npm:^9.0.7"
+    cborg: "npm:^4.0.5"
+    multiformats: "npm:^13.0.0"
+    varint: "npm:^6.0.0"
+  checksum: 10c0/0e89db13b6a7d572bca6f513427952f95e454d2aca7e77dce9293a5a6ec042e158aae5b76c97e2eccf910d70d5207336f84256bcb15139c8b3e84a28a724632b
+  languageName: node
+  linkType: hard
+
 "@ipld/dag-cbor@npm:^7.0.0, @ipld/dag-cbor@npm:^7.0.3":
   version: 7.0.3
   resolution: "@ipld/dag-cbor@npm:7.0.3"
@@ -2221,6 +2233,16 @@ __metadata:
     cborg: "npm:^1.6.0"
     multiformats: "npm:^9.5.4"
   checksum: 10c0/1298d55f224a6d9d1b42e8f33241d5453d810937a01909fbca477dfc25bf57706efc2e3ab5a272c7c4bcfb243ff4480d70db40042bbc91b2ed3400f90e64c676
+  languageName: node
+  linkType: hard
+
+"@ipld/dag-cbor@npm:^9.0.7, @ipld/dag-cbor@npm:^9.2.2":
+  version: 9.2.2
+  resolution: "@ipld/dag-cbor@npm:9.2.2"
+  dependencies:
+    cborg: "npm:^4.0.0"
+    multiformats: "npm:^13.1.0"
+  checksum: 10c0/de554379adf27d6c3dc5ed706cbceb319ef7c54646c53dca6f85a840eeb4d08895c722ee08c92022b396090050f275a44ce5b07c7bdb87e105ebb0f84ad3e2ca
   languageName: node
   linkType: hard
 
@@ -2354,6 +2376,8 @@ __metadata:
     "@atproto/dev-env": "npm:^0.3.114"
     "@atproto/lex-cli": "npm:^0.7.1"
     "@atproto/xrpc-server": "npm:^0.7.15"
+    "@ipld/car": "npm:^5.4.0"
+    "@ipld/dag-cbor": "npm:^9.2.2"
     "@types/better-sqlite3": "npm:^7.6.13"
     "@types/compression": "npm:^1"
     "@types/cors": "npm:^2"
@@ -4201,6 +4225,15 @@ __metadata:
   bin:
     cborg: cli.js
   checksum: 10c0/e8c2ff47db7161600a2f5bf95a1871cce9f207d918d518b028fc181852169c19110e000e09d3e1cfc0515ad03246216edd00185e5204a15e191cf211cecc4b89
+  languageName: node
+  linkType: hard
+
+"cborg@npm:^4.0.0, cborg@npm:^4.0.5":
+  version: 4.2.9
+  resolution: "cborg@npm:4.2.9"
+  bin:
+    cborg: lib/bin.js
+  checksum: 10c0/3c99220ca94884c9633843a93ad1de6b5194d4a56846fc70cb26db2bd20972127624bfcae5a94b613aafa3bae9cc3d0117c7f0511a6ec6d6de179905bfc97803
   languageName: node
   linkType: hard
 
@@ -6138,7 +6171,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"multiformats@npm:^13.3.2":
+"multiformats@npm:^13.0.0, multiformats@npm:^13.1.0, multiformats@npm:^13.3.2":
   version: 13.3.2
   resolution: "multiformats@npm:13.3.2"
   checksum: 10c0/a2c6f17b04d6a9cd5d0cb7d07e32dc4f3be82804d44fc056357a98e449340a7ad37d0789da41186ccd8c953e0cf783be3b71f03a00b0a84788689f544ecade46

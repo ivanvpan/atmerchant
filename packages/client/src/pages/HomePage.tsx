@@ -13,8 +13,14 @@ const HomePage = () => {
           Merchant Groups
         </h2>
         <GroupList />
-        <input type="text" placeholder="Enter group name" onChange={(e) => setGroupName(e.target.value)} />
-        <button type="button" onClick={() => api.createGroup({ name: groupName })}>Create</button>
+        <input
+          type="text"
+          placeholder="Enter group name"
+          onChange={(e) => setGroupName(e.target.value)}
+        />
+        <button type="button" onClick={() => api.putGroup({ name: groupName })}>
+          Create
+        </button>
       </div>
     </div>
   )
