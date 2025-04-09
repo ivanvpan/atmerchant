@@ -190,6 +190,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@atproto/common-web@npm:^0.2.3":
+  version: 0.2.4
+  resolution: "@atproto/common-web@npm:0.2.4"
+  dependencies:
+    graphemer: "npm:^1.4.0"
+    multiformats: "npm:^9.9.0"
+    uint8arrays: "npm:3.0.0"
+    zod: "npm:^3.21.4"
+  checksum: 10c0/f487ec5346526c67734637f8e808b3151026e0674413bdd43b3163dadbb24380cffcbe91c57a37e25e95ac26e80f8c3a2d655f15c9ef0bfcc9beab9d6475effe
+  languageName: node
+  linkType: hard
+
 "@atproto/common-web@npm:^0.4.1":
   version: 0.4.1
   resolution: "@atproto/common-web@npm:0.4.1"
@@ -544,6 +556,24 @@ __metadata:
   version: 0.4.0
   resolution: "@atproto/syntax@npm:0.4.0"
   checksum: 10c0/a1d19bf7d5ea3b08380e8ca6b57db311db2bc7ec4733b88896578c950c57a86dc2f4b44ebcfd60d98eb44550f5c4ab36cc560618f19dc98ef61e849c945a3946
+  languageName: node
+  linkType: hard
+
+"@atproto/syntax@npm:^0.1.1":
+  version: 0.1.5
+  resolution: "@atproto/syntax@npm:0.1.5"
+  dependencies:
+    "@atproto/common-web": "npm:^0.2.3"
+  checksum: 10c0/ac3d438be954c7f516f28f330179ec5cd6e0b38724135944ae5cb0052d14c54a249a40aa1c0f098a4a49855b392f4f9281788573ed2d20bfb0f9347732ad8e38
+  languageName: node
+  linkType: hard
+
+"@atproto/uri@npm:^0.1.1":
+  version: 0.1.1
+  resolution: "@atproto/uri@npm:0.1.1"
+  dependencies:
+    "@atproto/syntax": "npm:^0.1.1"
+  checksum: 10c0/4cfd7aae924a8e7330225b7869d42635f9caa41e1ecdb83a2bd86572d18c47c16b960a3fa169e95d078a3dfa8c0d792175cb877ee523c240819f5e7a166b4d91
   languageName: node
   linkType: hard
 
@@ -2375,6 +2405,7 @@ __metadata:
     "@atproto/api": "npm:^0.14.20"
     "@atproto/dev-env": "npm:^0.3.114"
     "@atproto/lex-cli": "npm:^0.7.1"
+    "@atproto/uri": "npm:^0.1.1"
     "@atproto/xrpc-server": "npm:^0.7.15"
     "@ipld/car": "npm:^5.4.0"
     "@ipld/dag-cbor": "npm:^9.2.2"
@@ -8367,7 +8398,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.14.2, zod@npm:^3.23.8":
+"zod@npm:^3.14.2, zod@npm:^3.21.4, zod@npm:^3.23.8":
   version: 3.24.2
   resolution: "zod@npm:3.24.2"
   checksum: 10c0/c638c7220150847f13ad90635b3e7d0321b36cce36f3fc6050ed960689594c949c326dfe2c6fa87c14b126ee5d370ccdebd6efb304f41ef5557a4aaca2824565
