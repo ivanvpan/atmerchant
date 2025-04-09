@@ -31,11 +31,14 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["group"],
+          "required": ["groups"],
           "properties": {
-            "group": {
-              "type": "ref",
-              "ref": "xyz.noshdelivery.v0.merchant.defs#groupView"
+            "groups": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "xyz.noshdelivery.v0.merchant.defs#groupView"
+              }
             }
           }
         }

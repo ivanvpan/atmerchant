@@ -849,8 +849,12 @@ export const schemaDict = {
       groupView: {
         type: 'object',
         description: 'A view of a merchant group',
-        required: ['uri', 'name'],
+        required: ['tid', 'uri', 'name'],
         properties: {
+          tid: {
+            type: 'string',
+            format: 'tid',
+          },
           uri: {
             type: 'string',
             format: 'at-uri',
@@ -898,6 +902,42 @@ export const schemaDict = {
           coordinates: {
             type: 'ref',
             ref: 'lex:community.lexicon.location.geo',
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0MerchantGetGroup: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.merchant.getGroup',
+    defs: {
+      main: {
+        type: 'procedure',
+        description: 'Get a merchant group by tid.',
+        input: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['tid'],
+            properties: {
+              tid: {
+                type: 'string',
+                format: 'tid',
+              },
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['group'],
+            properties: {
+              group: {
+                type: 'ref',
+                ref: 'lex:xyz.noshdelivery.v0.merchant.defs#groupView',
+              },
+            },
           },
         },
       },
@@ -1079,11 +1119,14 @@ export const schemaDict = {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: ['group'],
+            required: ['groups'],
             properties: {
-              group: {
-                type: 'ref',
-                ref: 'lex:xyz.noshdelivery.v0.merchant.defs#groupView',
+              groups: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.merchant.defs#groupView',
+                },
               },
             },
           },
@@ -2183,6 +2226,7 @@ export const ids = {
   XyzNoshdeliveryV0MediaImage: 'xyz.noshdelivery.v0.media.image',
   XyzNoshdeliveryV0MediaVideo: 'xyz.noshdelivery.v0.media.video',
   XyzNoshdeliveryV0MerchantDefs: 'xyz.noshdelivery.v0.merchant.defs',
+  XyzNoshdeliveryV0MerchantGetGroup: 'xyz.noshdelivery.v0.merchant.getGroup',
   XyzNoshdeliveryV0MerchantGroup: 'xyz.noshdelivery.v0.merchant.group',
   XyzNoshdeliveryV0MerchantListGroups:
     'xyz.noshdelivery.v0.merchant.listGroups',

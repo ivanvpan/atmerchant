@@ -1,12 +1,13 @@
 import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
 
 import api from '#/services/api'
 
 const GroupList = () => {
   // Use React Query to fetch and cache statuses
   const { data, isPending, isError, error } = useQuery({
-    queryKey: ['statuses'],
+    queryKey: ['merchantGroups'],
     queryFn: async () => {
       const { data } = await api.listGroups(undefined)
       return data
@@ -50,13 +51,14 @@ const GroupList = () => {
     )
   }
 
-
   return (
-    <div className="px-4">
+    <div>
       <div className="relative">
-        {groups.map((group) =>
-          <div key={group.uri}>{group.name}</div>
-        )}
+        {groups.map((group) => (
+          <div key={group.tid}>
+            <Link to={`/group/${group.tid}`}>{group.name}</Link>
+          </div>
+        ))}
       </div>
     </div>
   )

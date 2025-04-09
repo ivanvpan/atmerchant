@@ -21,6 +21,7 @@ import * as XyzNoshdeliveryV0MediaDefs from './types/xyz/noshdelivery/v0/media/d
 import * as XyzNoshdeliveryV0MediaImage from './types/xyz/noshdelivery/v0/media/image.js'
 import * as XyzNoshdeliveryV0MediaVideo from './types/xyz/noshdelivery/v0/media/video.js'
 import * as XyzNoshdeliveryV0MerchantDefs from './types/xyz/noshdelivery/v0/merchant/defs.js'
+import * as XyzNoshdeliveryV0MerchantGetGroup from './types/xyz/noshdelivery/v0/merchant/getGroup.js'
 import * as XyzNoshdeliveryV0MerchantGroup from './types/xyz/noshdelivery/v0/merchant/group.js'
 import * as XyzNoshdeliveryV0MerchantListGroups from './types/xyz/noshdelivery/v0/merchant/listGroups.js'
 import * as XyzNoshdeliveryV0MerchantListLocations from './types/xyz/noshdelivery/v0/merchant/listLocations.js'
@@ -55,6 +56,7 @@ export * as XyzNoshdeliveryV0MediaDefs from './types/xyz/noshdelivery/v0/media/d
 export * as XyzNoshdeliveryV0MediaImage from './types/xyz/noshdelivery/v0/media/image.js'
 export * as XyzNoshdeliveryV0MediaVideo from './types/xyz/noshdelivery/v0/media/video.js'
 export * as XyzNoshdeliveryV0MerchantDefs from './types/xyz/noshdelivery/v0/merchant/defs.js'
+export * as XyzNoshdeliveryV0MerchantGetGroup from './types/xyz/noshdelivery/v0/merchant/getGroup.js'
 export * as XyzNoshdeliveryV0MerchantGroup from './types/xyz/noshdelivery/v0/merchant/group.js'
 export * as XyzNoshdeliveryV0MerchantListGroups from './types/xyz/noshdelivery/v0/merchant/listGroups.js'
 export * as XyzNoshdeliveryV0MerchantListLocations from './types/xyz/noshdelivery/v0/merchant/listLocations.js'
@@ -516,6 +518,18 @@ export class XyzNoshdeliveryV0MerchantNS {
     this._client = client
     this.group = new GroupRecord(client)
     this.location = new LocationRecord(client)
+  }
+
+  getGroup(
+    data?: XyzNoshdeliveryV0MerchantGetGroup.InputSchema,
+    opts?: XyzNoshdeliveryV0MerchantGetGroup.CallOptions,
+  ): Promise<XyzNoshdeliveryV0MerchantGetGroup.Response> {
+    return this._client.call(
+      'xyz.noshdelivery.v0.merchant.getGroup',
+      opts?.qp,
+      data,
+      opts,
+    )
   }
 
   listGroups(

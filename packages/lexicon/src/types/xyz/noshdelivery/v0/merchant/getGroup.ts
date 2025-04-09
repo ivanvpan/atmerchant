@@ -10,23 +10,20 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../../util'
-import type * as XyzNoshdeliveryV0MediaImage from '../media/image.js'
 import type * as XyzNoshdeliveryV0MerchantDefs from './defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'xyz.noshdelivery.v0.merchant.putGroup'
+const id = 'xyz.noshdelivery.v0.merchant.getGroup'
 
 export interface QueryParams {}
 
 export interface InputSchema {
-  externalId?: string
-  name: string
-  logo?: XyzNoshdeliveryV0MediaImage.Main
+  tid: string
 }
 
 export interface OutputSchema {
-  groups: XyzNoshdeliveryV0MerchantDefs.GroupView[]
+  group: XyzNoshdeliveryV0MerchantDefs.GroupView
 }
 
 export interface CallOptions {

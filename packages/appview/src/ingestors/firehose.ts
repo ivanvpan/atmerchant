@@ -9,7 +9,11 @@ function uriFromEvent(evt: CommitEvt) {
   return `at://${evt.uri.host}${evt.uri.pathname}`
 }
 
-export async function createFirehoseIngester(db: Database, service: string) {
+export async function createFirehoseIngester(
+  repoDid: string,
+  service: string,
+  db: Database,
+) {
   const logger = pino({ name: 'firehose ingestion' })
 
   const cursor = await db
@@ -35,6 +39,10 @@ export async function createFirehoseIngester(db: Database, service: string) {
     service,
     handleEvent: async (evt: Event) => {
       console.log('evt', evt.seq)
+      if (evt.did !== repoDid) {
+        return
+      }
+
       if (evt.event === 'create') {
         if (evt.collection === 'xyz.noshdelivery.v0.merchant.group') {
           const record = evt.record as XyzNoshdeliveryV0MerchantGroup.Record

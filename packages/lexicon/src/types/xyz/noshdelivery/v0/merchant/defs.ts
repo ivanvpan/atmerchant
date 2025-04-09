@@ -37,6 +37,7 @@ export function validateAspectRatio<V>(v: V) {
 /** A view of a merchant group */
 export interface GroupView {
   $type?: 'xyz.noshdelivery.v0.merchant.defs#groupView'
+  tid: string
   uri: string
   externalId?: string
   name: string

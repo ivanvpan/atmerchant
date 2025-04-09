@@ -5,6 +5,8 @@ import { AppContext } from '#/context'
 import { Server } from '#/lexicon'
 import { getSessionAgent } from '#/session'
 import { schemaDict } from '#/lexicon/lexicons'
+import { findAllMerchantGroups, upsertMerchantGroupRecord } from '#/db'
+import { dbMerchantGroupToMerchantGroupView } from '#/controllers/merchant'
 
 
 export default function (server: Server, ctx: AppContext) {
@@ -15,7 +17,6 @@ export default function (server: Server, ctx: AppContext) {
 
       const agent = await getSessionAgent()
       agent.assertDid
-
 
       const rkey = TID.nextStr()
       const record = {
@@ -40,22 +41,15 @@ export default function (server: Server, ctx: AppContext) {
         })
         console.log('uri', response.data.uri)
 
-        // TODO check for existing group with name/externalId and throw if found
-        await ctx.db.insertInto('merchant_group').values({
-          uri: response.data.uri,
-          externalId: input.body.externalId,
-          name: input.body.name
-        }).execute()
+        await upsertMerchantGroupRecord(ctx.db, response.data.uri, {
+          $type: schemaDict.XyzNoshdeliveryV0MerchantGroup.id,
+          ...input.body,
+        })
 
         return {
           encoding: 'application/json',
           body: {
-            group: {
-              uri: response.data.uri,
-              externalId: input.body.externalId,
-              logo: undefined,
-              name: input.body.name,
-            },
+            groups: (await findAllMerchantGroups(ctx.db)).map(dbMerchantGroupToMerchantGroupView),
           },
         }
       } catch (err) {

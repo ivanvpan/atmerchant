@@ -5,10 +5,7 @@
     "aspectRatio": {
       "type": "object",
       "description": "width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.",
-      "required": [
-        "width",
-        "height"
-      ],
+      "required": ["width", "height"],
       "properties": {
         "width": {
           "type": "integer",
@@ -23,11 +20,12 @@
     "groupView": {
       "type": "object",
       "description": "A view of a merchant group",
-      "required": [
-        "uri",
-        "name"
-      ],
+      "required": ["tid", "uri", "name"],
       "properties": {
+        "tid": {
+          "type": "string",
+          "format": "tid"
+        },
         "uri": {
           "type": "string",
           "format": "at-uri"

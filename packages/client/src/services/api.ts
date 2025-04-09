@@ -31,6 +31,10 @@ export const api = {
   putGroup(params: Lexicon.XyzNoshdeliveryV0MerchantPutGroup.InputSchema) {
     return agent.xyz.noshdelivery.v0.merchant.putGroup(params)
   },
+
+  getGroup(params: Lexicon.XyzNoshdeliveryV0MerchantGetGroup.InputSchema) {
+    return agent.xyz.noshdelivery.v0.merchant.getGroup(params)
+  },
 }
 
 export default api

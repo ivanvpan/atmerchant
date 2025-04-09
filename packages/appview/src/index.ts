@@ -17,7 +17,7 @@ import { env } from '#/env'
 import { XRPCError } from '@atproto/xrpc-server'
 import { createDb, migrateToLatest } from './db'
 import { createFirehoseIngester } from './ingestors/firehose'
-import { createSyncRepoIngester } from './ingestors/syncRepo'
+import { bulkSyncFromCursor } from './ingestors/syncRepo'
 
 export class Server {
   constructor(
@@ -34,14 +34,20 @@ export class Server {
     const db = createDb('./db.sqlite')
     await migrateToLatest(db)
 
+    const repoDid = 'did:plc:ufa7rl6agtfdqje6bant3wsb'
+    // await bulkSyncFromCursor('did:plc:ufa7rl6agtfdqje6bant3wsb', db)
+    const ingester = await createFirehoseIngester(
+      repoDid,
+      'wss://shored.boats',
+      db,
+    )
+    ingester.start()
+
     // Create the atproto utilities
     // const oauthClient = await createClient(db)
     // const baseIdResolver = createIdResolver()
-    // const ingester = await createJetstreamIngester(db)
-    const ingester = await createFirehoseIngester(db, 'wss://shored.boats')
-    await createSyncRepoIngester()
-    ingester.start()
     // const resolver = createBidirectionalResolver(baseIdResolver)
+
     const ctx = {
       db,
       ingester,

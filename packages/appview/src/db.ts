@@ -8,7 +8,7 @@ import {
   SqliteDialect,
   // ParseJSONResultsPlugin
 } from 'kysely'
-
+import { tidFromUri } from '#/utils/uri'
 // Types
 
 export type DatabaseSchema = {
@@ -23,6 +23,7 @@ export type Cursor = {
 }
 
 export interface MerchantGroup {
+  tid: string
   uri: string
   externalId?: string | null
   name: string
@@ -32,6 +33,7 @@ export interface MerchantGroup {
 type AddressJson = string
 type MediaJson = string
 export type MerchantLocation = {
+  tid: string
   uri: string
   externalId: string
   name: string
@@ -80,14 +82,16 @@ migrations['001'] = {
   async up(db: Kysely<unknown>) {
     await db.schema
       .createTable('merchant_group')
-      .addColumn('uri', 'varchar', (col) => col.primaryKey())
+      .addColumn('tid', 'varchar', (col) => col.primaryKey())
+      .addColumn('uri', 'varchar', (col) => col.unique())
       .addColumn('externalId', 'varchar', (col) => col.unique())
       .addColumn('name', 'varchar', (col) => col.notNull().unique())
       .addColumn('logo', 'varchar')
       .execute()
     await db.schema
       .createTable('merchant_location')
-      .addColumn('uri', 'varchar', (col) => col.primaryKey())
+      .addColumn('tid', 'varchar', (col) => col.primaryKey())
+      .addColumn('uri', 'varchar', (col) => col.unique())
       .addColumn('externalId', 'varchar', (col) => col.unique())
       .addColumn('name', 'varchar', (col) => col.notNull().unique())
       .addColumn('address', 'jsonb', (col) => col.notNull())
@@ -125,12 +129,30 @@ export const migrateToLatest = async (db: Database) => {
 
 export type Database = Kysely<DatabaseSchema>
 
+export const findMerchantGroupByTid = async (
+  db: Database,
+  tid: string,
+): Promise<MerchantGroup | undefined> => {
+  return await db
+    .selectFrom('merchant_group')
+    .where('tid', '=', tid)
+    .selectAll()
+    .executeTakeFirst()
+}
+
+export const findAllMerchantGroups = async (
+  db: Database,
+): Promise<MerchantGroup[]> => {
+  return await db.selectFrom('merchant_group').selectAll().execute()
+}
+
 export const upsertMerchantGroupRecord = async (
   db: Database,
   uri: string,
   record: XyzNoshdeliveryV0MerchantGroup.Record,
 ) => {
   const group = {
+    tid: tidFromUri(uri),
     uri,
     name: record.name,
     externalId: record.externalId,
@@ -140,7 +162,8 @@ export const upsertMerchantGroupRecord = async (
     await db
       .insertInto('merchant_group')
       .values(group)
-      .onConflict((oc) => oc.columns(['uri']).doUpdateSet(group)) // TODO not working!
+      .onConflict((oc) => oc.columns(['tid']).doUpdateSet(group))
+      .onConflict((oc) => oc.columns(['uri']).doUpdateSet(group))
       .onConflict((oc) => oc.columns(['name']).doUpdateSet(group))
       .execute()
     // console.log('created merchant group', group.uri)

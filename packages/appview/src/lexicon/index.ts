@@ -11,6 +11,7 @@ import {
 import { schemas } from './lexicons.js'
 import * as XyzNoshdeliveryV0CatalogGetCollectionsAndItems from './types/xyz/noshdelivery/v0/catalog/getCollectionsAndItems.js'
 import * as XyzNoshdeliveryV0CatalogGetFullCatalog from './types/xyz/noshdelivery/v0/catalog/getFullCatalog.js'
+import * as XyzNoshdeliveryV0MerchantGetGroup from './types/xyz/noshdelivery/v0/merchant/getGroup.js'
 import * as XyzNoshdeliveryV0MerchantListGroups from './types/xyz/noshdelivery/v0/merchant/listGroups.js'
 import * as XyzNoshdeliveryV0MerchantListLocations from './types/xyz/noshdelivery/v0/merchant/listLocations.js'
 import * as XyzNoshdeliveryV0MerchantPutGroup from './types/xyz/noshdelivery/v0/merchant/putGroup.js'
@@ -123,6 +124,17 @@ export class XyzNoshdeliveryV0MerchantNS {
 
   constructor(server: Server) {
     this._server = server
+  }
+
+  getGroup<AV extends AuthVerifier>(
+    cfg: ConfigOf<
+      AV,
+      XyzNoshdeliveryV0MerchantGetGroup.Handler<ExtractAuth<AV>>,
+      XyzNoshdeliveryV0MerchantGetGroup.HandlerReqCtx<ExtractAuth<AV>>
+    >,
+  ) {
+    const nsid = 'xyz.noshdelivery.v0.merchant.getGroup' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
   }
 
   listGroups<AV extends AuthVerifier>(

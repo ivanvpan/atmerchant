@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "xyz.noshdelivery.v0.merchant.getGroup",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Get a merchant group by tid.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["tid"],
+          "properties": {
+            "tid": {
+              "type": "string",
+              "format": "tid"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["group"],
+          "properties": {
+            "group": {
+              "type": "ref",
+              "ref": "xyz.noshdelivery.v0.merchant.defs#groupView"
+            }
+          }
+        }
+      }
+    }
+  }
+}
