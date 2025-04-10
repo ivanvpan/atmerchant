@@ -5,7 +5,7 @@ import { AppContext } from '#/context'
 import { Server } from '#/lexicon'
 import { getSessionAgent } from '#/session'
 import { schemaDict } from '#/lexicon/lexicons'
-import { findMerchantLocationsByGroupTid, upsertMerchantLocationRecord } from '#/db'
+import { findMerchantLocationsByGroupUri, upsertMerchantLocationRecord } from '#/db'
 import { dbMerchantLocationToMerchantLocationView } from '#/controllers/merchant'
 
 
@@ -49,11 +49,12 @@ export default function (server: Server, ctx: AppContext) {
         return {
           encoding: 'application/json',
           body: {
-            locations: (await findMerchantLocationsByGroupTid(ctx.db, input.body.parentGroup)).map(dbMerchantLocationToMerchantLocationView),
+            locations: (await findMerchantLocationsByGroupUri(ctx.db, input.body.parentGroup)).map(dbMerchantLocationToMerchantLocationView),
           },
         }
       } catch (err) {
-        throw new UpstreamFailureError('Failed to write record')
+        throw err
+        throw new UpstreamFailureError(`Failed to write record: ${err}`)
       }
     },
   })

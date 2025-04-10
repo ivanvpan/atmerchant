@@ -98,8 +98,7 @@ migrations['001'] = {
       .addColumn('name', 'varchar', (col) => col.notNull().unique())
       .addColumn('address', 'jsonb', (col) => col.notNull())
       .addColumn('timezone', 'varchar', (col) => col.notNull())
-      .addColumn('latitude', 'real', (col) => col.notNull())
-      .addColumn('longitude', 'real', (col) => col.notNull())
+      .addColumn('coordinates', 'jsonb', (col) => col.notNull())
       .addColumn('media', 'jsonb')
       .addColumn('parentGroup', 'varchar', (col) =>
         col.references('merchant_group.uri').notNull(),
@@ -177,6 +176,7 @@ export const upsertMerchantGroupRecord = async (
       console.log('merchant group already exists', group.uri)
     } else {
       console.error('error upserting merchant group', error)
+      throw error
     }
   }
 }
@@ -196,15 +196,23 @@ export const findMerchantLocationsByGroupTid = async (
     .execute()
 }
 
+// TODO the duplication of the above function and this one needs to be dealt with
+export const findMerchantLocationsByGroupUri = async (
+  db: Database,
+  groupUri: string,
+): Promise<MerchantLocation[]> => {
+  return await db
+    .selectFrom('merchant_location')
+    .where('parentGroup', '=', groupUri)
+    .selectAll()
+    .execute()
+}
+
 export const upsertMerchantLocationRecord = async (
   db: Database,
   uri: string,
   record: XyzNoshdeliveryV0MerchantLocation.Record,
 ) => {
-  const groupUri = (await findMerchantGroupByTid(db, record.parentGroup))?.uri
-  if (!groupUri) {
-    throw new InvalidRequestError('Group not found')
-  }
   const location = {
     tid: tidFromUri(uri),
     uri,
@@ -212,7 +220,7 @@ export const upsertMerchantLocationRecord = async (
     address: JSON.stringify(record.address),
     timezone: record.timezone,
     coordinates: JSON.stringify(record.coordinates),
-    parentGroup: groupUri,
+    parentGroup: record.parentGroup,
     externalId: record.externalId || undefined,
   }
   try {
@@ -224,6 +232,8 @@ export const upsertMerchantLocationRecord = async (
       .onConflict((oc) => oc.columns(['name']).doUpdateSet(location))
       .execute()
   } catch (error) {
+    // TODO too verbose and shouldn't onConflict handle this?
     console.error('error upserting merchant location', error)
+    throw error
   }
 }

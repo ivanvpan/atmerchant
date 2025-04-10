@@ -28,7 +28,24 @@ const GroupInfo = () => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<LocationFormData>()
+  } = useForm<LocationFormData>({
+    defaultValues: {
+      name: 'Test Location',
+      externalId: 'TEST123',
+      timezone: 'America/New_York',
+      coordinates: {
+        latitude: '40.7128',
+        longitude: '-74.0060',
+      },
+      address: {
+        street: '123 Test Street',
+        locality: 'New York',
+        region: 'NY',
+        postalCode: '10001',
+        country: 'US',
+      },
+    },
+  })
 
   if (!groupTid) {
     return <div>Error: No group tid</div>
@@ -67,8 +84,8 @@ const GroupInfo = () => {
         parentGroup: groupResponse?.data.group.uri || '',
       })
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['group', groupTid] })
+    onSuccess: (response) => {
+      queryClient.setQueryData(['locations', groupTid], response.data.locations)
       reset()
     },
   })
