@@ -2,8 +2,15 @@ import { IdResolver } from '@atproto/identity'
 import { CommitEvt, Firehose, Event, MemoryRunner } from '@atproto/sync'
 import pino from 'pino'
 
-import { upsertMerchantGroupRecord, type Database } from '#/db'
-import { XyzNoshdeliveryV0MerchantGroup } from '@nosh/lexicon'
+import {
+  upsertMerchantGroupRecord,
+  upsertMerchantLocationRecord,
+  type Database,
+} from '#/db'
+import {
+  XyzNoshdeliveryV0MerchantGroup,
+  XyzNoshdeliveryV0MerchantLocation,
+} from '@nosh/lexicon'
 
 function uriFromEvent(evt: CommitEvt) {
   return `at://${evt.uri.host}${evt.uri.pathname}`
@@ -44,19 +51,29 @@ export async function createFirehoseIngester(
       }
 
       if (evt.event === 'create') {
+        console.log('collection', evt.collection)
         if (evt.collection === 'xyz.noshdelivery.v0.merchant.group') {
           const record = evt.record as XyzNoshdeliveryV0MerchantGroup.Record
           const validatedRecord =
             XyzNoshdeliveryV0MerchantGroup.validateRecord(record)
           if (!validatedRecord.success) return
           await upsertMerchantGroupRecord(db, uriFromEvent(evt), record)
+        } else if (evt.collection === 'xyz.noshdelivery.v0.merchant.location') {
+          const record = evt.record as XyzNoshdeliveryV0MerchantLocation.Record
+          const validatedRecord =
+            XyzNoshdeliveryV0MerchantLocation.validateRecord(record)
+          if (!validatedRecord.success) return
+          await upsertMerchantLocationRecord(db, uriFromEvent(evt), record)
         }
       }
     },
     onError: (err: Error) => {
       logger.error({ err }, 'error on firehose ingestion')
     },
-    filterCollections: ['xyz.noshdelivery.v0.merchant.group'],
+    filterCollections: [
+      'xyz.noshdelivery.v0.merchant.group',
+      'xyz.noshdelivery.v0.merchant.location',
+    ],
     excludeIdentity: true,
     excludeAccount: true,
   })

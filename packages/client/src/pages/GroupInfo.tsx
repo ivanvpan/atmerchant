@@ -85,10 +85,11 @@ const GroupInfo = () => {
       })
     },
     onSuccess: (response) => {
-      queryClient.setQueryData(['locations', groupTid], response.data.locations)
+      queryClient.setQueryData(['locations', groupTid], response)
       reset()
     },
   })
+  console.log('locationsResponse', locationsResponse)
 
   const onSubmit = (data: LocationFormData) => {
     createLocationMutation.mutate(data)
@@ -367,16 +368,16 @@ const GroupInfo = () => {
           )}
         </form>
       </div>
+
       <div className="mt-8 text-xl font-semibold"> Locations </div>
       {locationsResponse && (
-        <div className="grid grid-cols-3 gap-4">
+        <div>
           {locationsResponse.data.locations.map((location) => (
-            <Link
-              to={`/merchant/${groupTid}/location/${location.tid}`}
-              key={location.tid}
-            >
-              {location.name}
-            </Link>
+            <div key={location.tid}>
+              <Link to={`/merchant/${groupTid}/location/${location.tid}`}>
+                {location.name}
+              </Link>
+            </div>
           ))}
         </div>
       )}

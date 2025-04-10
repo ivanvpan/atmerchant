@@ -86,16 +86,16 @@ migrations['001'] = {
       .createTable('merchant_group')
       .addColumn('tid', 'varchar', (col) => col.primaryKey())
       .addColumn('uri', 'varchar', (col) => col.unique())
-      .addColumn('externalId', 'varchar', (col) => col.unique())
-      .addColumn('name', 'varchar', (col) => col.notNull().unique())
+      .addColumn('externalId', 'varchar')
+      .addColumn('name', 'varchar', (col) => col.notNull())
       .addColumn('logo', 'varchar')
       .execute()
     await db.schema
       .createTable('merchant_location')
       .addColumn('tid', 'varchar', (col) => col.primaryKey())
       .addColumn('uri', 'varchar', (col) => col.unique())
-      .addColumn('externalId', 'varchar', (col) => col.unique())
-      .addColumn('name', 'varchar', (col) => col.notNull().unique())
+      .addColumn('externalId', 'varchar')
+      .addColumn('name', 'varchar', (col) => col.notNull())
       .addColumn('address', 'jsonb', (col) => col.notNull())
       .addColumn('timezone', 'varchar', (col) => col.notNull())
       .addColumn('coordinates', 'jsonb', (col) => col.notNull())
@@ -165,7 +165,6 @@ export const upsertMerchantGroupRecord = async (
       .values(group)
       .onConflict((oc) => oc.columns(['tid']).doUpdateSet(group))
       .onConflict((oc) => oc.columns(['uri']).doUpdateSet(group))
-      .onConflict((oc) => oc.columns(['name']).doUpdateSet(group))
       .execute()
     // console.log('created merchant group', group.uri)
   } catch (error) {
@@ -229,7 +228,6 @@ export const upsertMerchantLocationRecord = async (
       .values(location)
       .onConflict((oc) => oc.columns(['tid']).doUpdateSet(location))
       .onConflict((oc) => oc.columns(['uri']).doUpdateSet(location))
-      .onConflict((oc) => oc.columns(['name']).doUpdateSet(location))
       .execute()
   } catch (error) {
     // TODO too verbose and shouldn't onConflict handle this?

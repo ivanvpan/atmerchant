@@ -5,7 +5,7 @@ import { AppContext } from '#/context'
 import { Server } from '#/lexicon'
 import { getSessionAgent } from '#/session'
 import { schemaDict } from '#/lexicon/lexicons'
-import { findMerchantLocationsByGroupUri, upsertMerchantLocationRecord } from '#/db'
+import { findMerchantLocationsByGroupTid, findMerchantLocationsByGroupUri, upsertMerchantLocationRecord } from '#/db'
 import { dbMerchantLocationToMerchantLocationView } from '#/controllers/merchant'
 
 
@@ -34,7 +34,7 @@ export default function (server: Server, ctx: AppContext) {
       try {
         const response = await agent.com.atproto.repo.putRecord({
           repo: agent.assertDid,
-          collection: schemaDict.XyzNoshdeliveryV0MerchantGroup.id,
+          collection: schemaDict.XyzNoshdeliveryV0MerchantLocation.id,
           rkey,
           record: validation.value,
           validate: false,
