@@ -1,4 +1,7 @@
-import { XyzNoshdeliveryV0MerchantGroup } from '@nosh/lexicon'
+import {
+  XyzNoshdeliveryV0MerchantGroup,
+  XyzNoshdeliveryV0MerchantLocation,
+} from '@nosh/lexicon'
 import SqliteDb from 'better-sqlite3'
 import {
   Kysely,
@@ -35,13 +38,13 @@ type MediaJson = string
 export type MerchantLocation = {
   tid: string
   uri: string
-  externalId: string
+  externalId?: string | null
   name: string
   address: AddressJson
   timezone: string
   coordinates: string
   media?: MediaJson | null
-  groupUri: string
+  parentGroup: string
 }
 
 // Migrations
@@ -98,7 +101,7 @@ migrations['001'] = {
       .addColumn('latitude', 'real', (col) => col.notNull())
       .addColumn('longitude', 'real', (col) => col.notNull())
       .addColumn('media', 'jsonb')
-      .addColumn('groupUri', 'varchar', (col) =>
+      .addColumn('parentGroup', 'varchar', (col) =>
         col.references('merchant_group.uri').notNull(),
       )
       .execute()
@@ -188,7 +191,39 @@ export const findMerchantLocationsByGroupTid = async (
   }
   return await db
     .selectFrom('merchant_location')
-    .where('groupUri', '=', groupUri)
+    .where('parentGroup', '=', groupUri)
     .selectAll()
     .execute()
+}
+
+export const upsertMerchantLocationRecord = async (
+  db: Database,
+  uri: string,
+  record: XyzNoshdeliveryV0MerchantLocation.Record,
+) => {
+  const groupUri = (await findMerchantGroupByTid(db, record.parentGroup))?.uri
+  if (!groupUri) {
+    throw new InvalidRequestError('Group not found')
+  }
+  const location = {
+    tid: tidFromUri(uri),
+    uri,
+    name: record.name,
+    address: JSON.stringify(record.address),
+    timezone: record.timezone,
+    coordinates: JSON.stringify(record.coordinates),
+    parentGroup: groupUri,
+    externalId: record.externalId || undefined,
+  }
+  try {
+    await db
+      .insertInto('merchant_location')
+      .values(location)
+      .onConflict((oc) => oc.columns(['tid']).doUpdateSet(location))
+      .onConflict((oc) => oc.columns(['uri']).doUpdateSet(location))
+      .onConflict((oc) => oc.columns(['name']).doUpdateSet(location))
+      .execute()
+  } catch (error) {
+    console.error('error upserting merchant location', error)
+  }
 }

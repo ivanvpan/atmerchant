@@ -30,7 +30,7 @@ export function dbMerchantLocationToMerchantLocationView(
   return {
     tid: dbMerchantLocation.tid,
     uri: dbMerchantLocation.uri,
-    externalId: dbMerchantLocation.externalId,
+    externalId: dbMerchantLocation.externalId || undefined,
     name: dbMerchantLocation.name,
     address: JSON.parse(dbMerchantLocation.address) as Address,
     timezone: dbMerchantLocation.timezone,

@@ -20,7 +20,7 @@ const id = 'xyz.noshdelivery.v0.merchant.location'
 export interface Record {
   $type: 'xyz.noshdelivery.v0.merchant.location'
   /** The uri for the merchant group that this location belongs to. */
-  parentGroup?: string
+  parentGroup: string
   externalId?: string
   name: string
   timezone: string

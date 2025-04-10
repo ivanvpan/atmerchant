@@ -1,17 +1,16 @@
 import {TID} from '@atproto/common'
 import { InvalidRequestError, UpstreamFailureError } from '@atproto/xrpc-server'
-import { XyzNoshdeliveryV0MerchantGroup } from '@nosh/lexicon'
+import { XyzNoshdeliveryV0MerchantLocation } from '@nosh/lexicon'
 import { AppContext } from '#/context'
 import { Server } from '#/lexicon'
 import { getSessionAgent } from '#/session'
 import { schemaDict } from '#/lexicon/lexicons'
-import { findAllMerchantGroups, upsertMerchantGroupRecord } from '#/db'
-import { dbMerchantGroupToMerchantGroupView } from '#/controllers/merchant'
+import { findMerchantLocationsByGroupTid, upsertMerchantLocationRecord } from '#/db'
+import { dbMerchantLocationToMerchantLocationView } from '#/controllers/merchant'
 
 
 export default function (server: Server, ctx: AppContext) {
-  ctx.logger.info('Hello!')
-  server.xyz.noshdelivery.v0.merchant.putGroup({
+  server.xyz.noshdelivery.v0.merchant.putLocation({
     handler: async ({ input }) => {
       ctx.logger.info('inside handler!')
 
@@ -20,19 +19,19 @@ export default function (server: Server, ctx: AppContext) {
 
       const rkey = TID.nextStr()
       const record = {
-        $type: schemaDict.XyzNoshdeliveryV0MerchantGroup.id,
+        $type: schemaDict.XyzNoshdeliveryV0MerchantLocation.id,
         ...input.body,
       }
 
       console.log('validating record', record)
-      const validation = XyzNoshdeliveryV0MerchantGroup.validateRecord(record)
+      const validation = XyzNoshdeliveryV0MerchantLocation.validateRecord(record)
 
       if (!validation.success) {
         throw new InvalidRequestError('Invalid group record')
       }
 
+      // TODO ensure uniqueness constraints first
       try {
-        // TODO ensure uniqueness constraints first
         const response = await agent.com.atproto.repo.putRecord({
           repo: agent.assertDid,
           collection: schemaDict.XyzNoshdeliveryV0MerchantGroup.id,
@@ -42,15 +41,15 @@ export default function (server: Server, ctx: AppContext) {
         })
         console.log('uri', response.data.uri)
 
-        await upsertMerchantGroupRecord(ctx.db, response.data.uri, {
-          $type: schemaDict.XyzNoshdeliveryV0MerchantGroup.id,
+        await upsertMerchantLocationRecord(ctx.db, response.data.uri, {
+          $type: schemaDict.XyzNoshdeliveryV0MerchantLocation.id,
           ...input.body,
         })
 
         return {
           encoding: 'application/json',
           body: {
-            groups: (await findAllMerchantGroups(ctx.db)).map(dbMerchantGroupToMerchantGroupView),
+            locations: (await findMerchantLocationsByGroupTid(ctx.db, input.body.parentGroup)).map(dbMerchantLocationToMerchantLocationView),
           },
         }
       } catch (err) {

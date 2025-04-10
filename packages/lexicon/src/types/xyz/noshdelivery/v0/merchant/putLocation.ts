@@ -10,6 +10,8 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../../util'
+import type * as CommunityLexiconLocationAddress from '../../../../community/lexicon/location/address.js'
+import type * as CommunityLexiconLocationGeo from '../../../../community/lexicon/location/geo.js'
 import type * as XyzNoshdeliveryV0MerchantDefs from './defs.js'
 
 const is$typed = _is$typed,
@@ -18,10 +20,23 @@ const id = 'xyz.noshdelivery.v0.merchant.putLocation'
 
 export interface QueryParams {}
 
-export interface InputSchema {}
+export interface InputSchema {
+  /** The tid of the merchant group. */
+  groupTid: string
+  /** The external id of the merchant location. */
+  externalId?: string
+  /** The name of the merchant location. */
+  name: string
+  address: CommunityLexiconLocationAddress.Main
+  coordinates: CommunityLexiconLocationGeo.Main
+  /** The timezone of the merchant location. */
+  timezone: string
+  /** The uri of the merchant group. */
+  parentGroup: string
+}
 
 export interface OutputSchema {
-  location: XyzNoshdeliveryV0MerchantDefs.LocationView
+  locations: XyzNoshdeliveryV0MerchantDefs.LocationView[]
 }
 
 export interface CallOptions {

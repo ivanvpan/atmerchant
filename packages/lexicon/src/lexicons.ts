@@ -1048,7 +1048,13 @@ export const schemaDict = {
         key: 'tid',
         record: {
           type: 'object',
-          required: ['name', 'timezone', 'address', 'coordinates'],
+          required: [
+            'name',
+            'timezone',
+            'address',
+            'coordinates',
+            'parentGroup',
+          ],
           properties: {
             parentGroup: {
               type: 'string',
@@ -1145,19 +1151,60 @@ export const schemaDict = {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: [],
-            properties: {},
+            required: [
+              'groupTid',
+              'name',
+              'address',
+              'coordinates',
+              'timezone',
+              'parentGroup',
+            ],
+            properties: {
+              groupTid: {
+                type: 'string',
+                description: 'The tid of the merchant group.',
+                format: 'tid',
+              },
+              externalId: {
+                type: 'string',
+                description: 'The external id of the merchant location.',
+              },
+              name: {
+                type: 'string',
+                description: 'The name of the merchant location.',
+              },
+              address: {
+                type: 'ref',
+                ref: 'lex:community.lexicon.location.address',
+              },
+              coordinates: {
+                type: 'ref',
+                ref: 'lex:community.lexicon.location.geo',
+              },
+              timezone: {
+                type: 'string',
+                description: 'The timezone of the merchant location.',
+              },
+              parentGroup: {
+                type: 'string',
+                description: 'The uri of the merchant group.',
+                format: 'at-uri',
+              },
+            },
           },
         },
         output: {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: ['location'],
+            required: ['locations'],
             properties: {
-              location: {
-                type: 'ref',
-                ref: 'lex:xyz.noshdelivery.v0.merchant.defs#locationView',
+              locations: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.merchant.defs#locationView',
+                },
               },
             },
           },

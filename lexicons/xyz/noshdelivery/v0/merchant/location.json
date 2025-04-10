@@ -12,7 +12,8 @@
           "name",
           "timezone",
           "address",
-          "coordinates"
+          "coordinates",
+          "parentGroup"
         ],
         "properties": {
           "parentGroup": {
