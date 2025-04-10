@@ -8,9 +8,9 @@
       "parameters": {
         "type": "params",
         "properties": {
-          "groupUri": {
+          "groupTid": {
             "type": "string",
-            "format": "at-uri"
+            "format": "tid"
           }
         }
       },
@@ -18,9 +18,7 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": [
-            "locations"
-          ],
+          "required": ["locations"],
           "properties": {
             "locations": {
               "type": "array",

@@ -1013,9 +1013,9 @@ export const schemaDict = {
         parameters: {
           type: 'params',
           properties: {
-            groupUri: {
+            groupTid: {
               type: 'string',
-              format: 'at-uri',
+              format: 'tid',
             },
           },
         },

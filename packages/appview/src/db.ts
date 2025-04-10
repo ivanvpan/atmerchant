@@ -9,7 +9,7 @@ import {
   // ParseJSONResultsPlugin
 } from 'kysely'
 import { tidFromUri } from '#/utils/uri'
-// Types
+import { InvalidRequestError } from '@atproto/xrpc-server'
 
 export type DatabaseSchema = {
   merchant_group: MerchantGroup
@@ -39,8 +39,7 @@ export type MerchantLocation = {
   name: string
   address: AddressJson
   timezone: string
-  latitude: number
-  longitude: number
+  coordinates: string
   media?: MediaJson | null
   groupUri: string
 }
@@ -177,4 +176,19 @@ export const upsertMerchantGroupRecord = async (
       console.error('error upserting merchant group', error)
     }
   }
+}
+
+export const findMerchantLocationsByGroupTid = async (
+  db: Database,
+  tid: string,
+): Promise<MerchantLocation[]> => {
+  const groupUri = (await findMerchantGroupByTid(db, tid))?.uri
+  if (!groupUri) {
+    throw new InvalidRequestError('Group not found')
+  }
+  return await db
+    .selectFrom('merchant_location')
+    .where('groupUri', '=', groupUri)
+    .selectAll()
+    .execute()
 }
