@@ -521,13 +521,13 @@ export class XyzNoshdeliveryV0MerchantNS {
   }
 
   getGroup(
-    data?: XyzNoshdeliveryV0MerchantGetGroup.InputSchema,
+    params?: XyzNoshdeliveryV0MerchantGetGroup.QueryParams,
     opts?: XyzNoshdeliveryV0MerchantGetGroup.CallOptions,
   ): Promise<XyzNoshdeliveryV0MerchantGetGroup.Response> {
     return this._client.call(
       'xyz.noshdelivery.v0.merchant.getGroup',
-      opts?.qp,
-      data,
+      params,
+      undefined,
       opts,
     )
   }

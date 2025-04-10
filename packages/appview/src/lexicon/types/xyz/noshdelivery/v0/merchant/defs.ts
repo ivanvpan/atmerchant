@@ -57,6 +57,7 @@ export function validateGroupView<V>(v: V) {
 /** A view of a merchant location */
 export interface LocationView {
   $type?: 'xyz.noshdelivery.v0.merchant.defs#locationView'
+  tid?: string
   uri?: string
   externalId?: string
   name?: string

@@ -32,8 +32,20 @@ export const api = {
     return agent.xyz.noshdelivery.v0.merchant.putGroup(params)
   },
 
-  getGroup(params: Lexicon.XyzNoshdeliveryV0MerchantGetGroup.InputSchema) {
+  getGroup(params: Lexicon.XyzNoshdeliveryV0MerchantGetGroup.QueryParams) {
     return agent.xyz.noshdelivery.v0.merchant.getGroup(params)
+  },
+
+  listLocations(
+    params: Lexicon.XyzNoshdeliveryV0MerchantListLocations.QueryParams,
+  ) {
+    return agent.xyz.noshdelivery.v0.merchant.listLocations(params)
+  },
+
+  putLocation(
+    params: Lexicon.XyzNoshdeliveryV0MerchantPutLocation.InputSchema,
+  ) {
+    return agent.xyz.noshdelivery.v0.merchant.putLocation(params)
   },
 }
 

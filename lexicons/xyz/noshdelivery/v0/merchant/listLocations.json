@@ -7,6 +7,7 @@
       "description": "Get all merchants in a group.",
       "parameters": {
         "type": "params",
+        "required": ["groupTid"],
         "properties": {
           "groupTid": {
             "type": "string",

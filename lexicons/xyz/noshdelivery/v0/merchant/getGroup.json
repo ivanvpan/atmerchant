@@ -3,18 +3,15 @@
   "id": "xyz.noshdelivery.v0.merchant.getGroup",
   "defs": {
     "main": {
-      "type": "procedure",
+      "type": "query",
       "description": "Get a merchant group by tid.",
-      "input": {
-        "encoding": "application/json",
-        "schema": {
-          "type": "object",
-          "required": ["tid"],
-          "properties": {
-            "tid": {
-              "type": "string",
-              "format": "tid"
-            }
+      "parameters": {
+        "type": "params",
+        "required": ["tid"],
+        "properties": {
+          "tid": {
+            "type": "string",
+            "format": "tid"
           }
         }
       },

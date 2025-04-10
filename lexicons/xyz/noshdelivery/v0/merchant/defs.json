@@ -49,6 +49,10 @@
       "type": "object",
       "description": "A view of a merchant location",
       "properties": {
+        "tid": {
+          "type": "string",
+          "format": "tid"
+        },
         "uri": {
           "type": "string",
           "format": "at-uri"

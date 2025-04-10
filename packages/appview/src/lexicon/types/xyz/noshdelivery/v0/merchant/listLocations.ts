@@ -18,7 +18,7 @@ const is$typed = _is$typed,
 const id = 'xyz.noshdelivery.v0.merchant.listLocations'
 
 export interface QueryParams {
-  groupTid?: string
+  groupTid: string
 }
 
 export type InputSchema = undefined

@@ -878,6 +878,10 @@ export const schemaDict = {
         type: 'object',
         description: 'A view of a merchant location',
         properties: {
+          tid: {
+            type: 'string',
+            format: 'tid',
+          },
           uri: {
             type: 'string',
             format: 'at-uri',
@@ -912,18 +916,15 @@ export const schemaDict = {
     id: 'xyz.noshdelivery.v0.merchant.getGroup',
     defs: {
       main: {
-        type: 'procedure',
+        type: 'query',
         description: 'Get a merchant group by tid.',
-        input: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            required: ['tid'],
-            properties: {
-              tid: {
-                type: 'string',
-                format: 'tid',
-              },
+        parameters: {
+          type: 'params',
+          required: ['tid'],
+          properties: {
+            tid: {
+              type: 'string',
+              format: 'tid',
             },
           },
         },
@@ -1012,6 +1013,7 @@ export const schemaDict = {
         description: 'Get all merchants in a group.',
         parameters: {
           type: 'params',
+          required: ['groupTid'],
           properties: {
             groupTid: {
               type: 'string',

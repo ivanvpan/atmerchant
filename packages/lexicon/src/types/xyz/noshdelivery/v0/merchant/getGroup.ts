@@ -16,11 +16,11 @@ const is$typed = _is$typed,
   validate = _validate
 const id = 'xyz.noshdelivery.v0.merchant.getGroup'
 
-export interface QueryParams {}
-
-export interface InputSchema {
+export interface QueryParams {
   tid: string
 }
+
+export type InputSchema = undefined
 
 export interface OutputSchema {
   group: XyzNoshdeliveryV0MerchantDefs.GroupView
@@ -29,8 +29,6 @@ export interface OutputSchema {
 export interface CallOptions {
   signal?: AbortSignal
   headers?: HeadersMap
-  qp?: QueryParams
-  encoding?: 'application/json'
 }
 
 export interface Response {

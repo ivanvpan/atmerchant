@@ -6,8 +6,9 @@ import { findMerchantGroupByTid } from '#/db'
 
 export default function (server: Server, ctx: AppContext) {
   server.xyz.noshdelivery.v0.merchant.getGroup({
-    handler: async ({ input }) => {
-      const group = await findMerchantGroupByTid(ctx.db, input.body.tid)
+    handler: async ({ params }) => {
+
+      const group = await findMerchantGroupByTid(ctx.db, params.tid)
       if (!group) {
         throw new Error('Group not found') // TODO what's the right error here?
       }
