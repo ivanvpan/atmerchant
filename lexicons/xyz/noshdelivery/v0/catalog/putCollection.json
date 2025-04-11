@@ -48,9 +48,9 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["collectionView"],
+          "required": ["collection"],
           "properties": {
-            "collectionView": {
+            "collection": {
               "type": "ref",
               "ref": "xyz.noshdelivery.v0.catalog.defs#collectionView"
             }

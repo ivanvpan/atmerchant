@@ -54,11 +54,11 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["collectionView"],
+          "required": ["item"],
           "properties": {
-            "collectionView": {
+            "item": {
               "type": "ref",
-              "ref": "xyz.noshdelivery.v0.catalog.defs#collectionView"
+              "ref": "xyz.noshdelivery.v0.catalog.defs#itemView"
             }
           }
         }

@@ -47,14 +47,11 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["catalogViews"],
+          "required": ["catalog"],
           "properties": {
-            "catalogViews": {
-              "type": "array",
-              "items": {
-                "type": "ref",
-                "ref": "xyz.noshdelivery.v0.catalog.defs#shallowCatalogView"
-              }
+            "catalog": {
+              "type": "ref",
+              "ref": "xyz.noshdelivery.v0.catalog.defs#catalogView"
             }
           }
         }

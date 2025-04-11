@@ -29,7 +29,7 @@ export interface InputSchema {
 }
 
 export interface OutputSchema {
-  catalogViews: XyzNoshdeliveryV0CatalogDefs.ShallowCatalogView[]
+  catalog: XyzNoshdeliveryV0CatalogDefs.CatalogView
 }
 
 export interface HandlerInput {

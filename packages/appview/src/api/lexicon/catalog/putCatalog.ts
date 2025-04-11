@@ -1,12 +1,13 @@
-import { InvalidRequestError, UpstreamFailureError } from '@atproto/xrpc-server'
+import {TID} from '@atproto/common'
+import { InternalServerError, InvalidRequestError, UpstreamFailureError } from '@atproto/xrpc-server'
 import { XyzNoshdeliveryV0CatalogCatalog, XyzNoshdeliveryV0MerchantLocation } from '@nosh/lexicon'
 import { AppContext } from '#/context'
 import { Server } from '#/lexicon'
 import { getSessionAgent } from '#/session'
 import { schemaDict } from '#/lexicon/lexicons'
-import { findMerchantLocationsByGroupTid, findMerchantLocationsByGroupUri, upsertMerchantLocationRecord } from '#/db'
-import { dbMerchantLocationToMerchantLocationView } from '#/controllers/merchant'
-
+import { findCatalogByTid, upsertCatalogRecord } from '#/db'
+import { dbCatalogToCatalogView } from '#/controllers/catalog'
+import { tidFromUri } from '#/utils/uri'
 
 export default function (server: Server, ctx: AppContext) {
   server.xyz.noshdelivery.v0.catalog.putCatalog({
@@ -37,8 +38,24 @@ export default function (server: Server, ctx: AppContext) {
         })
 
         await upsertCatalogRecord(ctx.db, response.data.uri, {
+          $type: schemaDict.XyzNoshdeliveryV0CatalogCatalog.id,
+          ...input.body,
+        })
+
+        const dbCatalog = await findCatalogByTid(ctx.db, tidFromUri(response.data.uri)) 
+        if (!dbCatalog) {
+          throw new InternalServerError('Failed to find catalog')
+        }
+
+        return {
+          encoding: 'application/json',
+          body: {
+            catalog: dbCatalogToCatalogView(dbCatalog),
+          },
+        }
       } catch (err) {
-        throw err
         throw new UpstreamFailureError(`Failed to write record: ${err}`)
       }
+    },
   })
+}

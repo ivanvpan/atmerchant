@@ -30,7 +30,7 @@ export interface InputSchema {
 }
 
 export interface OutputSchema {
-  collectionView: XyzNoshdeliveryV0CatalogDefs.CollectionView
+  collection: XyzNoshdeliveryV0CatalogDefs.CollectionView
 }
 
 export interface CallOptions {

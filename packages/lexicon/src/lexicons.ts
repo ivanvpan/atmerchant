@@ -751,14 +751,11 @@ export const schemaDict = {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: ['catalogViews'],
+            required: ['catalog'],
             properties: {
-              catalogViews: {
-                type: 'array',
-                items: {
-                  type: 'ref',
-                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#shallowCatalogView',
-                },
+              catalog: {
+                type: 'ref',
+                ref: 'lex:xyz.noshdelivery.v0.catalog.defs#catalogView',
               },
             },
           },
@@ -818,9 +815,9 @@ export const schemaDict = {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: ['collectionView'],
+            required: ['collection'],
             properties: {
-              collectionView: {
+              collection: {
                 type: 'ref',
                 ref: 'lex:xyz.noshdelivery.v0.catalog.defs#collectionView',
               },
@@ -889,11 +886,11 @@ export const schemaDict = {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: ['collectionView'],
+            required: ['item'],
             properties: {
-              collectionView: {
+              item: {
                 type: 'ref',
-                ref: 'lex:xyz.noshdelivery.v0.catalog.defs#collectionView',
+                ref: 'lex:xyz.noshdelivery.v0.catalog.defs#itemView',
               },
             },
           },

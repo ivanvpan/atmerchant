@@ -1,4 +1,7 @@
 import {
+  XyzNoshdeliveryV0CatalogCatalog,
+  XyzNoshdeliveryV0CatalogCollection,
+  XyzNoshdeliveryV0CatalogItem,
   XyzNoshdeliveryV0MerchantGroup,
   XyzNoshdeliveryV0MerchantLocation,
 } from '@nosh/lexicon'
@@ -335,4 +338,117 @@ export const findCatalogsByLocationTid = async (
     .where('merchantLocation', '=', tid)
     .selectAll()
     .execute()
+}
+
+export const findCatalogByTid = async (
+  db: Database,
+  tid: string,
+): Promise<Catalog | undefined> => {
+  return await db
+    .selectFrom('catalog')
+    .where('tid', '=', tid)
+    .selectAll()
+    .executeTakeFirst()
+}
+
+export const upsertCatalogRecord = async (
+  db: Database,
+  uri: string,
+  record: XyzNoshdeliveryV0CatalogCatalog.Record,
+) => {
+  const catalog = {
+    tid: tidFromUri(uri),
+    uri,
+    name: record.name,
+    merchantLocation: record.merchantLocation,
+    availabilityPeriods: JSON.stringify(record.availabilityPeriods),
+    childCollections: JSON.stringify(record.childCollections),
+  }
+  try {
+    await db
+      .insertInto('catalog')
+      .values(catalog)
+      .onConflict((oc) => oc.columns(['tid']).doUpdateSet(catalog))
+      .onConflict((oc) => oc.columns(['uri']).doUpdateSet(catalog))
+      .execute()
+  } catch (error) {
+    console.error('error upserting catalog', error)
+    throw error
+  }
+}
+
+export const findCollectionByTid = async (
+  db: Database,
+  tid: string,
+): Promise<CatalogCollection | undefined> => {
+  return await db
+    .selectFrom('catalog_collection')
+    .where('tid', '=', tid)
+    .selectAll()
+    .executeTakeFirst()
+}
+
+export const upsertCollectionRecord = async (
+  db: Database,
+  uri: string,
+  record: XyzNoshdeliveryV0CatalogCollection.Record,
+) => {
+  const collection = {
+    tid: tidFromUri(uri),
+    uri,
+    name: record.name,
+    items: JSON.stringify(record.items),
+    media: JSON.stringify(record.media),
+    childCollections: JSON.stringify(record.childCollections),
+  }
+  try {
+    await db
+      .insertInto('catalog_collection')
+      .values(collection)
+      .onConflict((oc) => oc.columns(['tid']).doUpdateSet(collection))
+      .onConflict((oc) => oc.columns(['uri']).doUpdateSet(collection))
+      .execute()
+  } catch (error) {
+    console.error('error upserting collection', error)
+    throw error
+  }
+}
+
+export const findItemByTid = async (
+  db: Database,
+  tid: string,
+): Promise<CatalogItem | undefined> => {
+  return await db
+    .selectFrom('catalog_item')
+    .where('tid', '=', tid)
+    .selectAll()
+    .executeTakeFirst()
+}
+
+export const upsertItemRecord = async (
+  db: Database,
+  uri: string,
+  record: XyzNoshdeliveryV0CatalogItem.Record,
+) => {
+  const item = {
+    tid: tidFromUri(uri),
+    uri,
+    name: record.name,
+    description: record.description,
+    media: JSON.stringify(record.media),
+    priceMoney: JSON.stringify(record.priceMoney),
+    availableForSale: record.availableForSale,
+    modifierGroups: JSON.stringify(record.modifierGroups),
+  }
+  try {
+    await db
+      .insertInto('catalog_item')
+      .values(item)
+      .onConflict((oc) => oc.columns(['tid']).doUpdateSet(item))
+      .onConflict((oc) => oc.columns(['uri']).doUpdateSet(item))
+      .execute()
+  } catch (error) {
+    console.error('error upserting item', error)
+    throw error
+  }
 }
