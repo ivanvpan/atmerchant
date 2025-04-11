@@ -13,7 +13,7 @@ import * as XyzNoshdeliveryV0CatalogCatalog from './types/xyz/noshdelivery/v0/ca
 import * as XyzNoshdeliveryV0CatalogCollection from './types/xyz/noshdelivery/v0/catalog/collection.js'
 import * as XyzNoshdeliveryV0CatalogDefs from './types/xyz/noshdelivery/v0/catalog/defs.js'
 import * as XyzNoshdeliveryV0CatalogGetFullCatalog from './types/xyz/noshdelivery/v0/catalog/getFullCatalog.js'
-import * as XyzNoshdeliveryV0CatalogGetShallowCatalogs from './types/xyz/noshdelivery/v0/catalog/getShallowCatalogs.js'
+import * as XyzNoshdeliveryV0CatalogGetShallowCatalogView from './types/xyz/noshdelivery/v0/catalog/getShallowCatalogView.js'
 import * as XyzNoshdeliveryV0CatalogItem from './types/xyz/noshdelivery/v0/catalog/item.js'
 import * as XyzNoshdeliveryV0CatalogModifier from './types/xyz/noshdelivery/v0/catalog/modifier.js'
 import * as XyzNoshdeliveryV0CatalogModifierGroup from './types/xyz/noshdelivery/v0/catalog/modifierGroup.js'
@@ -51,7 +51,7 @@ export * as XyzNoshdeliveryV0CatalogCatalog from './types/xyz/noshdelivery/v0/ca
 export * as XyzNoshdeliveryV0CatalogCollection from './types/xyz/noshdelivery/v0/catalog/collection.js'
 export * as XyzNoshdeliveryV0CatalogDefs from './types/xyz/noshdelivery/v0/catalog/defs.js'
 export * as XyzNoshdeliveryV0CatalogGetFullCatalog from './types/xyz/noshdelivery/v0/catalog/getFullCatalog.js'
-export * as XyzNoshdeliveryV0CatalogGetShallowCatalogs from './types/xyz/noshdelivery/v0/catalog/getShallowCatalogs.js'
+export * as XyzNoshdeliveryV0CatalogGetShallowCatalogView from './types/xyz/noshdelivery/v0/catalog/getShallowCatalogView.js'
 export * as XyzNoshdeliveryV0CatalogItem from './types/xyz/noshdelivery/v0/catalog/item.js'
 export * as XyzNoshdeliveryV0CatalogModifier from './types/xyz/noshdelivery/v0/catalog/modifier.js'
 export * as XyzNoshdeliveryV0CatalogModifierGroup from './types/xyz/noshdelivery/v0/catalog/modifierGroup.js'
@@ -166,12 +166,12 @@ export class XyzNoshdeliveryV0CatalogNS {
     )
   }
 
-  getShallowCatalogs(
-    params?: XyzNoshdeliveryV0CatalogGetShallowCatalogs.QueryParams,
-    opts?: XyzNoshdeliveryV0CatalogGetShallowCatalogs.CallOptions,
-  ): Promise<XyzNoshdeliveryV0CatalogGetShallowCatalogs.Response> {
+  getShallowCatalogView(
+    params?: XyzNoshdeliveryV0CatalogGetShallowCatalogView.QueryParams,
+    opts?: XyzNoshdeliveryV0CatalogGetShallowCatalogView.CallOptions,
+  ): Promise<XyzNoshdeliveryV0CatalogGetShallowCatalogView.Response> {
     return this._client.call(
-      'xyz.noshdelivery.v0.catalog.getShallowCatalogs',
+      'xyz.noshdelivery.v0.catalog.getShallowCatalogView',
       params,
       undefined,
       opts,

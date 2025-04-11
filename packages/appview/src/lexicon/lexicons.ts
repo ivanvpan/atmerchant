@@ -485,9 +485,9 @@ export const schemaDict = {
       },
     },
   },
-  XyzNoshdeliveryV0CatalogGetShallowCatalogs: {
+  XyzNoshdeliveryV0CatalogGetShallowCatalogView: {
     lexicon: 1,
-    id: 'xyz.noshdelivery.v0.catalog.getShallowCatalogs',
+    id: 'xyz.noshdelivery.v0.catalog.getShallowCatalogView',
     defs: {
       main: {
         type: 'query',
@@ -497,7 +497,7 @@ export const schemaDict = {
           type: 'params',
           required: [],
           properties: {
-            merchantUri: {
+            locationUri: {
               type: 'string',
               description: 'The URI of the merchant whose catalogs to get.',
               format: 'at-uri',
@@ -508,18 +508,15 @@ export const schemaDict = {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: ['merchantLocation', 'catalogViews'],
+            required: ['merchantLocation', 'shallowCatalogView'],
             properties: {
               merchantLocation: {
                 type: 'string',
                 format: 'at-uri',
               },
-              catalogViews: {
-                type: 'array',
-                items: {
-                  type: 'ref',
-                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#shallowCatalogView',
-                },
+              shallowCatalogView: {
+                type: 'ref',
+                ref: 'lex:xyz.noshdelivery.v0.catalog.defs#shallowCatalogView',
               },
             },
           },
@@ -2479,8 +2476,8 @@ export const ids = {
   XyzNoshdeliveryV0CatalogDefs: 'xyz.noshdelivery.v0.catalog.defs',
   XyzNoshdeliveryV0CatalogGetFullCatalog:
     'xyz.noshdelivery.v0.catalog.getFullCatalog',
-  XyzNoshdeliveryV0CatalogGetShallowCatalogs:
-    'xyz.noshdelivery.v0.catalog.getShallowCatalogs',
+  XyzNoshdeliveryV0CatalogGetShallowCatalogView:
+    'xyz.noshdelivery.v0.catalog.getShallowCatalogView',
   XyzNoshdeliveryV0CatalogItem: 'xyz.noshdelivery.v0.catalog.item',
   XyzNoshdeliveryV0CatalogModifier: 'xyz.noshdelivery.v0.catalog.modifier',
   XyzNoshdeliveryV0CatalogModifierGroup:

@@ -15,18 +15,18 @@ import type * as XyzNoshdeliveryV0CatalogDefs from './defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'xyz.noshdelivery.v0.catalog.getShallowCatalogs'
+const id = 'xyz.noshdelivery.v0.catalog.getShallowCatalogView'
 
 export interface QueryParams {
   /** The URI of the merchant whose catalogs to get. */
-  merchantUri?: string
+  locationUri?: string
 }
 
 export type InputSchema = undefined
 
 export interface OutputSchema {
   merchantLocation: string
-  catalogViews: XyzNoshdeliveryV0CatalogDefs.ShallowCatalogView[]
+  shallowCatalogView: XyzNoshdeliveryV0CatalogDefs.ShallowCatalogView
 }
 
 export type HandlerInput = undefined

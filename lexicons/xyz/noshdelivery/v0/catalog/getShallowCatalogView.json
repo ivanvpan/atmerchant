@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "xyz.noshdelivery.v0.catalog.getShallowCatalogs",
+  "id": "xyz.noshdelivery.v0.catalog.getShallowCatalogView",
   "defs": {
     "main": {
       "type": "query",
@@ -9,7 +9,7 @@
         "type": "params",
         "required": [],
         "properties": {
-          "merchantUri": {
+          "locationUri": {
             "type": "string",
             "description": "The URI of the merchant whose catalogs to get.",
             "format": "at-uri"
@@ -20,18 +20,15 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["merchantLocation", "catalogViews"],
+          "required": ["merchantLocation", "shallowCatalogView"],
           "properties": {
             "merchantLocation": {
               "type": "string",
               "format": "at-uri"
             },
-            "catalogViews": {
-              "type": "array",
-              "items": {
-                "type": "ref",
-                "ref": "xyz.noshdelivery.v0.catalog.defs#shallowCatalogView"
-              }
+            "shallowCatalogView": {
+              "type": "ref",
+              "ref": "xyz.noshdelivery.v0.catalog.defs#shallowCatalogView"
             }
           }
         }

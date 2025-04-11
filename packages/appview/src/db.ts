@@ -329,15 +329,37 @@ export const upsertMerchantLocationRecord = async (
   }
 }
 
-export const findCatalogsByLocationTid = async (
+export const getSharedCatalogsForLocationUri = async (
   db: Database,
-  tid: string,
-): Promise<Catalog[]> => {
-  return await db
+  uri: string,
+): Promise<{
+  catalogs: Catalog[]
+  collections: CatalogCollection[]
+  items: CatalogItem[]
+}> => {
+  const catalogs = await db
     .selectFrom('catalog')
-    .where('merchantLocation', '=', tid)
+    .where('merchantLocation', '=', uri)
     .selectAll()
     .execute()
+
+  const collectionsIds = catalogs.flatMap((catalog) => catalog.childCollections)
+
+  const collections = await db
+    .selectFrom('catalog_collection')
+    .where('tid', 'in', collectionsIds)
+    .selectAll()
+    .execute()
+
+  const itemsIds = collections.flatMap((collection) => collection.items)
+
+  const items = await db
+    .selectFrom('catalog_item')
+    .where('tid', 'in', itemsIds)
+    .selectAll()
+    .execute()
+
+  return { catalogs, collections, items }
 }
 
 export const findCatalogByTid = async (
