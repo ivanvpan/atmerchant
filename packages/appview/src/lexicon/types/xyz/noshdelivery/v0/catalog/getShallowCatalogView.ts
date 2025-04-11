@@ -26,7 +26,7 @@ export type InputSchema = undefined
 
 export interface OutputSchema {
   merchantLocation: string
-  shallowCatalogView: XyzNoshdeliveryV0CatalogDefs.ShallowCatalogView
+  shallowCatalogView: ShallowCatalogView
 }
 
 export type HandlerInput = undefined
@@ -54,3 +54,20 @@ export type HandlerReqCtx<HA extends HandlerAuth = never> = {
 export type Handler<HA extends HandlerAuth = never> = (
   ctx: HandlerReqCtx<HA>,
 ) => Promise<HandlerOutput> | HandlerOutput
+
+export interface ShallowCatalogView {
+  $type?: 'xyz.noshdelivery.v0.catalog.getShallowCatalogView#shallowCatalogView'
+  catalogs: XyzNoshdeliveryV0CatalogDefs.CatalogView[]
+  collections: XyzNoshdeliveryV0CatalogDefs.CollectionView[]
+  items: XyzNoshdeliveryV0CatalogDefs.ItemView[]
+}
+
+const hashShallowCatalogView = 'shallowCatalogView'
+
+export function isShallowCatalogView<V>(v: V) {
+  return is$typed(v, id, hashShallowCatalogView)
+}
+
+export function validateShallowCatalogView<V>(v: V) {
+  return validate<ShallowCatalogView & V>(v, id, hashShallowCatalogView)
+}

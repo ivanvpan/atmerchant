@@ -25,7 +25,7 @@ export type InputSchema = undefined
 
 export interface OutputSchema {
   merchantLocation: string
-  shallowCatalogView: XyzNoshdeliveryV0CatalogDefs.ShallowCatalogView
+  shallowCatalogView: ShallowCatalogView
 }
 
 export interface CallOptions {
@@ -41,4 +41,21 @@ export interface Response {
 
 export function toKnownErr(e: any) {
   return e
+}
+
+export interface ShallowCatalogView {
+  $type?: 'xyz.noshdelivery.v0.catalog.getShallowCatalogView#shallowCatalogView'
+  catalogs: XyzNoshdeliveryV0CatalogDefs.CatalogView[]
+  collections: XyzNoshdeliveryV0CatalogDefs.CollectionView[]
+  items: XyzNoshdeliveryV0CatalogDefs.ItemView[]
+}
+
+const hashShallowCatalogView = 'shallowCatalogView'
+
+export function isShallowCatalogView<V>(v: V) {
+  return is$typed(v, id, hashShallowCatalogView)
+}
+
+export function validateShallowCatalogView<V>(v: V) {
+  return validate<ShallowCatalogView & V>(v, id, hashShallowCatalogView)
 }

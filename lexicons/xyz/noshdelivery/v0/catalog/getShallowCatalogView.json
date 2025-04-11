@@ -28,8 +28,35 @@
             },
             "shallowCatalogView": {
               "type": "ref",
-              "ref": "xyz.noshdelivery.v0.catalog.defs#shallowCatalogView"
+              "ref": "#shallowCatalogView"
             }
+          }
+        }
+      }
+    },
+    "shallowCatalogView": {
+      "type": "object",
+      "required": ["catalogs", "collections", "items"],
+      "properties": {
+        "catalogs": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "xyz.noshdelivery.v0.catalog.defs#catalogView"
+          }
+        },
+        "collections": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "xyz.noshdelivery.v0.catalog.defs#collectionView"
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "xyz.noshdelivery.v0.catalog.defs#itemView"
           }
         }
       }

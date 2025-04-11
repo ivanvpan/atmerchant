@@ -357,37 +357,6 @@ export const schemaDict = {
           },
         },
       },
-      shallowCatalogView: {
-        type: 'object',
-        required: ['merchantLocation', 'catalogs', 'collections', 'items'],
-        properties: {
-          merchantLocation: {
-            type: 'string',
-            format: 'at-uri',
-          },
-          catalogs: {
-            type: 'array',
-            items: {
-              type: 'ref',
-              ref: 'lex:xyz.noshdelivery.v0.catalog.defs#catalogView',
-            },
-          },
-          collections: {
-            type: 'array',
-            items: {
-              type: 'ref',
-              ref: 'lex:xyz.noshdelivery.v0.catalog.defs#collectionView',
-            },
-          },
-          items: {
-            type: 'array',
-            items: {
-              type: 'ref',
-              ref: 'lex:xyz.noshdelivery.v0.catalog.defs#itemView',
-            },
-          },
-        },
-      },
       availabilityPeriod: {
         type: 'object',
         properties: {
@@ -516,8 +485,35 @@ export const schemaDict = {
               },
               shallowCatalogView: {
                 type: 'ref',
-                ref: 'lex:xyz.noshdelivery.v0.catalog.defs#shallowCatalogView',
+                ref: 'lex:xyz.noshdelivery.v0.catalog.getShallowCatalogView#shallowCatalogView',
               },
+            },
+          },
+        },
+      },
+      shallowCatalogView: {
+        type: 'object',
+        required: ['catalogs', 'collections', 'items'],
+        properties: {
+          catalogs: {
+            type: 'array',
+            items: {
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.catalog.defs#catalogView',
+            },
+          },
+          collections: {
+            type: 'array',
+            items: {
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.catalog.defs#collectionView',
+            },
+          },
+          items: {
+            type: 'array',
+            items: {
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.catalog.defs#itemView',
             },
           },
         },

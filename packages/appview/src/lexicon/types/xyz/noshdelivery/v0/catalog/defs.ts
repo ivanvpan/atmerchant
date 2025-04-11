@@ -150,24 +150,6 @@ export function validateModifierView<V>(v: V) {
   return validate<ModifierView & V>(v, id, hashModifierView)
 }
 
-export interface ShallowCatalogView {
-  $type?: 'xyz.noshdelivery.v0.catalog.defs#shallowCatalogView'
-  merchantLocation: string
-  catalogs: CatalogView[]
-  collections: CollectionView[]
-  items: ItemView[]
-}
-
-const hashShallowCatalogView = 'shallowCatalogView'
-
-export function isShallowCatalogView<V>(v: V) {
-  return is$typed(v, id, hashShallowCatalogView)
-}
-
-export function validateShallowCatalogView<V>(v: V) {
-  return validate<ShallowCatalogView & V>(v, id, hashShallowCatalogView)
-}
-
 export interface AvailabilityPeriod {
   $type?: 'xyz.noshdelivery.v0.catalog.defs#availabilityPeriod'
   start?: AvailabilityTimeOfDay

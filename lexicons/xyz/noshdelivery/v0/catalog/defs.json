@@ -237,37 +237,6 @@
         }
       }
     },
-    "shallowCatalogView": {
-      "type": "object",
-      "required": ["merchantLocation", "catalogs", "collections", "items"],
-      "properties": {
-        "merchantLocation": {
-          "type": "string",
-          "format": "at-uri"
-        },
-        "catalogs": {
-          "type": "array",
-          "items": {
-            "type": "ref",
-            "ref": "xyz.noshdelivery.v0.catalog.defs#catalogView"
-          }
-        },
-        "collections": {
-          "type": "array",
-          "items": {
-            "type": "ref",
-            "ref": "xyz.noshdelivery.v0.catalog.defs#collectionView"
-          }
-        },
-        "items": {
-          "type": "array",
-          "items": {
-            "type": "ref",
-            "ref": "xyz.noshdelivery.v0.catalog.defs#itemView"
-          }
-        }
-      }
-    },
     "availabilityPeriod": {
       "type": "object",
       "properties": {
