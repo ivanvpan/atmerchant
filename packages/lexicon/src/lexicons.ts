@@ -357,6 +357,37 @@ export const schemaDict = {
           },
         },
       },
+      shallowCatalogView: {
+        type: 'object',
+        required: ['merchantLocation', 'catalogs', 'collections', 'items'],
+        properties: {
+          merchantLocation: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          catalogs: {
+            type: 'array',
+            items: {
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.catalog.defs#catalogView',
+            },
+          },
+          collections: {
+            type: 'array',
+            items: {
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.catalog.defs#collectionView',
+            },
+          },
+          items: {
+            type: 'array',
+            items: {
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.catalog.defs#itemView',
+            },
+          },
+        },
+      },
       availabilityPeriod: {
         type: 'object',
         properties: {
@@ -397,62 +428,6 @@ export const schemaDict = {
             type: 'integer',
             minimum: 0,
             maximum: 59,
-          },
-        },
-      },
-    },
-  },
-  XyzNoshdeliveryV0CatalogGetCollectionsAndItems: {
-    lexicon: 1,
-    id: 'xyz.noshdelivery.v0.catalog.getCollectionsAndItems',
-    defs: {
-      main: {
-        type: 'query',
-        description:
-          'Get a view of all catalogs with categories and items, but no modifiers. This is a reasonable call only on smaller catalogs such as restaurant menus.',
-        parameters: {
-          type: 'params',
-          required: [],
-          properties: {
-            merchantUri: {
-              type: 'string',
-              description: 'The URI of the merchant whose catalogs to get.',
-              format: 'at-uri',
-            },
-          },
-        },
-        output: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            required: ['merchantLocation'],
-            properties: {
-              merchantLocation: {
-                type: 'string',
-                format: 'at-uri',
-              },
-              catalogs: {
-                type: 'array',
-                items: {
-                  type: 'ref',
-                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#catalogView',
-                },
-              },
-              collections: {
-                type: 'array',
-                items: {
-                  type: 'ref',
-                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#collectionView',
-                },
-              },
-              items: {
-                type: 'array',
-                items: {
-                  type: 'ref',
-                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#itemView',
-                },
-              },
-            },
           },
         },
       },
@@ -510,6 +485,48 @@ export const schemaDict = {
       },
     },
   },
+  XyzNoshdeliveryV0CatalogGetShallowCatalogs: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.catalog.getShallowCatalogs',
+    defs: {
+      main: {
+        type: 'query',
+        description:
+          'Get a view of all catalogs with categories and items, but no modifiers. This is a reasonable call only on smaller catalogs such as restaurant menus.',
+        parameters: {
+          type: 'params',
+          required: [],
+          properties: {
+            merchantUri: {
+              type: 'string',
+              description: 'The URI of the merchant whose catalogs to get.',
+              format: 'at-uri',
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['merchantLocation', 'catalogViews'],
+            properties: {
+              merchantLocation: {
+                type: 'string',
+                format: 'at-uri',
+              },
+              catalogViews: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#shallowCatalogView',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   XyzNoshdeliveryV0CatalogItem: {
     lexicon: 1,
     id: 'xyz.noshdelivery.v0.catalog.item',
@@ -519,7 +536,7 @@ export const schemaDict = {
         key: 'tid',
         record: {
           type: 'object',
-          required: ['name', 'priceMoney'],
+          required: ['name', 'priceMoney', 'availableForSale'],
           properties: {
             externalId: {
               type: 'string',
@@ -677,6 +694,206 @@ export const schemaDict = {
               items: {
                 type: 'string',
                 format: 'tid',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0CatalogPutCatalog: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.catalog.putCatalog',
+    description: 'A catalog for a merchant location.',
+    defs: {
+      main: {
+        type: 'procedure',
+        description: 'Create or update a catalog.',
+        input: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['name', 'merchantLocation', 'availabilityPeriods'],
+            properties: {
+              externalId: {
+                type: 'string',
+                maxLength: 64,
+              },
+              name: {
+                type: 'string',
+                minLength: 1,
+                maxLength: 128,
+              },
+              merchantLocation: {
+                type: 'string',
+                format: 'at-uri',
+              },
+              availabilityPeriods: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#availabilityPeriod',
+                },
+              },
+              childCollections: {
+                type: 'array',
+                description:
+                  'Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented.',
+                items: {
+                  type: 'string',
+                  format: 'tid',
+                },
+              },
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['catalogViews'],
+            properties: {
+              catalogViews: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#shallowCatalogView',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0CatalogPutCollection: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.catalog.putCollection',
+    description: 'todo',
+    defs: {
+      main: {
+        type: 'procedure',
+        description: 'Create or update a collection.',
+        input: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['name'],
+            properties: {
+              externalId: {
+                type: 'string',
+                description:
+                  'An external ID that can be used to identify this object in an external system such as a warehousing system',
+                maxLength: 64,
+              },
+              name: {
+                type: 'string',
+                minLength: 1,
+                maxLength: 128,
+              },
+              childCollections: {
+                type: 'array',
+                items: {
+                  type: 'string',
+                  format: 'at-uri',
+                },
+              },
+              media: {
+                type: 'ref',
+                ref: 'lex:xyz.noshdelivery.v0.media.defs#mediaView',
+              },
+              items: {
+                type: 'array',
+                description:
+                  'Pkeys of xyz.noshdelivery.v0.catalog.item records that are in this collection. Ordered in the way they will be presented.',
+                items: {
+                  type: 'string',
+                  format: 'tid',
+                },
+              },
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['collectionView'],
+            properties: {
+              collectionView: {
+                type: 'ref',
+                ref: 'lex:xyz.noshdelivery.v0.catalog.defs#collectionView',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0CatalogPutItem: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.catalog.putItem',
+    description: 'todo',
+    defs: {
+      main: {
+        type: 'procedure',
+        description: 'Create or update an item.',
+        input: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['name', 'priceMoney'],
+            properties: {
+              externalId: {
+                type: 'string',
+                description:
+                  'An external ID that can be used to identify this object in an external system such as a warehousing system',
+                maxLength: 64,
+              },
+              availableForSale: {
+                type: 'boolean',
+                description:
+                  'The item is currently available for ordering at this location',
+                default: true,
+              },
+              name: {
+                type: 'string',
+                minLength: 1,
+                maxLength: 128,
+              },
+              description: {
+                type: 'string',
+                maxLength: 1024,
+              },
+              media: {
+                type: 'ref',
+                ref: 'lex:xyz.noshdelivery.v0.media.defs#mediaView',
+              },
+              priceMoney: {
+                type: 'ref',
+                ref: 'lex:xyz.noshdelivery.v0.catalog.defs#priceMoney',
+              },
+              modifierGroups: {
+                type: 'array',
+                description:
+                  'Pkeys of xyz.noshdelivery.v0.catalog.modifierGroup records that belong in this item. Ordered in the way they will be presented.',
+                items: {
+                  type: 'string',
+                  format: 'tid',
+                },
+              },
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['collectionView'],
+            properties: {
+              collectionView: {
+                type: 'ref',
+                ref: 'lex:xyz.noshdelivery.v0.catalog.defs#collectionView',
               },
             },
           },
@@ -2263,14 +2480,18 @@ export const ids = {
   XyzNoshdeliveryV0CatalogCatalog: 'xyz.noshdelivery.v0.catalog.catalog',
   XyzNoshdeliveryV0CatalogCollection: 'xyz.noshdelivery.v0.catalog.collection',
   XyzNoshdeliveryV0CatalogDefs: 'xyz.noshdelivery.v0.catalog.defs',
-  XyzNoshdeliveryV0CatalogGetCollectionsAndItems:
-    'xyz.noshdelivery.v0.catalog.getCollectionsAndItems',
   XyzNoshdeliveryV0CatalogGetFullCatalog:
     'xyz.noshdelivery.v0.catalog.getFullCatalog',
+  XyzNoshdeliveryV0CatalogGetShallowCatalogs:
+    'xyz.noshdelivery.v0.catalog.getShallowCatalogs',
   XyzNoshdeliveryV0CatalogItem: 'xyz.noshdelivery.v0.catalog.item',
   XyzNoshdeliveryV0CatalogModifier: 'xyz.noshdelivery.v0.catalog.modifier',
   XyzNoshdeliveryV0CatalogModifierGroup:
     'xyz.noshdelivery.v0.catalog.modifierGroup',
+  XyzNoshdeliveryV0CatalogPutCatalog: 'xyz.noshdelivery.v0.catalog.putCatalog',
+  XyzNoshdeliveryV0CatalogPutCollection:
+    'xyz.noshdelivery.v0.catalog.putCollection',
+  XyzNoshdeliveryV0CatalogPutItem: 'xyz.noshdelivery.v0.catalog.putItem',
   XyzNoshdeliveryV0MediaDefs: 'xyz.noshdelivery.v0.media.defs',
   XyzNoshdeliveryV0MediaImage: 'xyz.noshdelivery.v0.media.image',
   XyzNoshdeliveryV0MediaVideo: 'xyz.noshdelivery.v0.media.video',

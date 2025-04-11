@@ -56,13 +56,28 @@ export async function createFirehoseIngester(
           const record = evt.record as XyzNoshdeliveryV0MerchantGroup.Record
           const validatedRecord =
             XyzNoshdeliveryV0MerchantGroup.validateRecord(record)
-          if (!validatedRecord.success) return
+          if (!validatedRecord.success) {
+            console.log(
+              'invalid group, skipping',
+              validatedRecord.error,
+              record,
+            )
+            return
+          }
           await upsertMerchantGroupRecord(db, uriFromEvent(evt), record)
         } else if (evt.collection === 'xyz.noshdelivery.v0.merchant.location') {
+          console.log('location', evt.record)
           const record = evt.record as XyzNoshdeliveryV0MerchantLocation.Record
           const validatedRecord =
             XyzNoshdeliveryV0MerchantLocation.validateRecord(record)
-          if (!validatedRecord.success) return
+          if (!validatedRecord.success) {
+            console.log(
+              'invalid location, skipping',
+              validatedRecord.error,
+              record,
+            )
+            return
+          }
           await upsertMerchantLocationRecord(db, uriFromEvent(evt), record)
         }
       }

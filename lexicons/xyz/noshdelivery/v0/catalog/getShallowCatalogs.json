@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "xyz.noshdelivery.v0.catalog.getCollectionsAndItems",
+  "id": "xyz.noshdelivery.v0.catalog.getShallowCatalogs",
   "defs": {
     "main": {
       "type": "query",
@@ -20,33 +20,17 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": [
-            "merchantLocation"
-          ],
+          "required": ["merchantLocation", "catalogViews"],
           "properties": {
             "merchantLocation": {
               "type": "string",
               "format": "at-uri"
             },
-            "catalogs": {
+            "catalogViews": {
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "xyz.noshdelivery.v0.catalog.defs#catalogView"
-              }
-            },
-            "collections": {
-              "type": "array",
-              "items": {
-                "type": "ref",
-                "ref": "xyz.noshdelivery.v0.catalog.defs#collectionView"
-              }
-            },
-            "items": {
-              "type": "array",
-              "items": {
-                "type": "ref",
-                "ref": "xyz.noshdelivery.v0.catalog.defs#itemView"
+                "ref": "xyz.noshdelivery.v0.catalog.defs#shallowCatalogView"
               }
             }
           }

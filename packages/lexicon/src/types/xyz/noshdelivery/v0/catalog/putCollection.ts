@@ -10,29 +10,34 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../../util'
+import type * as XyzNoshdeliveryV0MediaDefs from '../media/defs.js'
 import type * as XyzNoshdeliveryV0CatalogDefs from './defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'xyz.noshdelivery.v0.catalog.getCollectionsAndItems'
+const id = 'xyz.noshdelivery.v0.catalog.putCollection'
 
-export interface QueryParams {
-  /** The URI of the merchant whose catalogs to get. */
-  merchantUri?: string
+export interface QueryParams {}
+
+export interface InputSchema {
+  /** An external ID that can be used to identify this object in an external system such as a warehousing system */
+  externalId?: string
+  name: string
+  childCollections?: string[]
+  media?: XyzNoshdeliveryV0MediaDefs.MediaView
+  /** Pkeys of xyz.noshdelivery.v0.catalog.item records that are in this collection. Ordered in the way they will be presented. */
+  items?: string[]
 }
 
-export type InputSchema = undefined
-
 export interface OutputSchema {
-  merchantLocation: string
-  catalogs?: XyzNoshdeliveryV0CatalogDefs.CatalogView[]
-  collections?: XyzNoshdeliveryV0CatalogDefs.CollectionView[]
-  items?: XyzNoshdeliveryV0CatalogDefs.ItemView[]
+  collectionView: XyzNoshdeliveryV0CatalogDefs.CollectionView
 }
 
 export interface CallOptions {
   signal?: AbortSignal
   headers?: HeadersMap
+  qp?: QueryParams
+  encoding?: 'application/json'
 }
 
 export interface Response {

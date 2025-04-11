@@ -4,10 +4,7 @@
   "defs": {
     "priceMoney": {
       "type": "object",
-      "required": [
-        "currency",
-        "amount"
-      ],
+      "required": ["currency", "amount"],
       "properties": {
         "currency": {
           "type": "string",
@@ -22,10 +19,7 @@
     },
     "catalogView": {
       "type": "object",
-      "required": [
-        "uri",
-        "name"
-      ],
+      "required": ["uri", "name"],
       "properties": {
         "uri": {
           "type": "string",
@@ -59,10 +53,7 @@
     },
     "collectionView": {
       "type": "object",
-      "required": [
-        "uri",
-        "name"
-      ],
+      "required": ["uri", "name"],
       "properties": {
         "uri": {
           "type": "string",
@@ -101,10 +92,7 @@
     },
     "itemView": {
       "type": "object",
-      "required": [
-        "uri",
-        "name"
-      ],
+      "required": ["uri", "name"],
       "properties": {
         "uri": {
           "type": "string",
@@ -211,11 +199,7 @@
     },
     "modifierView": {
       "type": "object",
-      "required": [
-        "uri",
-        "name",
-        "priceMoney"
-      ],
+      "required": ["uri", "name", "priceMoney"],
       "properties": {
         "uri": {
           "type": "string",
@@ -249,6 +233,37 @@
           "items": {
             "type": "string",
             "format": "tid"
+          }
+        }
+      }
+    },
+    "shallowCatalogView": {
+      "type": "object",
+      "required": ["merchantLocation", "catalogs", "collections", "items"],
+      "properties": {
+        "merchantLocation": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "catalogs": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "xyz.noshdelivery.v0.catalog.defs#catalogView"
+          }
+        },
+        "collections": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "xyz.noshdelivery.v0.catalog.defs#collectionView"
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "xyz.noshdelivery.v0.catalog.defs#itemView"
           }
         }
       }

@@ -17,6 +17,9 @@ import { InvalidRequestError } from '@atproto/xrpc-server'
 export type DatabaseSchema = {
   merchant_group: MerchantGroup
   merchant_location: MerchantLocation
+  catalog: Catalog
+  catalog_collection: CatalogCollection
+  catalog_item: CatalogItem
   cursor: Cursor
 }
 
@@ -47,6 +50,38 @@ export type MerchantLocation = {
   parentGroup: string
 }
 
+export type Catalog = {
+  tid: string
+  uri: string
+  externalId?: string | null
+  name: string
+  merchantLocation: string
+  availabilityPeriods: string
+  childCollections: string | null
+}
+
+export type CatalogCollection = {
+  tid: string
+  uri: string
+  externalId?: string | null
+  name: string
+  items: string
+  media: string | null
+  childCollections: string | null
+}
+
+export type CatalogItem = {
+  tid: string
+  uri: string
+  externalId?: string | null
+  name: string
+  description: string | null
+  media: string | null
+  priceMoney: string
+  availableForSale: boolean
+  modifierGroups: string
+}
+
 // Migrations
 
 const migrations: Record<string, Migration> = {}
@@ -69,10 +104,7 @@ migrations['002'] = {
     // id=1 is for firehose, id=2 is for jetstream
     await db
       .insertInto('cursor' as never)
-      .values([
-        { id: 1, seq: 0 },
-        { id: 2, seq: 0 },
-      ])
+      .values([{ id: 1, seq: 53 }])
       .execute()
   },
   async down(db: Kysely<unknown>) {
@@ -82,6 +114,64 @@ migrations['002'] = {
 
 migrations['001'] = {
   async up(db: Kysely<unknown>) {
+    await db.schema
+      .createTable('catalog_modifier')
+      .addColumn('tid', 'varchar', (col) => col.primaryKey())
+      .addColumn('uri', 'varchar', (col) => col.unique())
+      .addColumn('externalId', 'varchar')
+      .addColumn('name', 'varchar', (col) => col.notNull())
+      .addColumn('description', 'varchar')
+      .addColumn('priceMoney', 'jsonb', (col) => col.notNull())
+      .addColumn('availableForSale', 'boolean', (col) => col.notNull())
+      .execute()
+    await db.schema
+      .createTable('catalog_modifier_group')
+      .addColumn('tid', 'varchar', (col) => col.primaryKey())
+      .addColumn('uri', 'varchar', (col) => col.unique())
+      .addColumn('externalId', 'varchar')
+      .addColumn('name', 'varchar', (col) => col.notNull())
+      .addColumn('description', 'varchar')
+      .addColumn('media', 'jsonb')
+      .addColumn('minimumSelection', 'integer', (col) => col.notNull())
+      .addColumn('maximumSelection', 'integer', (col) => col.notNull())
+      .addColumn('maximumOfEachModifier', 'integer', (col) => col.notNull())
+      .addColumn('modifiers', 'jsonb')
+      .execute()
+    await db.schema
+      .createTable('catalog_item')
+      .addColumn('tid', 'varchar', (col) => col.primaryKey())
+      .addColumn('uri', 'varchar', (col) => col.unique())
+      .addColumn('externalId', 'varchar')
+      .addColumn('name', 'varchar', (col) => col.notNull())
+      .addColumn('description', 'varchar')
+      .addColumn('media', 'jsonb')
+      .addColumn('priceMoney', 'jsonb', (col) => col.notNull())
+      .addColumn('availableForSale', 'boolean', (col) => col.notNull())
+      .addColumn('modifierGroups', 'jsonb')
+      .execute()
+    await db.schema
+      .createTable('catalog_collection')
+      .addColumn('tid', 'varchar', (col) => col.primaryKey())
+      .addColumn('uri', 'varchar', (col) => col.unique())
+      .addColumn('externalId', 'varchar')
+      .addColumn('name', 'varchar', (col) => col.notNull())
+      .addColumn('items', 'jsonb')
+      .addColumn('media', 'jsonb')
+      .addColumn('childCollections', 'jsonb')
+      .execute()
+    await db.schema
+      .createTable('catalog')
+      .addColumn('tid', 'varchar', (col) => col.primaryKey())
+      .addColumn('uri', 'varchar', (col) => col.unique())
+      .addColumn('externalId', 'varchar')
+      .addColumn('name', 'varchar', (col) => col.notNull())
+      .addColumn('merchantLocation', 'varchar', (col) =>
+        col.references('merchant_location.uri').notNull(),
+      )
+      .addColumn('availabilityPeriods', 'jsonb', (col) => col.notNull())
+      .addColumn('childCollections', 'jsonb')
+      .execute()
+
     await db.schema
       .createTable('merchant_group')
       .addColumn('tid', 'varchar', (col) => col.primaryKey())
@@ -234,4 +324,15 @@ export const upsertMerchantLocationRecord = async (
     console.error('error upserting merchant location', error)
     throw error
   }
+}
+
+export const findCatalogsByLocationTid = async (
+  db: Database,
+  tid: string,
+): Promise<Catalog[]> => {
+  return await db
+    .selectFrom('catalog')
+    .where('merchantLocation', '=', tid)
+    .selectAll()
+    .execute()
 }

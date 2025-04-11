@@ -7,10 +7,7 @@
       "key": "tid",
       "record": {
         "type": "object",
-        "required": [
-          "name",
-          "priceMoney"
-        ],
+        "required": ["name", "priceMoney", "availableForSale"],
         "properties": {
           "externalId": {
             "type": "string",

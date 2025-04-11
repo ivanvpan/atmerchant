@@ -8,11 +8,7 @@
       "key": "tid",
       "record": {
         "type": "object",
-        "required": [
-          "merchantLocation",
-          "name",
-          "availabilityPeriods"
-        ],
+        "required": ["merchantLocation", "name", "availabilityPeriods"],
         "properties": {
           "externalId": {
             "type": "string",

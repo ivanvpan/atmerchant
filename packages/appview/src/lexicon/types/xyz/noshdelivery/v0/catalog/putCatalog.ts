@@ -15,23 +15,27 @@ import type * as XyzNoshdeliveryV0CatalogDefs from './defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'xyz.noshdelivery.v0.catalog.getCollectionsAndItems'
+const id = 'xyz.noshdelivery.v0.catalog.putCatalog'
 
-export interface QueryParams {
-  /** The URI of the merchant whose catalogs to get. */
-  merchantUri?: string
+export interface QueryParams {}
+
+export interface InputSchema {
+  externalId?: string
+  name: string
+  merchantLocation: string
+  availabilityPeriods: XyzNoshdeliveryV0CatalogDefs.AvailabilityPeriod[]
+  /** Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented. */
+  childCollections?: string[]
 }
-
-export type InputSchema = undefined
 
 export interface OutputSchema {
-  merchantLocation: string
-  catalogs?: XyzNoshdeliveryV0CatalogDefs.CatalogView[]
-  collections?: XyzNoshdeliveryV0CatalogDefs.CollectionView[]
-  items?: XyzNoshdeliveryV0CatalogDefs.ItemView[]
+  catalogViews: XyzNoshdeliveryV0CatalogDefs.ShallowCatalogView[]
 }
 
-export type HandlerInput = undefined
+export interface HandlerInput {
+  encoding: 'application/json'
+  body: InputSchema
+}
 
 export interface HandlerSuccess {
   encoding: 'application/json'
