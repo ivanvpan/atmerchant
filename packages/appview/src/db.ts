@@ -18,6 +18,7 @@ import { tidFromUri } from '#/utils/uri'
 import { InvalidRequestError } from '@atproto/xrpc-server'
 
 export type DatabaseSchema = {
+  adjacency_list: AdjacencyList
   merchant_group: MerchantGroup
   merchant_location: MerchantLocation
   catalog: Catalog
@@ -29,6 +30,14 @@ export type DatabaseSchema = {
 export type Cursor = {
   id: number
   seq: number
+}
+
+type NodeType = 'catalog' | 'collection' | 'item'
+export type AdjacencyList = {
+  parentTid: string
+  parentType: string
+  childTid: string
+  childType: string
 }
 
 export interface MerchantGroup {
@@ -117,6 +126,24 @@ migrations['002'] = {
 
 migrations['001'] = {
   async up(db: Kysely<unknown>) {
+    await db.schema
+      .createTable('adjacency_list')
+      .addColumn('parentTid', 'varchar')
+      .addColumn('parentType', 'varchar')
+      .addColumn('childTid', 'varchar')
+      .addColumn('childType', 'varchar')
+      .execute()
+    await db.schema
+      .createIndex('adjacency_list_parent_tid_idx')
+      .on('adjacency_list')
+      .column('parentTid')
+      .execute()
+    await db.schema
+      .createIndex('adjacency_list_child_tid_idx')
+      .on('adjacency_list')
+      .column('childTid')
+      .execute()
+
     await db.schema
       .createTable('catalog_modifier')
       .addColumn('tid', 'varchar', (col) => col.primaryKey())
@@ -222,6 +249,74 @@ export const migrateToLatest = async (db: Database) => {
 }
 
 export type Database = Kysely<DatabaseSchema>
+
+export const updateAdjacencyList = async (
+  db: Database,
+  parentTid: string,
+  parentType: NodeType,
+  childTids: string[],
+  childType: NodeType,
+) => {
+  try {
+    // TODO this is not very efficient but whatevs
+    await db.transaction().execute(async (tx) => {
+      await tx
+        .deleteFrom('adjacency_list')
+        .where('parentTid', '=', parentTid)
+        .execute()
+      await tx
+        .insertInto('adjacency_list')
+        .values(
+          childTids.map((childTid) => ({
+            parentTid,
+            parentType,
+            childTid,
+            childType,
+          })),
+        )
+        .onConflict((oc) => oc.doNothing())
+        .execute()
+    })
+  } catch (error) {
+    console.error('error updating adjacency list', error)
+    throw error
+  }
+}
+
+async function findAllCatalogsContainingItem(
+  db: Database,
+  itemId: string,
+): Promise<{ tid: string; name: string }[]> {
+  return await db
+    .withRecursive('item_ancestors', (cte) =>
+      cte
+        .selectFrom('adjacency_list')
+        .select(['childTid', 'parentTid'])
+        .where('childTid', '=', itemId)
+        .unionAll(
+          cte
+            .selectFrom('item_ancestors')
+            .innerJoin(
+              'adjacency_list',
+              'adjacency_list.childTid',
+              'item_ancestors.parentTid',
+            )
+            .select(['item_ancestors.childTid', 'adjacency_list.parentTid']),
+        ),
+    )
+    .selectFrom('item_ancestors')
+    .innerJoin('catalog', 'catalog.tid', 'item_ancestors.parentTid')
+    .select(['catalog.tid', 'catalog.name'])
+    .execute()
+}
+
+export const findItemRoots = async (db: Database, tid: string) => {
+  return await db
+    .selectFrom('adjacency_list')
+    .where('childTid', '=', tid)
+    .selectAll()
+    .execute()
+}
 
 export const findMerchantGroupByTid = async (
   db: Database,
