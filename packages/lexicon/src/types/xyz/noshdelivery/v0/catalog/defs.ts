@@ -78,8 +78,8 @@ export interface ItemView {
   $type?: 'xyz.noshdelivery.v0.catalog.defs#itemView'
   uri: string
   externalId?: string
-  /** The item is currently available for ordering at this location */
-  availableForSale: boolean
+  /** The item is currently suspended from ordering */
+  suspended: boolean
   name: string
   description?: string
   media?: XyzNoshdeliveryV0MediaDefs.MediaView
@@ -102,8 +102,8 @@ export interface ModifierGroupView {
   $type?: 'xyz.noshdelivery.v0.catalog.defs#modifierGroupView'
   uri: string
   externalId?: string
-  /** The item is currently available for ordering at this location */
-  availableForSale: boolean
+  /** The modifier group is currently suspended from ordering */
+  suspended: boolean
   name: string
   description?: string
   media?: XyzNoshdeliveryV0MediaDefs.MediaView

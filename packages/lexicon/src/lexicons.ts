@@ -213,11 +213,10 @@ export const schemaDict = {
             type: 'string',
             maxLength: 64,
           },
-          availableForSale: {
+          suspended: {
             type: 'boolean',
-            description:
-              'The item is currently available for ordering at this location',
-            default: true,
+            description: 'The item is currently suspended from ordering',
+            default: false,
           },
           name: {
             type: 'string',
@@ -265,11 +264,11 @@ export const schemaDict = {
             type: 'string',
             maxLength: 64,
           },
-          availableForSale: {
+          suspended: {
             type: 'boolean',
             description:
-              'The item is currently available for ordering at this location',
-            default: true,
+              'The modifier group is currently suspended from ordering',
+            default: false,
           },
           name: {
             type: 'string',
@@ -529,7 +528,7 @@ export const schemaDict = {
         key: 'tid',
         record: {
           type: 'object',
-          required: ['name', 'priceMoney', 'availableForSale'],
+          required: ['name', 'priceMoney', 'suspended'],
           properties: {
             externalId: {
               type: 'string',
@@ -537,11 +536,10 @@ export const schemaDict = {
                 'An external ID that can be used to identify this object in an external system such as a warehousing system',
               maxLength: 64,
             },
-            availableForSale: {
+            suspended: {
               type: 'boolean',
-              description:
-                'The item is currently available for ordering at this location',
-              default: true,
+              description: 'The item is currently suspended from ordering',
+              default: false,
             },
             name: {
               type: 'string',

@@ -90,7 +90,7 @@ export type CatalogItem = {
   description: string | null
   media: string | null
   priceMoney: string
-  availableForSale: boolean
+  suspended: boolean
   modifierGroups: string
 }
 
@@ -152,7 +152,9 @@ migrations['001'] = {
       .addColumn('name', 'varchar', (col) => col.notNull())
       .addColumn('description', 'varchar')
       .addColumn('priceMoney', 'jsonb', (col) => col.notNull())
-      .addColumn('availableForSale', 'boolean', (col) => col.notNull())
+      .addColumn('suspended', 'boolean', (col) =>
+        col.defaultTo(false).notNull(),
+      )
       .execute()
     await db.schema
       .createTable('catalog_modifier_group')
@@ -176,7 +178,9 @@ migrations['001'] = {
       .addColumn('description', 'varchar')
       .addColumn('media', 'jsonb')
       .addColumn('priceMoney', 'jsonb', (col) => col.notNull())
-      .addColumn('availableForSale', 'boolean', (col) => col.notNull())
+      .addColumn('suspended', 'boolean', (col) =>
+        col.defaultTo(false).notNull(),
+      )
       .addColumn('modifierGroups', 'jsonb')
       .execute()
     await db.schema
@@ -554,7 +558,7 @@ export const upsertItemRecord = async (
     description: record.description,
     media: JSON.stringify(record.media),
     priceMoney: JSON.stringify(record.priceMoney),
-    availableForSale: record.availableForSale,
+    suspended: record.suspended,
     modifierGroups: JSON.stringify(record.modifierGroups),
   }
   try {
