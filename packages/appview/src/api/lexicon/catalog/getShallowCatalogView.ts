@@ -1,7 +1,7 @@
 import { AppContext } from '#/context'
 import { Server } from '#/lexicon'
 import { dbMerchantGroupToMerchantGroupView } from '#/controllers/merchant'
-import { findAllMerchantGroups, getSharedCatalogsForLocationUri } from '#/db'
+import { findAllMerchantGroups, getShallowCatalogsForLocationUri } from '#/db'
 import { dbItemToItemView } from '#/controllers/catalog'
 import { dbCollectionToCollectionView } from '#/controllers/catalog'
 import { dbCatalogToCatalogView } from '#/controllers/catalog'
@@ -14,7 +14,7 @@ export default function (server: Server, ctx: AppContext) {
       if (!locationUri) {
         throw new InvalidRequestError('locationUri is required')
       }
-      const { catalogs, collections, items } = await getSharedCatalogsForLocationUri(ctx.db, locationUri)
+      const { catalogs, collections, items } = await getShallowCatalogsForLocationUri(ctx.db, locationUri)
       return {
         encoding: 'application/json',
         body: {

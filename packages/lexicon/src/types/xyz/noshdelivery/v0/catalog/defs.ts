@@ -102,6 +102,8 @@ export interface ModifierGroupView {
   $type?: 'xyz.noshdelivery.v0.catalog.defs#modifierGroupView'
   uri: string
   externalId?: string
+  /** The modifier group is currently available for ordering, whether it is suspended by store or not scheduled to be available at this time */
+  availableForSale: boolean
   /** The modifier group is currently suspended from ordering */
   suspended: boolean
   name: string
@@ -154,14 +156,14 @@ export interface AvailabilityPeriod {
   $type?: 'xyz.noshdelivery.v0.catalog.defs#availabilityPeriod'
   start?: AvailabilityTimeOfDay
   end?: AvailabilityTimeOfDay
-  daysOfWeek?:
+  dayOfWeek?:
     | 'MONDAY'
     | 'TUESDAY'
     | 'WEDNESDAY'
     | 'THURSDAY'
     | 'FRIDAY'
     | 'SATURDAY'
-    | 'SUNDAY'[]
+    | 'SUNDAY'
 }
 
 const hashAvailabilityPeriod = 'availabilityPeriod'

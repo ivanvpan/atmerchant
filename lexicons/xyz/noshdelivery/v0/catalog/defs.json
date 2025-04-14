@@ -152,6 +152,11 @@
           "type": "string",
           "maxLength": 64
         },
+        "availableForSale": {
+          "type": "boolean",
+          "description": "The modifier group is currently available for ordering, whether it is suspended by store or not scheduled to be available at this time",
+          "default": true
+        },
         "suspended": {
           "type": "boolean",
           "description": "The modifier group is currently suspended from ordering",
@@ -248,20 +253,17 @@
           "type": "ref",
           "ref": "#availabilityTimeOfDay"
         },
-        "daysOfWeek": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "MONDAY",
-              "TUESDAY",
-              "WEDNESDAY",
-              "THURSDAY",
-              "FRIDAY",
-              "SATURDAY",
-              "SUNDAY"
-            ]
-          }
+        "dayOfWeek": {
+          "type": "string",
+          "enum": [
+            "MONDAY",
+            "TUESDAY",
+            "WEDNESDAY",
+            "THURSDAY",
+            "FRIDAY",
+            "SATURDAY",
+            "SUNDAY"
+          ]
         }
       }
     },

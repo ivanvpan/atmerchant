@@ -12,7 +12,6 @@ import { type OmitKey, type Un$Typed } from './util.js'
 import * as XyzNoshdeliveryV0CatalogCatalog from './types/xyz/noshdelivery/v0/catalog/catalog.js'
 import * as XyzNoshdeliveryV0CatalogCollection from './types/xyz/noshdelivery/v0/catalog/collection.js'
 import * as XyzNoshdeliveryV0CatalogDefs from './types/xyz/noshdelivery/v0/catalog/defs.js'
-import * as XyzNoshdeliveryV0CatalogGetFullCatalog from './types/xyz/noshdelivery/v0/catalog/getFullCatalog.js'
 import * as XyzNoshdeliveryV0CatalogGetShallowCatalogView from './types/xyz/noshdelivery/v0/catalog/getShallowCatalogView.js'
 import * as XyzNoshdeliveryV0CatalogItem from './types/xyz/noshdelivery/v0/catalog/item.js'
 import * as XyzNoshdeliveryV0CatalogModifier from './types/xyz/noshdelivery/v0/catalog/modifier.js'
@@ -50,7 +49,6 @@ import * as CommunityLexiconLocationGeo from './types/community/lexicon/location
 export * as XyzNoshdeliveryV0CatalogCatalog from './types/xyz/noshdelivery/v0/catalog/catalog.js'
 export * as XyzNoshdeliveryV0CatalogCollection from './types/xyz/noshdelivery/v0/catalog/collection.js'
 export * as XyzNoshdeliveryV0CatalogDefs from './types/xyz/noshdelivery/v0/catalog/defs.js'
-export * as XyzNoshdeliveryV0CatalogGetFullCatalog from './types/xyz/noshdelivery/v0/catalog/getFullCatalog.js'
 export * as XyzNoshdeliveryV0CatalogGetShallowCatalogView from './types/xyz/noshdelivery/v0/catalog/getShallowCatalogView.js'
 export * as XyzNoshdeliveryV0CatalogItem from './types/xyz/noshdelivery/v0/catalog/item.js'
 export * as XyzNoshdeliveryV0CatalogModifier from './types/xyz/noshdelivery/v0/catalog/modifier.js'
@@ -152,18 +150,6 @@ export class XyzNoshdeliveryV0CatalogNS {
     this.item = new ItemRecord(client)
     this.modifier = new ModifierRecord(client)
     this.modifierGroup = new ModifierGroupRecord(client)
-  }
-
-  getFullCatalog(
-    params?: XyzNoshdeliveryV0CatalogGetFullCatalog.QueryParams,
-    opts?: XyzNoshdeliveryV0CatalogGetFullCatalog.CallOptions,
-  ): Promise<XyzNoshdeliveryV0CatalogGetFullCatalog.Response> {
-    return this._client.call(
-      'xyz.noshdelivery.v0.catalog.getFullCatalog',
-      params,
-      undefined,
-      opts,
-    )
   }
 
   getShallowCatalogView(

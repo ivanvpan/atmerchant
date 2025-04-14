@@ -7,12 +7,19 @@
       "description": "Get all info about a specific item including modifiers.",
       "parameters": {
         "type": "params",
-        "required": [],
+        "required": ["merchantLocation", "itemIds"],
         "properties": {
-          "uri": {
+          "merchantLocation": {
             "type": "string",
-            "description": "The URI of the item to get.",
             "format": "at-uri"
+          },
+          "itemIds": {
+            "type": "array",
+            "description": "The IDs of the items to get.",
+            "items": {
+              "type": "string",
+              "format": "tid"
+            }
           }
         }
       },
@@ -20,18 +27,18 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": [
-            "merchantLocation",
-            "itemDetails"
-          ],
+          "required": ["merchantLocation", "itemDetails"],
           "properties": {
             "merchantLocation": {
               "type": "string",
               "format": "at-uri"
             },
-            "itemDetails": {
-              "type": "ref",
-              "ref": "xyz.noshdelivery.v0.catalog.defs#itemView"
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "xyz.noshdelivery.v0.catalog.defs#itemView"
+              }
             },
             "modifierGroups": {
               "type": "array",

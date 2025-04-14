@@ -16,6 +16,7 @@ import {
 } from 'kysely'
 import { tidFromUri } from '#/utils/uri'
 import { InvalidRequestError } from '@atproto/xrpc-server'
+import { AvailabilityTimeOfDay } from './utils/time'
 
 export type DatabaseSchema = {
   adjacency_list: AdjacencyList
@@ -24,6 +25,8 @@ export type DatabaseSchema = {
   catalog: Catalog
   catalog_collection: CatalogCollection
   catalog_item: CatalogItem
+  catalog_modifier_group: CatalogModifierGroup
+  catalog_modifier: CatalogModifier
   cursor: Cursor
 }
 
@@ -92,6 +95,26 @@ export type CatalogItem = {
   priceMoney: string
   suspended: boolean
   modifierGroups: string
+}
+
+export type CatalogModifierGroup = {
+  tid: string
+  uri: string
+  externalId?: string | null
+  name: string
+  description: string | null
+  media: string | null
+  minimumSelection: number
+  maximumSelection: number
+  maximumOfEachModifier: number
+  modifiers: string
+}
+
+export type CatalogModifier = {
+  tid: string
+  uri: string
+  externalId?: string | null
+  name: string
 }
 
 // Migrations
@@ -287,16 +310,16 @@ export const updateAdjacencyList = async (
   }
 }
 
-async function findAllCatalogsContainingItem(
+export const findAllCatalogsContainingItems = async (
   db: Database,
-  itemId: string,
-): Promise<{ tid: string; name: string }[]> {
-  return await db
+  itemIds: string[],
+): Promise<Record<string, string[]>> => {
+  const result = await db
     .withRecursive('item_ancestors', (cte) =>
       cte
         .selectFrom('adjacency_list')
         .select(['childTid', 'parentTid'])
-        .where('childTid', '=', itemId)
+        .where('childTid', 'in', itemIds)
         .unionAll(
           cte
             .selectFrom('item_ancestors')
@@ -310,16 +333,22 @@ async function findAllCatalogsContainingItem(
     )
     .selectFrom('item_ancestors')
     .innerJoin('catalog', 'catalog.tid', 'item_ancestors.parentTid')
-    .select(['catalog.tid', 'catalog.name'])
+    .select([
+      'item_ancestors.childTid as itemTid',
+      'catalog.tid',
+      'catalog.name',
+    ])
     .execute()
-}
-
-export const findItemRoots = async (db: Database, tid: string) => {
-  return await db
-    .selectFrom('adjacency_list')
-    .where('childTid', '=', tid)
-    .selectAll()
-    .execute()
+  return result.reduce(
+    (acc, row) => {
+      if (!acc[row.itemTid]) {
+        acc[row.itemTid] = []
+      }
+      acc[row.itemTid].push(row.tid)
+      return acc
+    },
+    {} as Record<string, string[]>,
+  )
 }
 
 export const findMerchantGroupByTid = async (
@@ -399,6 +428,14 @@ export const findMerchantLocationsByGroupUri = async (
     .execute()
 }
 
+export const getMerchantLocation = async (db: Database, tid: string) => {
+  return await db
+    .selectFrom('merchant_location')
+    .where('tid', '=', tid)
+    .selectAll()
+    .executeTakeFirst()
+}
+
 export const upsertMerchantLocationRecord = async (
   db: Database,
   uri: string,
@@ -428,7 +465,7 @@ export const upsertMerchantLocationRecord = async (
   }
 }
 
-export const getSharedCatalogsForLocationUri = async (
+export const getShallowCatalogsForLocationUri = async (
   db: Database,
   uri: string,
 ): Promise<{
@@ -459,6 +496,14 @@ export const getSharedCatalogsForLocationUri = async (
     .execute()
 
   return { catalogs, collections, items }
+}
+
+export const getCatalogs = (db: Database, merchantUri: string) => {
+  return db
+    .selectFrom('catalog')
+    .where('merchantLocation', '=', merchantUri)
+    .selectAll()
+    .execute()
 }
 
 export const findCatalogByTid = async (
@@ -572,4 +617,31 @@ export const upsertItemRecord = async (
     console.error('error upserting item', error)
     throw error
   }
+}
+
+export const getItems = async (db: Database, itemIds: string[]) => {
+  return await db
+    .selectFrom('catalog_item')
+    .where('tid', 'in', itemIds)
+    .selectAll()
+    .execute()
+}
+
+export const getModifierGroups = async (
+  db: Database,
+  modifierGroupIds: string[],
+) => {
+  return await db
+    .selectFrom('catalog_modifier_group')
+    .where('tid', 'in', modifierGroupIds)
+    .selectAll()
+    .execute()
+}
+
+export const getModifiers = async (db: Database, modifierIds: string[]) => {
+  return await db
+    .selectFrom('catalog_modifier')
+    .where('tid', 'in', modifierIds)
+    .selectAll()
+    .execute()
 }

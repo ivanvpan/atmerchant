@@ -1,4 +1,5 @@
 import { Catalog, CatalogCollection, CatalogItem } from '#/db'
+import { CatalogAvailabilityPeriod, isActiveCatalog } from '#/utils/time'
 
 export function dbCatalogToCatalogView(dbCatalog: Catalog) {
   return {
@@ -7,7 +8,9 @@ export function dbCatalogToCatalogView(dbCatalog: Catalog) {
     name: dbCatalog.name,
     externalId: dbCatalog.externalId || undefined,
     merchantLocation: dbCatalog.merchantLocation,
-    availabilityPeriods: JSON.parse(dbCatalog.availabilityPeriods),
+    availabilityPeriods: JSON.parse(
+      dbCatalog.availabilityPeriods,
+    ) as CatalogAvailabilityPeriod[],
     childCollections: JSON.parse(dbCatalog.childCollections || '[]'),
   }
 }
@@ -23,14 +26,19 @@ export function dbCollectionToCollectionView(dbCollection: CatalogCollection) {
   }
 }
 
-export function dbItemToItemView(dbItem: CatalogItem) {
+export function dbItemToItemView(
+  dbItem: CatalogItem,
+  availabilityPeriods: CatalogAvailabilityPeriod[],
+  timezone: string,
+) {
   return {
     tid: dbItem.tid,
     uri: dbItem.uri,
     name: dbItem.name,
     externalId: dbItem.externalId || undefined,
-    availableForSale: dbItem.availableForSale,
     description: dbItem.description || undefined,
+    availableForSale: isActiveCatalog(availabilityPeriods, timezone),
+    suspended: dbItem.suspended,
     media: JSON.parse(dbItem.media || 'undefined'),
     priceMoney: JSON.parse(dbItem.priceMoney),
     modifierGroups: JSON.parse(dbItem.modifierGroups || '[]'),

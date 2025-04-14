@@ -264,6 +264,12 @@ export const schemaDict = {
             type: 'string',
             maxLength: 64,
           },
+          availableForSale: {
+            type: 'boolean',
+            description:
+              'The modifier group is currently available for ordering, whether it is suspended by store or not scheduled to be available at this time',
+            default: true,
+          },
           suspended: {
             type: 'boolean',
             description:
@@ -367,20 +373,17 @@ export const schemaDict = {
             type: 'ref',
             ref: 'lex:xyz.noshdelivery.v0.catalog.defs#availabilityTimeOfDay',
           },
-          daysOfWeek: {
-            type: 'array',
-            items: {
-              type: 'string',
-              enum: [
-                'MONDAY',
-                'TUESDAY',
-                'WEDNESDAY',
-                'THURSDAY',
-                'FRIDAY',
-                'SATURDAY',
-                'SUNDAY',
-              ],
-            },
+          dayOfWeek: {
+            type: 'string',
+            enum: [
+              'MONDAY',
+              'TUESDAY',
+              'WEDNESDAY',
+              'THURSDAY',
+              'FRIDAY',
+              'SATURDAY',
+              'SUNDAY',
+            ],
           },
         },
       },
@@ -396,58 +399,6 @@ export const schemaDict = {
             type: 'integer',
             minimum: 0,
             maximum: 59,
-          },
-        },
-      },
-    },
-  },
-  XyzNoshdeliveryV0CatalogGetFullCatalog: {
-    lexicon: 1,
-    id: 'xyz.noshdelivery.v0.catalog.getFullCatalog',
-    defs: {
-      main: {
-        type: 'query',
-        description: 'Get all info about a specific item including modifiers.',
-        parameters: {
-          type: 'params',
-          required: [],
-          properties: {
-            uri: {
-              type: 'string',
-              description: 'The URI of the item to get.',
-              format: 'at-uri',
-            },
-          },
-        },
-        output: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            required: ['merchantLocation', 'itemDetails'],
-            properties: {
-              merchantLocation: {
-                type: 'string',
-                format: 'at-uri',
-              },
-              itemDetails: {
-                type: 'ref',
-                ref: 'lex:xyz.noshdelivery.v0.catalog.defs#itemView',
-              },
-              modifierGroups: {
-                type: 'array',
-                items: {
-                  type: 'ref',
-                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#modifierGroupView',
-                },
-              },
-              modifiers: {
-                type: 'array',
-                items: {
-                  type: 'ref',
-                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#modifierView',
-                },
-              },
-            },
           },
         },
       },
@@ -2468,8 +2419,6 @@ export const ids = {
   XyzNoshdeliveryV0CatalogCatalog: 'xyz.noshdelivery.v0.catalog.catalog',
   XyzNoshdeliveryV0CatalogCollection: 'xyz.noshdelivery.v0.catalog.collection',
   XyzNoshdeliveryV0CatalogDefs: 'xyz.noshdelivery.v0.catalog.defs',
-  XyzNoshdeliveryV0CatalogGetFullCatalog:
-    'xyz.noshdelivery.v0.catalog.getFullCatalog',
   XyzNoshdeliveryV0CatalogGetShallowCatalogView:
     'xyz.noshdelivery.v0.catalog.getShallowCatalogView',
   XyzNoshdeliveryV0CatalogItem: 'xyz.noshdelivery.v0.catalog.item',
