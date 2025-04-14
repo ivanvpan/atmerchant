@@ -115,6 +115,9 @@ export type CatalogModifier = {
   uri: string
   externalId?: string | null
   name: string
+  description: string | null
+  priceMoney: string
+  childModifierGroups: string
 }
 
 // Migrations
@@ -175,6 +178,7 @@ migrations['001'] = {
       .addColumn('name', 'varchar', (col) => col.notNull())
       .addColumn('description', 'varchar')
       .addColumn('priceMoney', 'jsonb', (col) => col.notNull())
+      .addColumn('childModifierGroups', 'jsonb')
       .addColumn('suspended', 'boolean', (col) =>
         col.defaultTo(false).notNull(),
       )

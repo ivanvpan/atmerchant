@@ -1,4 +1,10 @@
-import { Catalog, CatalogCollection, CatalogItem } from '#/db'
+import {
+  Catalog,
+  CatalogCollection,
+  CatalogItem,
+  CatalogModifierGroup,
+  CatalogModifier,
+} from '#/db'
 import { CatalogAvailabilityPeriod, isActiveCatalog } from '#/utils/time'
 
 export function dbCatalogToCatalogView(dbCatalog: Catalog) {
@@ -42,5 +48,33 @@ export function dbItemToItemView(
     media: JSON.parse(dbItem.media || 'undefined'),
     priceMoney: JSON.parse(dbItem.priceMoney),
     modifierGroups: JSON.parse(dbItem.modifierGroups || '[]'),
+  }
+}
+
+export function dbModifierGroupToModifierGroupView(
+  dbModifierGroup: CatalogModifierGroup,
+) {
+  return {
+    tid: dbModifierGroup.tid,
+    uri: dbModifierGroup.uri,
+    name: dbModifierGroup.name,
+    description: dbModifierGroup.description || undefined,
+    media: JSON.parse(dbModifierGroup.media || 'undefined'),
+    minimumSelection: dbModifierGroup.minimumSelection,
+    maximumSelection: dbModifierGroup.maximumSelection,
+    maximumOfEachModifier: dbModifierGroup.maximumOfEachModifier,
+    modifiers: JSON.parse(dbModifierGroup.modifiers || '[]') as string[],
+  }
+}
+
+export function dbModifierToModifierView(dbModifier: CatalogModifier) {
+  return {
+    tid: dbModifier.tid,
+    uri: dbModifier.uri,
+    name: dbModifier.name,
+    priceMoney: JSON.parse(dbModifier.priceMoney),
+    childModifierGroups: JSON.parse(
+      dbModifier.childModifierGroups || '[]',
+    ) as string[],
   }
 }

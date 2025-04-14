@@ -1,8 +1,7 @@
 import { AppContext } from '#/context'
 import { Server } from '#/lexicon'
 import { findAllCatalogsContainingItems, getItems, getModifierGroups, getModifiers, getCatalogs, getMerchantLocation } from '#/db'
-import { dbItemToItemView } from '#/controllers/catalog'
-import { dbCollectionToCollectionView } from '#/controllers/catalog'
+import { dbItemToItemView, dbModifierGroupToModifierGroupView, dbModifierToModifierView } from '#/controllers/catalog'
 import { dbCatalogToCatalogView } from '#/controllers/catalog'
 import { InvalidRequestError } from '@atproto/xrpc-server'
 
@@ -35,7 +34,7 @@ export default function (server: Server, ctx: AppContext) {
       return {
         encoding: 'application/json',
         body: {
-          items: items.map(item => dbItemToItemView(item, itemsToAvailabilityPeriods.get(item.tid) || [], merchantLocation.timezone)
+          items: items.map(item => dbItemToItemView(item, itemsToAvailabilityPeriods.get(item.tid) || [], merchantLocation.timezone)),
           modifierGroups: modifierGroups.map(dbModifierGroupToModifierGroupView),
           modifiers: modifiers.map(dbModifierToModifierView),
         },
