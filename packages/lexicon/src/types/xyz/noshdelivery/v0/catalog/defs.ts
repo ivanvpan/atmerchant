@@ -102,10 +102,6 @@ export interface ModifierGroupView {
   $type?: 'xyz.noshdelivery.v0.catalog.defs#modifierGroupView'
   uri: string
   externalId?: string
-  /** The modifier group is currently available for ordering, whether it is suspended by store or not scheduled to be available at this time */
-  availableForSale: boolean
-  /** The modifier group is currently suspended from ordering */
-  suspended: boolean
   name: string
   description?: string
   media?: XyzNoshdeliveryV0MediaDefs.MediaView
@@ -133,8 +129,8 @@ export interface ModifierView {
   $type?: 'xyz.noshdelivery.v0.catalog.defs#modifierView'
   uri: string
   externalId?: string
-  /** The item is currently available for ordering at this location */
-  availableForSale: boolean
+  /** The modifier group is currently suspended from ordering */
+  suspended: boolean
   name: string
   description?: string
   priceMoney: PriceMoney

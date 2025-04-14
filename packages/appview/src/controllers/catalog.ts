@@ -72,6 +72,7 @@ export function dbModifierToModifierView(dbModifier: CatalogModifier) {
     tid: dbModifier.tid,
     uri: dbModifier.uri,
     name: dbModifier.name,
+    suspended: dbModifier.suspended,
     priceMoney: JSON.parse(dbModifier.priceMoney),
     childModifierGroups: JSON.parse(
       dbModifier.childModifierGroups || '[]',

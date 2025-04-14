@@ -12,6 +12,7 @@ import { type OmitKey, type Un$Typed } from './util.js'
 import * as XyzNoshdeliveryV0CatalogCatalog from './types/xyz/noshdelivery/v0/catalog/catalog.js'
 import * as XyzNoshdeliveryV0CatalogCollection from './types/xyz/noshdelivery/v0/catalog/collection.js'
 import * as XyzNoshdeliveryV0CatalogDefs from './types/xyz/noshdelivery/v0/catalog/defs.js'
+import * as XyzNoshdeliveryV0CatalogGetItemsDetails from './types/xyz/noshdelivery/v0/catalog/getItemsDetails.js'
 import * as XyzNoshdeliveryV0CatalogGetShallowCatalogView from './types/xyz/noshdelivery/v0/catalog/getShallowCatalogView.js'
 import * as XyzNoshdeliveryV0CatalogItem from './types/xyz/noshdelivery/v0/catalog/item.js'
 import * as XyzNoshdeliveryV0CatalogModifier from './types/xyz/noshdelivery/v0/catalog/modifier.js'
@@ -49,6 +50,7 @@ import * as CommunityLexiconLocationGeo from './types/community/lexicon/location
 export * as XyzNoshdeliveryV0CatalogCatalog from './types/xyz/noshdelivery/v0/catalog/catalog.js'
 export * as XyzNoshdeliveryV0CatalogCollection from './types/xyz/noshdelivery/v0/catalog/collection.js'
 export * as XyzNoshdeliveryV0CatalogDefs from './types/xyz/noshdelivery/v0/catalog/defs.js'
+export * as XyzNoshdeliveryV0CatalogGetItemsDetails from './types/xyz/noshdelivery/v0/catalog/getItemsDetails.js'
 export * as XyzNoshdeliveryV0CatalogGetShallowCatalogView from './types/xyz/noshdelivery/v0/catalog/getShallowCatalogView.js'
 export * as XyzNoshdeliveryV0CatalogItem from './types/xyz/noshdelivery/v0/catalog/item.js'
 export * as XyzNoshdeliveryV0CatalogModifier from './types/xyz/noshdelivery/v0/catalog/modifier.js'
@@ -150,6 +152,18 @@ export class XyzNoshdeliveryV0CatalogNS {
     this.item = new ItemRecord(client)
     this.modifier = new ModifierRecord(client)
     this.modifierGroup = new ModifierGroupRecord(client)
+  }
+
+  getItemsDetails(
+    params?: XyzNoshdeliveryV0CatalogGetItemsDetails.QueryParams,
+    opts?: XyzNoshdeliveryV0CatalogGetItemsDetails.CallOptions,
+  ): Promise<XyzNoshdeliveryV0CatalogGetItemsDetails.Response> {
+    return this._client.call(
+      'xyz.noshdelivery.v0.catalog.getItemsDetails',
+      params,
+      undefined,
+      opts,
+    )
   }
 
   getShallowCatalogView(

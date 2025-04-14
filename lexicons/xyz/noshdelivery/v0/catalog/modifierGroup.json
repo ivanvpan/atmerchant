@@ -7,19 +7,12 @@
       "key": "tid",
       "record": {
         "type": "object",
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "properties": {
           "externalId": {
             "type": "string",
             "description": "An external ID that can be used to identify this object in an external system such as a warehousing system",
             "maxLength": 64
-          },
-          "availableForSale": {
-            "type": "boolean",
-            "description": "The item is currently available for ordering at this location",
-            "default": true
           },
           "name": {
             "type": "string",

@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "xyz.noshdelivery.v0.catalog.getFullCatalog",
+  "id": "xyz.noshdelivery.v0.catalog.getItemsDetails",
   "defs": {
     "main": {
       "type": "query",
@@ -27,7 +27,7 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["merchantLocation", "itemDetails"],
+          "required": ["merchantLocation", "items"],
           "properties": {
             "merchantLocation": {
               "type": "string",

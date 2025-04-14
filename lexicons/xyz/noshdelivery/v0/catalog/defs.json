@@ -152,16 +152,6 @@
           "type": "string",
           "maxLength": 64
         },
-        "availableForSale": {
-          "type": "boolean",
-          "description": "The modifier group is currently available for ordering, whether it is suspended by store or not scheduled to be available at this time",
-          "default": true
-        },
-        "suspended": {
-          "type": "boolean",
-          "description": "The modifier group is currently suspended from ordering",
-          "default": false
-        },
         "name": {
           "type": "string",
           "minLength": 1,
@@ -214,10 +204,10 @@
           "type": "string",
           "maxLength": 64
         },
-        "availableForSale": {
+        "suspended": {
           "type": "boolean",
-          "description": "The item is currently available for ordering at this location",
-          "default": true
+          "description": "The modifier group is currently suspended from ordering",
+          "default": false
         },
         "name": {
           "type": "string",

@@ -264,18 +264,6 @@ export const schemaDict = {
             type: 'string',
             maxLength: 64,
           },
-          availableForSale: {
-            type: 'boolean',
-            description:
-              'The modifier group is currently available for ordering, whether it is suspended by store or not scheduled to be available at this time',
-            default: true,
-          },
-          suspended: {
-            type: 'boolean',
-            description:
-              'The modifier group is currently suspended from ordering',
-            default: false,
-          },
           name: {
             type: 'string',
             minLength: 1,
@@ -332,11 +320,11 @@ export const schemaDict = {
             type: 'string',
             maxLength: 64,
           },
-          availableForSale: {
+          suspended: {
             type: 'boolean',
             description:
-              'The item is currently available for ordering at this location',
-            default: true,
+              'The modifier group is currently suspended from ordering',
+            default: false,
           },
           name: {
             type: 'string',
@@ -399,6 +387,68 @@ export const schemaDict = {
             type: 'integer',
             minimum: 0,
             maximum: 59,
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0CatalogGetItemsDetails: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.catalog.getItemsDetails',
+    defs: {
+      main: {
+        type: 'query',
+        description: 'Get all info about a specific item including modifiers.',
+        parameters: {
+          type: 'params',
+          required: ['merchantLocation', 'itemIds'],
+          properties: {
+            merchantLocation: {
+              type: 'string',
+              format: 'at-uri',
+            },
+            itemIds: {
+              type: 'array',
+              description: 'The IDs of the items to get.',
+              items: {
+                type: 'string',
+                format: 'tid',
+              },
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['merchantLocation', 'items'],
+            properties: {
+              merchantLocation: {
+                type: 'string',
+                format: 'at-uri',
+              },
+              items: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#itemView',
+                },
+              },
+              modifierGroups: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#modifierGroupView',
+                },
+              },
+              modifiers: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#modifierView',
+                },
+              },
+            },
           },
         },
       },
@@ -540,11 +590,10 @@ export const schemaDict = {
                 'An external ID that can be used to identify this object in an external system such as a warehousing system',
               maxLength: 64,
             },
-            availableForSale: {
+            suspended: {
               type: 'boolean',
-              description:
-                'The item is currently available for ordering at this location',
-              default: true,
+              description: 'The modifier is currently suspended from ordering',
+              default: false,
             },
             name: {
               type: 'string',
@@ -589,12 +638,6 @@ export const schemaDict = {
               description:
                 'An external ID that can be used to identify this object in an external system such as a warehousing system',
               maxLength: 64,
-            },
-            availableForSale: {
-              type: 'boolean',
-              description:
-                'The item is currently available for ordering at this location',
-              default: true,
             },
             name: {
               type: 'string',
@@ -2419,6 +2462,8 @@ export const ids = {
   XyzNoshdeliveryV0CatalogCatalog: 'xyz.noshdelivery.v0.catalog.catalog',
   XyzNoshdeliveryV0CatalogCollection: 'xyz.noshdelivery.v0.catalog.collection',
   XyzNoshdeliveryV0CatalogDefs: 'xyz.noshdelivery.v0.catalog.defs',
+  XyzNoshdeliveryV0CatalogGetItemsDetails:
+    'xyz.noshdelivery.v0.catalog.getItemsDetails',
   XyzNoshdeliveryV0CatalogGetShallowCatalogView:
     'xyz.noshdelivery.v0.catalog.getShallowCatalogView',
   XyzNoshdeliveryV0CatalogItem: 'xyz.noshdelivery.v0.catalog.item',

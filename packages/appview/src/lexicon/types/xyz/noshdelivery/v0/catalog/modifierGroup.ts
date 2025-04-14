@@ -19,8 +19,6 @@ export interface Record {
   $type: 'xyz.noshdelivery.v0.catalog.modifierGroup'
   /** An external ID that can be used to identify this object in an external system such as a warehousing system */
   externalId?: string
-  /** The item is currently available for ordering at this location */
-  availableForSale: boolean
   name: string
   description?: string
   media?: XyzNoshdeliveryV0MediaDefs.MediaView

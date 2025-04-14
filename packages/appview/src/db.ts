@@ -115,6 +115,7 @@ export type CatalogModifier = {
   uri: string
   externalId?: string | null
   name: string
+  suspended: boolean
   description: string | null
   priceMoney: string
   childModifierGroups: string
@@ -177,11 +178,11 @@ migrations['001'] = {
       .addColumn('externalId', 'varchar')
       .addColumn('name', 'varchar', (col) => col.notNull())
       .addColumn('description', 'varchar')
-      .addColumn('priceMoney', 'jsonb', (col) => col.notNull())
-      .addColumn('childModifierGroups', 'jsonb')
       .addColumn('suspended', 'boolean', (col) =>
         col.defaultTo(false).notNull(),
       )
+      .addColumn('priceMoney', 'jsonb', (col) => col.notNull())
+      .addColumn('childModifierGroups', 'jsonb')
       .execute()
     await db.schema
       .createTable('catalog_modifier_group')

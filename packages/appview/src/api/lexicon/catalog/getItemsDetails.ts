@@ -4,6 +4,7 @@ import { findAllCatalogsContainingItems, getItems, getModifierGroups, getModifie
 import { dbItemToItemView, dbModifierGroupToModifierGroupView, dbModifierToModifierView } from '#/controllers/catalog'
 import { dbCatalogToCatalogView } from '#/controllers/catalog'
 import { InvalidRequestError } from '@atproto/xrpc-server'
+import { dbMerchantLocationToMerchantLocationView } from '#/controllers/merchant'
 
 export default function (server: Server, ctx: AppContext) {
   server.xyz.noshdelivery.v0.catalog.getItemsDetails({
@@ -34,6 +35,7 @@ export default function (server: Server, ctx: AppContext) {
       return {
         encoding: 'application/json',
         body: {
+          merchantLocation: merchantLocation.uri,
           items: items.map(item => dbItemToItemView(item, itemsToAvailabilityPeriods.get(item.tid) || [], merchantLocation.timezone)),
           modifierGroups: modifierGroups.map(dbModifierGroupToModifierGroupView),
           modifiers: modifiers.map(dbModifierToModifierView),
