@@ -1,7 +1,4 @@
 import {
-  XyzNoshdeliveryV0CatalogCatalog,
-  XyzNoshdeliveryV0CatalogCollection,
-  XyzNoshdeliveryV0CatalogItem,
   XyzNoshdeliveryV0MerchantGroup,
   XyzNoshdeliveryV0MerchantLocation,
 } from '@nosh/lexicon'
@@ -16,7 +13,6 @@ import {
 } from 'kysely'
 import { tidFromUri, typeFromUri } from '#/utils/uri'
 import { InvalidRequestError } from '@atproto/xrpc-server'
-import { AvailabilityTimeOfDay } from './utils/time'
 import {
   CatalogObject,
   CatalogObjectData,
@@ -292,46 +288,127 @@ export const getCatalogObject = async (
   }
 }
 
-// export const findAllCatalogsContainingItems = async (
-//   db: Database,
-//   itemIds: string[],
-// ): Promise<Record<string, string[]>> => {
-//   const result = await db
-//     .withRecursive('item_ancestors', (cte) =>
-//       cte
-//         .selectFrom('adjacency_list')
-//         .select(['childTid', 'parentTid'])
-//         .where('childTid', 'in', itemIds)
-//         .unionAll(
-//           cte
-//             .selectFrom('item_ancestors')
-//             .innerJoin(
-//               'adjacency_list',
-//               'adjacency_list.childTid',
-//               'item_ancestors.parentTid',
-//             )
-//             .select(['item_ancestors.childTid', 'adjacency_list.parentTid']),
-//         ),
-//     )
-//     .selectFrom('item_ancestors')
-//     .innerJoin('catalog', 'catalog.tid', 'item_ancestors.parentTid')
-//     .select([
-//       'item_ancestors.childTid as itemTid',
-//       'catalog.tid',
-//       'catalog.name',
-//     ])
-//     .execute()
-//   return result.reduce(
-//     (acc, row) => {
-//       if (!acc[row.itemTid]) {
-//         acc[row.itemTid] = []
-//       }
-//       acc[row.itemTid].push(row.tid)
-//       return acc
-//     },
-//     {} as Record<string, string[]>,
-//   )
-// }
+export const findDescendantsOfType = async (
+  db: Database,
+  objectIds: string[],
+  objectTypes: CatalogObjectType[],
+): Promise<Record<CatalogObjectType, CatalogObject[]>> => {
+  // If no object IDs provided, return empty result
+  if (objectIds.length === 0) {
+    return objectTypes.reduce(
+      (acc, type) => {
+        acc[type] = []
+        return acc
+      },
+      {} as Record<CatalogObjectType, CatalogObject[]>,
+    )
+  }
+
+  // First, find all descendants using recursive CTE
+  const descendantIds = await db
+    .with('descendants', (db) =>
+      db
+        .selectFrom('adjacency_list')
+        .where('parentTid', 'in', objectIds)
+        .select(['childTid', 'childType'])
+        .unionAll(
+          db
+            .selectFrom('adjacency_list as al')
+            .innerJoin('descendants as d', 'al.parentTid', 'd.childTid')
+            .select(['al.childTid', 'al.childType']),
+        ),
+    )
+    .selectFrom('descendants')
+    .where('childType', 'in', objectTypes)
+    .select(['childTid', 'childType'])
+    .execute()
+
+  // Group descendant IDs by type
+  const idsByType = descendantIds.reduce(
+    (acc, { childTid, childType }) => {
+      if (!acc[childType as CatalogObjectType]) {
+        acc[childType as CatalogObjectType] = []
+      }
+      acc[childType as CatalogObjectType].push(childTid)
+      return acc
+    },
+    {} as Record<CatalogObjectType, string[]>,
+  )
+
+  // Fetch all catalog objects for the found IDs, grouped by type
+  const result: Record<CatalogObjectType, CatalogObject[]> = {}
+
+  // Initialize result with empty arrays for all requested types
+  objectTypes.forEach((type) => {
+    result[type] = []
+  })
+
+  // For each type that has descendants, fetch the full objects
+  await Promise.all(
+    Object.entries(idsByType).map(async ([type, ids]) => {
+      if (ids.length > 0) {
+        const objects = await db
+          .selectFrom('catalog_object')
+          .where('tid', 'in', ids)
+          .where('type', '=', type)
+          .selectAll()
+          .execute()
+
+        result[type as CatalogObjectType] = objects
+      }
+    }),
+  )
+
+  return result
+}
+export const findAllCatalogsContainingItems = async (
+  db: Database,
+  itemIds: string[],
+): Promise<Record<string, string[]>> => {
+  const result = await db
+    .withRecursive('item_ancestors', (cte) =>
+      cte
+        .selectFrom('adjacency_list')
+        .select(['childTid', 'parentTid'])
+        .where('childTid', 'in', itemIds)
+        .unionAll(
+          cte
+            .selectFrom('item_ancestors')
+            .innerJoin('adjacency_list', (join) =>
+              join
+                .onRef(
+                  'adjacency_list.childTid',
+                  '=',
+                  'item_ancestors.parentTid',
+                )
+                .on('adjacency_list.parentType', '=', 'catalog'),
+            )
+            .select(['item_ancestors.childTid', 'adjacency_list.parentTid']),
+        ),
+    )
+    .selectFrom('item_ancestors')
+    .innerJoin(
+      'catalog_object',
+      'catalog_object.tid',
+      'item_ancestors.parentTid',
+    )
+    .select([
+      'item_ancestors.childTid as itemTid',
+      'catalog_object.tid',
+      'catalog_object.name',
+    ])
+    .execute()
+  return result.reduce(
+    (acc, row) => {
+      if (!acc[row.itemTid]) {
+        acc[row.itemTid] = []
+      }
+      acc[row.itemTid].push(row.tid)
+      return acc
+    },
+    {} as Record<string, string[]>,
+  )
+}
 
 export const findMerchantGroupByTid = async (
   db: Database,
