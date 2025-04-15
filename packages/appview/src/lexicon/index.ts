@@ -12,6 +12,7 @@ import { schemas } from './lexicons.js'
 import * as XyzNoshdeliveryV0CatalogGetItemsDetails from './types/xyz/noshdelivery/v0/catalog/getItemsDetails.js'
 import * as XyzNoshdeliveryV0CatalogGetShallowCatalogView from './types/xyz/noshdelivery/v0/catalog/getShallowCatalogView.js'
 import * as XyzNoshdeliveryV0CatalogPutCatalog from './types/xyz/noshdelivery/v0/catalog/putCatalog.js'
+import * as XyzNoshdeliveryV0CatalogPutCatalogObject from './types/xyz/noshdelivery/v0/catalog/putCatalogObject.js'
 import * as XyzNoshdeliveryV0CatalogPutCollection from './types/xyz/noshdelivery/v0/catalog/putCollection.js'
 import * as XyzNoshdeliveryV0CatalogPutItem from './types/xyz/noshdelivery/v0/catalog/putItem.js'
 import * as XyzNoshdeliveryV0MerchantGetGroup from './types/xyz/noshdelivery/v0/merchant/getGroup.js'
@@ -121,6 +122,17 @@ export class XyzNoshdeliveryV0CatalogNS {
     >,
   ) {
     const nsid = 'xyz.noshdelivery.v0.catalog.putCatalog' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  putCatalogObject<AV extends AuthVerifier>(
+    cfg: ConfigOf<
+      AV,
+      XyzNoshdeliveryV0CatalogPutCatalogObject.Handler<ExtractAuth<AV>>,
+      XyzNoshdeliveryV0CatalogPutCatalogObject.HandlerReqCtx<ExtractAuth<AV>>
+    >,
+  ) {
+    const nsid = 'xyz.noshdelivery.v0.catalog.putCatalogObject' // @ts-ignore
     return this._server.xrpc.method(nsid, cfg)
   }
 

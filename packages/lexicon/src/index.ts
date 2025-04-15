@@ -18,6 +18,7 @@ import * as XyzNoshdeliveryV0CatalogItem from './types/xyz/noshdelivery/v0/catal
 import * as XyzNoshdeliveryV0CatalogModifier from './types/xyz/noshdelivery/v0/catalog/modifier.js'
 import * as XyzNoshdeliveryV0CatalogModifierGroup from './types/xyz/noshdelivery/v0/catalog/modifierGroup.js'
 import * as XyzNoshdeliveryV0CatalogPutCatalog from './types/xyz/noshdelivery/v0/catalog/putCatalog.js'
+import * as XyzNoshdeliveryV0CatalogPutCatalogObject from './types/xyz/noshdelivery/v0/catalog/putCatalogObject.js'
 import * as XyzNoshdeliveryV0CatalogPutCollection from './types/xyz/noshdelivery/v0/catalog/putCollection.js'
 import * as XyzNoshdeliveryV0CatalogPutItem from './types/xyz/noshdelivery/v0/catalog/putItem.js'
 import * as XyzNoshdeliveryV0MediaDefs from './types/xyz/noshdelivery/v0/media/defs.js'
@@ -56,6 +57,7 @@ export * as XyzNoshdeliveryV0CatalogItem from './types/xyz/noshdelivery/v0/catal
 export * as XyzNoshdeliveryV0CatalogModifier from './types/xyz/noshdelivery/v0/catalog/modifier.js'
 export * as XyzNoshdeliveryV0CatalogModifierGroup from './types/xyz/noshdelivery/v0/catalog/modifierGroup.js'
 export * as XyzNoshdeliveryV0CatalogPutCatalog from './types/xyz/noshdelivery/v0/catalog/putCatalog.js'
+export * as XyzNoshdeliveryV0CatalogPutCatalogObject from './types/xyz/noshdelivery/v0/catalog/putCatalogObject.js'
 export * as XyzNoshdeliveryV0CatalogPutCollection from './types/xyz/noshdelivery/v0/catalog/putCollection.js'
 export * as XyzNoshdeliveryV0CatalogPutItem from './types/xyz/noshdelivery/v0/catalog/putItem.js'
 export * as XyzNoshdeliveryV0MediaDefs from './types/xyz/noshdelivery/v0/media/defs.js'
@@ -184,6 +186,18 @@ export class XyzNoshdeliveryV0CatalogNS {
   ): Promise<XyzNoshdeliveryV0CatalogPutCatalog.Response> {
     return this._client.call(
       'xyz.noshdelivery.v0.catalog.putCatalog',
+      opts?.qp,
+      data,
+      opts,
+    )
+  }
+
+  putCatalogObject(
+    data?: XyzNoshdeliveryV0CatalogPutCatalogObject.InputSchema,
+    opts?: XyzNoshdeliveryV0CatalogPutCatalogObject.CallOptions,
+  ): Promise<XyzNoshdeliveryV0CatalogPutCatalogObject.Response> {
+    return this._client.call(
+      'xyz.noshdelivery.v0.catalog.putCatalogObject',
       opts?.qp,
       data,
       opts,
