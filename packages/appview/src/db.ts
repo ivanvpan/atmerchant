@@ -293,74 +293,84 @@ export const findDescendantsOfType = async (
   objectIds: string[],
   objectTypes: CatalogObjectType[],
 ): Promise<Record<CatalogObjectType, CatalogObject[]>> => {
-  // If no object IDs provided, return empty result
-  if (objectIds.length === 0) {
-    return objectTypes.reduce(
-      (acc, type) => {
-        acc[type] = []
-        return acc
-      },
-      {} as Record<CatalogObjectType, CatalogObject[]>,
-    )
-  }
-
-  // First, find all descendants using recursive CTE
-  const descendantIds = await db
-    .with('descendants', (db) =>
-      db
-        .selectFrom('adjacency_list')
-        .where('parentTid', 'in', objectIds)
-        .select(['childTid', 'childType'])
+  const result = await db
+    .withRecursive('descendants', (cte) =>
+      cte
+        .selectFrom('catalog_object')
+        .select(['tid', 'type'])
+        .where('tid', 'in', objectIds)
         .unionAll(
-          db
-            .selectFrom('adjacency_list as al')
-            .innerJoin('descendants as d', 'al.parentTid', 'd.childTid')
-            .select(['al.childTid', 'al.childType']),
+          cte
+            .selectFrom('descendants')
+            .innerJoin('adjacency_list', (join) =>
+              join
+                .onRef('adjacency_list.parentTid', '=', 'descendants.tid')
+                .on(
+                  'adjacency_list.parentType',
+                  '=',
+                  'descendants.type' as CatalogObjectType,
+                ),
+            )
+            .innerJoin('catalog_object', (join) =>
+              join
+                .onRef('catalog_object.tid', '=', 'adjacency_list.childTid')
+                .on(
+                  'catalog_object.type',
+                  '=',
+                  'adjacency_list.childType' as CatalogObjectType,
+                ),
+            )
+            .select(['catalog_object.tid', 'catalog_object.type']),
         ),
     )
     .selectFrom('descendants')
-    .where('childType', 'in', objectTypes)
-    .select(['childTid', 'childType'])
+    .innerJoin('catalog_object', 'catalog_object.tid', 'descendants.tid')
+    .selectAll('catalog_object')
     .execute()
 
-  // Group descendant IDs by type
-  const idsByType = descendantIds.reduce(
-    (acc, { childTid, childType }) => {
-      if (!acc[childType as CatalogObjectType]) {
-        acc[childType as CatalogObjectType] = []
+  // Group results by type
+  const idsByType = result.reduce(
+    (acc, { tid, type }) => {
+      if (!acc[type as CatalogObjectType]) {
+        acc[type as CatalogObjectType] = []
       }
-      acc[childType as CatalogObjectType].push(childTid)
+      acc[type as CatalogObjectType].push(tid)
       return acc
     },
     {} as Record<CatalogObjectType, string[]>,
   )
 
   // Fetch all catalog objects for the found IDs, grouped by type
-  const result: Record<CatalogObjectType, CatalogObject[]> = {}
+  const finalResult: Record<CatalogObjectType, CatalogObject[]> =
+    objectTypes.reduce(
+      (acc, type) => {
+        acc[type] = []
+        return acc
+      },
+      {} as Record<CatalogObjectType, CatalogObject[]>,
+    )
 
-  // Initialize result with empty arrays for all requested types
-  objectTypes.forEach((type) => {
-    result[type] = []
-  })
-
-  // For each type that has descendants, fetch the full objects
+  // Fetch objects for each type
   await Promise.all(
     Object.entries(idsByType).map(async ([type, ids]) => {
       if (ids.length > 0) {
         const objects = await db
           .selectFrom('catalog_object')
           .where('tid', 'in', ids)
-          .where('type', '=', type)
           .selectAll()
           .execute()
 
-        result[type as CatalogObjectType] = objects
+        finalResult[type as CatalogObjectType] = objects.map((obj) => ({
+          ...obj,
+          data: JSON.parse(obj.data),
+        }))
       }
     }),
   )
 
-  return result
+  return finalResult
 }
+
 export const findAllCatalogsContainingItems = async (
   db: Database,
   itemIds: string[],
