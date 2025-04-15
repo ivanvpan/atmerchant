@@ -15,6 +15,7 @@ export type CatalogObjectType =
   | 'modifier'
 
 export type BaseCatalogObject = {
+  type: CatalogObjectType
   tid: string
   uri: string
   name: string

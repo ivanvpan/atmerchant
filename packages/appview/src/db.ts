@@ -20,6 +20,7 @@ import { AvailabilityTimeOfDay } from './utils/time'
 import {
   CatalogObject,
   CatalogObjectData,
+  CatalogObjectType,
   LexiconType,
   lexiconTypeToCatalogObjectType,
 } from './types'
@@ -28,11 +29,6 @@ export type DatabaseSchema = {
   adjacency_list: AdjacencyList
   merchant_group: MerchantGroup
   merchant_location: MerchantLocation
-  catalog: Catalog
-  catalog_collection: CatalogCollection
-  catalog_item: CatalogItem
-  catalog_modifier_group: CatalogModifierGroup
-  catalog_modifier: CatalogModifier
   cursor: Cursor
   catalog_object: DBCatalogObject
 }
@@ -46,12 +42,11 @@ export type Cursor = {
   seq: number
 }
 
-type NodeType = 'catalog' | 'collection' | 'item'
 export type AdjacencyList = {
   parentTid: string
-  parentType: string
+  parentType: CatalogObjectType
   childTid: string
-  childType: string
+  childType: CatalogObjectType
 }
 
 export interface MerchantGroup {
@@ -74,62 +69,6 @@ export type MerchantLocation = {
   coordinates: string
   media?: MediaJson | null
   parentGroup: string
-}
-
-export type Catalog = {
-  tid: string
-  uri: string
-  externalId?: string | null
-  name: string
-  merchantLocation: string
-  availabilityPeriods: string
-  childCollections: string | null
-}
-
-export type CatalogCollection = {
-  tid: string
-  uri: string
-  externalId?: string | null
-  name: string
-  items: string
-  media: string | null
-  childCollections: string | null
-}
-
-export type CatalogItem = {
-  tid: string
-  uri: string
-  externalId?: string | null
-  name: string
-  description: string | null
-  media: string | null
-  priceMoney: string
-  suspended: boolean
-  modifierGroups: string
-}
-
-export type CatalogModifierGroup = {
-  tid: string
-  uri: string
-  externalId?: string | null
-  name: string
-  description: string | null
-  media: string | null
-  minimumSelection: number
-  maximumSelection: number
-  maximumOfEachModifier: number
-  modifiers: string
-}
-
-export type CatalogModifier = {
-  tid: string
-  uri: string
-  externalId?: string | null
-  name: string
-  suspended: boolean
-  description: string | null
-  priceMoney: string
-  childModifierGroups: string
 }
 
 // Migrations
@@ -243,9 +182,8 @@ export type Database = Kysely<DatabaseSchema>
 export const updateAdjacencyList = async (
   db: Database,
   parentTid: string,
-  parentType: NodeType,
-  childTids: string[],
-  childType: NodeType,
+  parentType: CatalogObjectType,
+  children: { childTid: string; childType: CatalogObjectType }[],
 ) => {
   try {
     // TODO this is not very efficient but whatevs
@@ -257,11 +195,11 @@ export const updateAdjacencyList = async (
       await tx
         .insertInto('adjacency_list')
         .values(
-          childTids.map((childTid) => ({
+          children.map((child) => ({
             parentTid,
             parentType,
-            childTid,
-            childType,
+            childTid: child.childTid,
+            childType: child.childType,
           })),
         )
         .onConflict((oc) => oc.doNothing())
@@ -273,38 +211,38 @@ export const updateAdjacencyList = async (
   }
 }
 
-function getCatalogObjectAdjacencyList(catalogObject: CatalogObject) {
-  let adjacencyList: AdjacencyList[] = []
-  switch (catalogObject.type) {
-    case 'catalog': {
+function getCatalogObjectAdjacencyList(
+  catalogObjectData: CatalogObjectData,
+): Pick<AdjacencyList, 'childTid' | 'childType'>[] {
+  let adjacencyList: Pick<AdjacencyList, 'childTid' | 'childType'>[] = []
+
+  // TODO not great to be using the lexicon type here, but maybe it's the right thing? What is consistent?
+  switch (catalogObjectData.$type) {
+    case 'xyz.noshdelivery.v0.catalog.catalog': {
       adjacencyList =
-        catalogObject.data.collections?.map((collection) => ({
-          parentTid: catalogObject.tid,
-          parentType: catalogObject.type,
+        catalogObjectData.collections?.map((collection) => ({
           childTid: collection,
           childType: 'collection',
         })) || []
       break
     }
-    case 'collection': {
+    case 'xyz.noshdelivery.v0.catalog.collection': {
       adjacencyList =
-        catalogObject.data.items?.map((item) => ({
-          parentTid: catalogObject.tid,
-          parentType: catalogObject.type,
+        catalogObjectData.items?.map((item) => ({
           childTid: item,
           childType: 'item',
         })) || []
       break
     }
-    case 'item': {
+    case 'xyz.noshdelivery.v0.catalog.item': {
       adjacencyList = []
       break
     }
-    case 'modifierGroup': {
+    case 'xyz.noshdelivery.v0.catalog.modifierGroup': {
       adjacencyList = []
       break
     }
-    case 'modifier': {
+    case 'xyz.noshdelivery.v0.catalog.modifier': {
       adjacencyList = []
       break
     }
@@ -317,19 +255,23 @@ export const upsertCatalogObjectRecord = async (
   uri: string,
   record: CatalogObjectData,
 ) => {
+  const tid = tidFromUri(uri)
   const type = lexiconTypeToCatalogObjectType[typeFromUri(uri) as LexiconType]
   const data = JSON.stringify(record)
 
   await db
     .insertInto('catalog_object')
     .values({
-      tid: tidFromUri(uri),
+      tid,
       uri,
       name: record.name,
       type,
       data,
     })
     .execute()
+  const adjacencyList = getCatalogObjectAdjacencyList(record)
+
+  await updateAdjacencyList(db, tid, type, adjacencyList)
 }
 
 export const getCatalogObject = async (
@@ -350,46 +292,46 @@ export const getCatalogObject = async (
   }
 }
 
-export const findAllCatalogsContainingItems = async (
-  db: Database,
-  itemIds: string[],
-): Promise<Record<string, string[]>> => {
-  const result = await db
-    .withRecursive('item_ancestors', (cte) =>
-      cte
-        .selectFrom('adjacency_list')
-        .select(['childTid', 'parentTid'])
-        .where('childTid', 'in', itemIds)
-        .unionAll(
-          cte
-            .selectFrom('item_ancestors')
-            .innerJoin(
-              'adjacency_list',
-              'adjacency_list.childTid',
-              'item_ancestors.parentTid',
-            )
-            .select(['item_ancestors.childTid', 'adjacency_list.parentTid']),
-        ),
-    )
-    .selectFrom('item_ancestors')
-    .innerJoin('catalog', 'catalog.tid', 'item_ancestors.parentTid')
-    .select([
-      'item_ancestors.childTid as itemTid',
-      'catalog.tid',
-      'catalog.name',
-    ])
-    .execute()
-  return result.reduce(
-    (acc, row) => {
-      if (!acc[row.itemTid]) {
-        acc[row.itemTid] = []
-      }
-      acc[row.itemTid].push(row.tid)
-      return acc
-    },
-    {} as Record<string, string[]>,
-  )
-}
+// export const findAllCatalogsContainingItems = async (
+//   db: Database,
+//   itemIds: string[],
+// ): Promise<Record<string, string[]>> => {
+//   const result = await db
+//     .withRecursive('item_ancestors', (cte) =>
+//       cte
+//         .selectFrom('adjacency_list')
+//         .select(['childTid', 'parentTid'])
+//         .where('childTid', 'in', itemIds)
+//         .unionAll(
+//           cte
+//             .selectFrom('item_ancestors')
+//             .innerJoin(
+//               'adjacency_list',
+//               'adjacency_list.childTid',
+//               'item_ancestors.parentTid',
+//             )
+//             .select(['item_ancestors.childTid', 'adjacency_list.parentTid']),
+//         ),
+//     )
+//     .selectFrom('item_ancestors')
+//     .innerJoin('catalog', 'catalog.tid', 'item_ancestors.parentTid')
+//     .select([
+//       'item_ancestors.childTid as itemTid',
+//       'catalog.tid',
+//       'catalog.name',
+//     ])
+//     .execute()
+//   return result.reduce(
+//     (acc, row) => {
+//       if (!acc[row.itemTid]) {
+//         acc[row.itemTid] = []
+//       }
+//       acc[row.itemTid].push(row.tid)
+//       return acc
+//     },
+//     {} as Record<string, string[]>,
+//   )
+// }
 
 export const findMerchantGroupByTid = async (
   db: Database,
@@ -509,31 +451,13 @@ export const getShallowCatalogsForLocationUri = async (
   db: Database,
   uri: string,
 ): Promise<{
-  catalogs: Catalog[]
-  collections: CatalogCollection[]
-  items: CatalogItem[]
+  catalogs: CatalogObject[]
+  collections: CatalogObject[]
+  items: CatalogObject[]
 }> => {
-  const catalogs = await db
-    .selectFrom('catalog')
-    .where('merchantLocation', '=', uri)
-    .selectAll()
-    .execute()
-
-  const collectionsIds = catalogs.flatMap((catalog) => catalog.childCollections)
-
-  const collections = await db
-    .selectFrom('catalog_collection')
-    .where('tid', 'in', collectionsIds)
-    .selectAll()
-    .execute()
-
-  const itemsIds = collections.flatMap((collection) => collection.items)
-
-  const items = await db
-    .selectFrom('catalog_item')
-    .where('tid', 'in', itemsIds)
-    .selectAll()
-    .execute()
-
-  return { catalogs, collections, items }
+  return {
+    catalogs: [],
+    collections: [],
+    items: [],
+  }
 }
