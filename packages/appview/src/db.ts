@@ -273,6 +273,45 @@ export const updateAdjacencyList = async (
   }
 }
 
+function getCatalogObjectAdjacencyList(catalogObject: CatalogObject) {
+  let adjacencyList: AdjacencyList[] = []
+  switch (catalogObject.type) {
+    case 'catalog': {
+      adjacencyList =
+        catalogObject.data.collections?.map((collection) => ({
+          parentTid: catalogObject.tid,
+          parentType: catalogObject.type,
+          childTid: collection,
+          childType: 'collection',
+        })) || []
+      break
+    }
+    case 'collection': {
+      adjacencyList =
+        catalogObject.data.items?.map((item) => ({
+          parentTid: catalogObject.tid,
+          parentType: catalogObject.type,
+          childTid: item,
+          childType: 'item',
+        })) || []
+      break
+    }
+    case 'item': {
+      adjacencyList = []
+      break
+    }
+    case 'modifierGroup': {
+      adjacencyList = []
+      break
+    }
+    case 'modifier': {
+      adjacencyList = []
+      break
+    }
+  }
+  return adjacencyList
+}
+
 export const upsertCatalogObjectRecord = async (
   db: Database,
   uri: string,

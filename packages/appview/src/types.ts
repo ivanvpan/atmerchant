@@ -14,41 +14,56 @@ export type CatalogObjectType =
   | 'modifierGroup'
   | 'modifier'
 
-export type CatalogObject = {
-  type: CatalogObjectType
+export type BaseCatalogObject = {
   tid: string
   uri: string
   name: string
   externalId?: string
-  data:
-    | XyzNoshdeliveryV0CatalogCatalog.Record
-    | XyzNoshdeliveryV0CatalogCollection.Record
-    | XyzNoshdeliveryV0CatalogItem.Record
-  // | XyzNoshdeliveryV0CatalogModifierGroup.Record
-  // | XyzNoshdeliveryV0CatalogModifier.Record
 }
+
+export type CatalogObject =
+  | (BaseCatalogObject & {
+      type: 'catalog'
+      data: XyzNoshdeliveryV0CatalogCatalog.Record
+    })
+  | (BaseCatalogObject & {
+      type: 'collection'
+      data: XyzNoshdeliveryV0CatalogCollection.Record
+    })
+  | (BaseCatalogObject & {
+      type: 'item'
+      data: XyzNoshdeliveryV0CatalogItem.Record
+    })
+  | (BaseCatalogObject & {
+      type: 'modifierGroup'
+      data: XyzNoshdeliveryV0CatalogModifierGroup.Record
+    })
+  | (BaseCatalogObject & {
+      type: 'modifier'
+      data: XyzNoshdeliveryV0CatalogModifier.Record
+    })
 
 export type CatalogObjectData =
   | XyzNoshdeliveryV0CatalogCatalog.Record
   | XyzNoshdeliveryV0CatalogCollection.Record
   | XyzNoshdeliveryV0CatalogItem.Record
-// | XyzNoshdeliveryV0CatalogModifierGroup.Record
-// | XyzNoshdeliveryV0CatalogModifier.Record
+  | XyzNoshdeliveryV0CatalogModifierGroup.Record
+  | XyzNoshdeliveryV0CatalogModifier.Record
 
 export type LexiconType =
   | XyzNoshdeliveryV0CatalogCatalog.Record['$type']
   | XyzNoshdeliveryV0CatalogCollection.Record['$type']
   | XyzNoshdeliveryV0CatalogItem.Record['$type']
-// | XyzNoshdeliveryV0CatalogModifierGroup.Record['$type']
-// | XyzNoshdeliveryV0CatalogModifier.Record['$type']
+  | XyzNoshdeliveryV0CatalogModifierGroup.Record['$type']
+  | XyzNoshdeliveryV0CatalogModifier.Record['$type']
 
 // Is this sane?
 export const typeToLexiconType: Record<CatalogObjectType, LexiconType> = {
   catalog: schemaDict.XyzNoshdeliveryV0CatalogCatalog.id,
   collection: schemaDict.XyzNoshdeliveryV0CatalogCollection.id,
   item: schemaDict.XyzNoshdeliveryV0CatalogItem.id,
-  // modifierGroup: schemaDict.XyzNoshdeliveryV0CatalogModifierGroup.id,
-  // modifier: schemaDict.XyzNoshdeliveryV0CatalogModifier.id,
+  modifierGroup: schemaDict.XyzNoshdeliveryV0CatalogModifierGroup.id,
+  modifier: schemaDict.XyzNoshdeliveryV0CatalogModifier.id,
 }
 
 // TODO this a many-to-one mapping
@@ -59,6 +74,6 @@ export const lexiconTypeToCatalogObjectType: Record<
   [schemaDict.XyzNoshdeliveryV0CatalogCatalog.id]: 'catalog',
   [schemaDict.XyzNoshdeliveryV0CatalogCollection.id]: 'collection',
   [schemaDict.XyzNoshdeliveryV0CatalogItem.id]: 'item',
-  // modifierGroup: schemaDict.XyzNoshdeliveryV0CatalogModifierGroup.id,
-  // modifier: schemaDict.XyzNoshdeliveryV0CatalogModifier.id,
+  [schemaDict.XyzNoshdeliveryV0CatalogModifierGroup.id]: 'modifierGroup',
+  [schemaDict.XyzNoshdeliveryV0CatalogModifier.id]: 'modifier',
 }
