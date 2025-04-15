@@ -11,10 +11,7 @@ import {
 import { schemas } from './lexicons.js'
 import * as XyzNoshdeliveryV0CatalogGetItemsDetails from './types/xyz/noshdelivery/v0/catalog/getItemsDetails.js'
 import * as XyzNoshdeliveryV0CatalogGetShallowCatalogView from './types/xyz/noshdelivery/v0/catalog/getShallowCatalogView.js'
-import * as XyzNoshdeliveryV0CatalogPutCatalog from './types/xyz/noshdelivery/v0/catalog/putCatalog.js'
 import * as XyzNoshdeliveryV0CatalogPutCatalogObject from './types/xyz/noshdelivery/v0/catalog/putCatalogObject.js'
-import * as XyzNoshdeliveryV0CatalogPutCollection from './types/xyz/noshdelivery/v0/catalog/putCollection.js'
-import * as XyzNoshdeliveryV0CatalogPutItem from './types/xyz/noshdelivery/v0/catalog/putItem.js'
 import * as XyzNoshdeliveryV0MerchantGetGroup from './types/xyz/noshdelivery/v0/merchant/getGroup.js'
 import * as XyzNoshdeliveryV0MerchantListGroups from './types/xyz/noshdelivery/v0/merchant/listGroups.js'
 import * as XyzNoshdeliveryV0MerchantListLocations from './types/xyz/noshdelivery/v0/merchant/listLocations.js'
@@ -114,17 +111,6 @@ export class XyzNoshdeliveryV0CatalogNS {
     return this._server.xrpc.method(nsid, cfg)
   }
 
-  putCatalog<AV extends AuthVerifier>(
-    cfg: ConfigOf<
-      AV,
-      XyzNoshdeliveryV0CatalogPutCatalog.Handler<ExtractAuth<AV>>,
-      XyzNoshdeliveryV0CatalogPutCatalog.HandlerReqCtx<ExtractAuth<AV>>
-    >,
-  ) {
-    const nsid = 'xyz.noshdelivery.v0.catalog.putCatalog' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
   putCatalogObject<AV extends AuthVerifier>(
     cfg: ConfigOf<
       AV,
@@ -133,28 +119,6 @@ export class XyzNoshdeliveryV0CatalogNS {
     >,
   ) {
     const nsid = 'xyz.noshdelivery.v0.catalog.putCatalogObject' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
-  putCollection<AV extends AuthVerifier>(
-    cfg: ConfigOf<
-      AV,
-      XyzNoshdeliveryV0CatalogPutCollection.Handler<ExtractAuth<AV>>,
-      XyzNoshdeliveryV0CatalogPutCollection.HandlerReqCtx<ExtractAuth<AV>>
-    >,
-  ) {
-    const nsid = 'xyz.noshdelivery.v0.catalog.putCollection' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
-  putItem<AV extends AuthVerifier>(
-    cfg: ConfigOf<
-      AV,
-      XyzNoshdeliveryV0CatalogPutItem.Handler<ExtractAuth<AV>>,
-      XyzNoshdeliveryV0CatalogPutItem.HandlerReqCtx<ExtractAuth<AV>>
-    >,
-  ) {
-    const nsid = 'xyz.noshdelivery.v0.catalog.putItem' // @ts-ignore
     return this._server.xrpc.method(nsid, cfg)
   }
 }

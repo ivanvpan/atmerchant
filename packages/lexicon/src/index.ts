@@ -17,10 +17,7 @@ import * as XyzNoshdeliveryV0CatalogGetShallowCatalogView from './types/xyz/nosh
 import * as XyzNoshdeliveryV0CatalogItem from './types/xyz/noshdelivery/v0/catalog/item.js'
 import * as XyzNoshdeliveryV0CatalogModifier from './types/xyz/noshdelivery/v0/catalog/modifier.js'
 import * as XyzNoshdeliveryV0CatalogModifierGroup from './types/xyz/noshdelivery/v0/catalog/modifierGroup.js'
-import * as XyzNoshdeliveryV0CatalogPutCatalog from './types/xyz/noshdelivery/v0/catalog/putCatalog.js'
 import * as XyzNoshdeliveryV0CatalogPutCatalogObject from './types/xyz/noshdelivery/v0/catalog/putCatalogObject.js'
-import * as XyzNoshdeliveryV0CatalogPutCollection from './types/xyz/noshdelivery/v0/catalog/putCollection.js'
-import * as XyzNoshdeliveryV0CatalogPutItem from './types/xyz/noshdelivery/v0/catalog/putItem.js'
 import * as XyzNoshdeliveryV0MediaDefs from './types/xyz/noshdelivery/v0/media/defs.js'
 import * as XyzNoshdeliveryV0MediaImage from './types/xyz/noshdelivery/v0/media/image.js'
 import * as XyzNoshdeliveryV0MediaVideo from './types/xyz/noshdelivery/v0/media/video.js'
@@ -56,10 +53,7 @@ export * as XyzNoshdeliveryV0CatalogGetShallowCatalogView from './types/xyz/nosh
 export * as XyzNoshdeliveryV0CatalogItem from './types/xyz/noshdelivery/v0/catalog/item.js'
 export * as XyzNoshdeliveryV0CatalogModifier from './types/xyz/noshdelivery/v0/catalog/modifier.js'
 export * as XyzNoshdeliveryV0CatalogModifierGroup from './types/xyz/noshdelivery/v0/catalog/modifierGroup.js'
-export * as XyzNoshdeliveryV0CatalogPutCatalog from './types/xyz/noshdelivery/v0/catalog/putCatalog.js'
 export * as XyzNoshdeliveryV0CatalogPutCatalogObject from './types/xyz/noshdelivery/v0/catalog/putCatalogObject.js'
-export * as XyzNoshdeliveryV0CatalogPutCollection from './types/xyz/noshdelivery/v0/catalog/putCollection.js'
-export * as XyzNoshdeliveryV0CatalogPutItem from './types/xyz/noshdelivery/v0/catalog/putItem.js'
 export * as XyzNoshdeliveryV0MediaDefs from './types/xyz/noshdelivery/v0/media/defs.js'
 export * as XyzNoshdeliveryV0MediaImage from './types/xyz/noshdelivery/v0/media/image.js'
 export * as XyzNoshdeliveryV0MediaVideo from './types/xyz/noshdelivery/v0/media/video.js'
@@ -180,48 +174,12 @@ export class XyzNoshdeliveryV0CatalogNS {
     )
   }
 
-  putCatalog(
-    data?: XyzNoshdeliveryV0CatalogPutCatalog.InputSchema,
-    opts?: XyzNoshdeliveryV0CatalogPutCatalog.CallOptions,
-  ): Promise<XyzNoshdeliveryV0CatalogPutCatalog.Response> {
-    return this._client.call(
-      'xyz.noshdelivery.v0.catalog.putCatalog',
-      opts?.qp,
-      data,
-      opts,
-    )
-  }
-
   putCatalogObject(
     data?: XyzNoshdeliveryV0CatalogPutCatalogObject.InputSchema,
     opts?: XyzNoshdeliveryV0CatalogPutCatalogObject.CallOptions,
   ): Promise<XyzNoshdeliveryV0CatalogPutCatalogObject.Response> {
     return this._client.call(
       'xyz.noshdelivery.v0.catalog.putCatalogObject',
-      opts?.qp,
-      data,
-      opts,
-    )
-  }
-
-  putCollection(
-    data?: XyzNoshdeliveryV0CatalogPutCollection.InputSchema,
-    opts?: XyzNoshdeliveryV0CatalogPutCollection.CallOptions,
-  ): Promise<XyzNoshdeliveryV0CatalogPutCollection.Response> {
-    return this._client.call(
-      'xyz.noshdelivery.v0.catalog.putCollection',
-      opts?.qp,
-      data,
-      opts,
-    )
-  }
-
-  putItem(
-    data?: XyzNoshdeliveryV0CatalogPutItem.InputSchema,
-    opts?: XyzNoshdeliveryV0CatalogPutItem.CallOptions,
-  ): Promise<XyzNoshdeliveryV0CatalogPutItem.Response> {
-    return this._client.call(
-      'xyz.noshdelivery.v0.catalog.putItem',
       opts?.qp,
       data,
       opts,
