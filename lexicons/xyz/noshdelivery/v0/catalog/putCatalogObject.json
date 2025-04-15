@@ -44,9 +44,7 @@
               "refs": [
                 "xyz.noshdelivery.v0.catalog.defs#catalogView",
                 "xyz.noshdelivery.v0.catalog.defs#collectionView",
-                "xyz.noshdelivery.v0.catalog.defs#itemView",
-                "xyz.noshdelivery.v0.catalog.defs#modifierGroupView",
-                "xyz.noshdelivery.v0.catalog.defs#modifierView"
+                "xyz.noshdelivery.v0.catalog.defs#itemView"
               ]
             }
           }

@@ -4,9 +4,22 @@ import {
   CatalogItem,
   CatalogModifierGroup,
   CatalogModifier,
+  DBCatalogObject,
 } from '#/db'
+import { CatalogObject } from '#/types'
 import { CatalogAvailabilityPeriod, isActiveCatalog } from '#/utils/time'
 
+export function catalogObjectToCatalogObjectView(
+  dbCatalogObject: DBCatalogObject,
+): CatalogObject {
+  return {
+    tid: dbCatalogObject.tid,
+    uri: dbCatalogObject.uri,
+    name: dbCatalogObject.name,
+    type: dbCatalogObject.type,
+    data: JSON.parse(dbCatalogObject.data),
+  }
+}
 export function dbCatalogToCatalogView(dbCatalog: Catalog) {
   return {
     tid: dbCatalog.tid,

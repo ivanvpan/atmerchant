@@ -14,9 +14,15 @@ import {
   SqliteDialect,
   // ParseJSONResultsPlugin
 } from 'kysely'
-import { tidFromUri } from '#/utils/uri'
+import { tidFromUri, typeFromUri } from '#/utils/uri'
 import { InvalidRequestError } from '@atproto/xrpc-server'
 import { AvailabilityTimeOfDay } from './utils/time'
+import {
+  CatalogObject,
+  CatalogObjectData,
+  LexiconType,
+  lexiconTypeToCatalogObjectType,
+} from './types'
 
 export type DatabaseSchema = {
   adjacency_list: AdjacencyList
@@ -28,6 +34,11 @@ export type DatabaseSchema = {
   catalog_modifier_group: CatalogModifierGroup
   catalog_modifier: CatalogModifier
   cursor: Cursor
+  catalog_object: DBCatalogObject
+}
+
+export type DBCatalogObject = Omit<CatalogObject, 'data'> & {
+  data: string
 }
 
 export type Cursor = {
@@ -235,6 +246,16 @@ migrations['001'] = {
       .execute()
 
     await db.schema
+      .createTable('catalog_object')
+      .addColumn('tid', 'varchar', (col) => col.primaryKey())
+      .addColumn('uri', 'varchar', (col) => col.unique())
+      .addColumn('externalId', 'varchar')
+      .addColumn('name', 'varchar', (col) => col.notNull())
+      .addColumn('type', 'varchar', (col) => col.notNull())
+      .addColumn('data', 'jsonb', (col) => col.notNull())
+      .execute()
+
+    await db.schema
       .createTable('merchant_group')
       .addColumn('tid', 'varchar', (col) => col.primaryKey())
       .addColumn('uri', 'varchar', (col) => col.unique())
@@ -312,6 +333,44 @@ export const updateAdjacencyList = async (
   } catch (error) {
     console.error('error updating adjacency list', error)
     throw error
+  }
+}
+
+export const upsertCatalogObjectRecord = async (
+  db: Database,
+  uri: string,
+  record: CatalogObjectData,
+) => {
+  const type = lexiconTypeToCatalogObjectType[typeFromUri(uri) as LexiconType]
+  const data = JSON.stringify(record)
+
+  await db
+    .insertInto('catalog_object')
+    .values({
+      tid: tidFromUri(uri),
+      uri,
+      name: record.name,
+      type,
+      data,
+    })
+    .execute()
+}
+
+export const getCatalogObject = async (
+  db: Database,
+  tid: string,
+): Promise<CatalogObject> => {
+  const object = await db
+    .selectFrom('catalog_object')
+    .where('tid', '=', tid)
+    .selectAll()
+    .executeTakeFirst()
+  if (!object) {
+    throw new InvalidRequestError('Catalog object not found')
+  }
+  return {
+    ...object,
+    data: JSON.parse(object.data),
   }
 }
 

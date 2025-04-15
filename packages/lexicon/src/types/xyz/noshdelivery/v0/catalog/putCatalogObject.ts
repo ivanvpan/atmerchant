@@ -29,8 +29,6 @@ export interface OutputSchema {
     | $Typed<XyzNoshdeliveryV0CatalogDefs.CatalogView>
     | $Typed<XyzNoshdeliveryV0CatalogDefs.CollectionView>
     | $Typed<XyzNoshdeliveryV0CatalogDefs.ItemView>
-    | $Typed<XyzNoshdeliveryV0CatalogDefs.ModifierGroupView>
-    | $Typed<XyzNoshdeliveryV0CatalogDefs.ModifierView>
     | { $type: string }
 }
 

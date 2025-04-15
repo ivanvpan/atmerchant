@@ -43,7 +43,7 @@ export const schemaDict = {
                 ref: 'lex:xyz.noshdelivery.v0.catalog.defs#availabilityPeriod',
               },
             },
-            childCollections: {
+            collections: {
               type: 'array',
               description:
                 'Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented.',
@@ -799,8 +799,6 @@ export const schemaDict = {
                   'lex:xyz.noshdelivery.v0.catalog.defs#catalogView',
                   'lex:xyz.noshdelivery.v0.catalog.defs#collectionView',
                   'lex:xyz.noshdelivery.v0.catalog.defs#itemView',
-                  'lex:xyz.noshdelivery.v0.catalog.defs#modifierGroupView',
-                  'lex:xyz.noshdelivery.v0.catalog.defs#modifierView',
                 ],
               },
             },
