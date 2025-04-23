@@ -5,4 +5,9 @@ function tidFromUri(uri: string) {
   return atUri.rkey
 }
 
-export { tidFromUri }
+function typeFromUri(uri: string) {
+  const atUri = new AtUri(uri)
+  return atUri.collection
+}
+
+export { tidFromUri, typeFromUri }

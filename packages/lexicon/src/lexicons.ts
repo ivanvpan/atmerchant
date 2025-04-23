@@ -43,7 +43,7 @@ export const schemaDict = {
                 ref: 'lex:xyz.noshdelivery.v0.catalog.defs#availabilityPeriod',
               },
             },
-            childCollections: {
+            collections: {
               type: 'array',
               description:
                 'Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented.',
@@ -686,9 +686,9 @@ export const schemaDict = {
       },
     },
   },
-  XyzNoshdeliveryV0CatalogPutCatalog: {
+  XyzNoshdeliveryV0CatalogPutCatalogObject: {
     lexicon: 1,
-    id: 'xyz.noshdelivery.v0.catalog.putCatalog',
+    id: 'xyz.noshdelivery.v0.catalog.putCatalogObject',
     description: 'A catalog for a merchant location.',
     defs: {
       main: {
@@ -698,36 +698,29 @@ export const schemaDict = {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: ['name', 'merchantLocation', 'availabilityPeriods'],
+            required: ['merchantLocation', 'type', 'data'],
             properties: {
-              externalId: {
-                type: 'string',
-                maxLength: 64,
-              },
-              name: {
-                type: 'string',
-                minLength: 1,
-                maxLength: 128,
-              },
               merchantLocation: {
                 type: 'string',
                 format: 'at-uri',
               },
-              availabilityPeriods: {
-                type: 'array',
-                items: {
-                  type: 'ref',
-                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#availabilityPeriod',
-                },
+              type: {
+                type: 'string',
+                enum: [
+                  'catalog',
+                  'collection',
+                  'item',
+                  'modifierGroup',
+                  'modifier',
+                ],
               },
-              childCollections: {
-                type: 'array',
-                description:
-                  'Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented.',
-                items: {
-                  type: 'string',
-                  format: 'tid',
-                },
+              data: {
+                type: 'union',
+                refs: [
+                  'lex:xyz.noshdelivery.v0.catalog.putCatalogObject#catalog',
+                  'lex:xyz.noshdelivery.v0.catalog.putCatalogObject#collection',
+                  'lex:xyz.noshdelivery.v0.catalog.putCatalogObject#item',
+                ],
               },
             },
           },
@@ -736,147 +729,124 @@ export const schemaDict = {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: ['catalog'],
+            required: ['catalogObject'],
             properties: {
-              catalog: {
-                type: 'ref',
-                ref: 'lex:xyz.noshdelivery.v0.catalog.defs#catalogView',
+              catalogObject: {
+                type: 'union',
+                refs: [
+                  'lex:xyz.noshdelivery.v0.catalog.defs#catalogView',
+                  'lex:xyz.noshdelivery.v0.catalog.defs#collectionView',
+                  'lex:xyz.noshdelivery.v0.catalog.defs#itemView',
+                ],
               },
             },
           },
         },
       },
-    },
-  },
-  XyzNoshdeliveryV0CatalogPutCollection: {
-    lexicon: 1,
-    id: 'xyz.noshdelivery.v0.catalog.putCollection',
-    description: 'todo',
-    defs: {
-      main: {
-        type: 'procedure',
-        description: 'Create or update a collection.',
-        input: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            required: ['name'],
-            properties: {
-              externalId: {
-                type: 'string',
-                description:
-                  'An external ID that can be used to identify this object in an external system such as a warehousing system',
-                maxLength: 64,
-              },
-              name: {
-                type: 'string',
-                minLength: 1,
-                maxLength: 128,
-              },
-              childCollections: {
-                type: 'array',
-                items: {
-                  type: 'string',
-                  format: 'at-uri',
-                },
-              },
-              media: {
-                type: 'ref',
-                ref: 'lex:xyz.noshdelivery.v0.media.defs#mediaView',
-              },
-              items: {
-                type: 'array',
-                description:
-                  'Pkeys of xyz.noshdelivery.v0.catalog.item records that are in this collection. Ordered in the way they will be presented.',
-                items: {
-                  type: 'string',
-                  format: 'tid',
-                },
-              },
+      catalog: {
+        type: 'object',
+        required: ['name'],
+        properties: {
+          externalId: {
+            type: 'string',
+            maxLength: 64,
+          },
+          name: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 128,
+          },
+          merchantLocation: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          availabilityPeriods: {
+            type: 'array',
+            items: {
+              type: 'ref',
+              ref: 'lex:xyz.noshdelivery.v0.catalog.defs#availabilityPeriod',
             },
           },
-        },
-        output: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            required: ['collection'],
-            properties: {
-              collection: {
-                type: 'ref',
-                ref: 'lex:xyz.noshdelivery.v0.catalog.defs#collectionView',
-              },
+          collections: {
+            type: 'array',
+            description:
+              'Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented.',
+            items: {
+              type: 'string',
+              format: 'tid',
             },
           },
         },
       },
-    },
-  },
-  XyzNoshdeliveryV0CatalogPutItem: {
-    lexicon: 1,
-    id: 'xyz.noshdelivery.v0.catalog.putItem',
-    description: 'todo',
-    defs: {
-      main: {
-        type: 'procedure',
-        description: 'Create or update an item.',
-        input: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            required: ['name', 'priceMoney'],
-            properties: {
-              externalId: {
-                type: 'string',
-                description:
-                  'An external ID that can be used to identify this object in an external system such as a warehousing system',
-                maxLength: 64,
-              },
-              availableForSale: {
-                type: 'boolean',
-                description:
-                  'The item is currently available for ordering at this location',
-                default: true,
-              },
-              name: {
-                type: 'string',
-                minLength: 1,
-                maxLength: 128,
-              },
-              description: {
-                type: 'string',
-                maxLength: 1024,
-              },
-              media: {
-                type: 'ref',
-                ref: 'lex:xyz.noshdelivery.v0.media.defs#mediaView',
-              },
-              priceMoney: {
-                type: 'ref',
-                ref: 'lex:xyz.noshdelivery.v0.catalog.defs#priceMoney',
-              },
-              modifierGroups: {
-                type: 'array',
-                description:
-                  'Pkeys of xyz.noshdelivery.v0.catalog.modifierGroup records that belong in this item. Ordered in the way they will be presented.',
-                items: {
-                  type: 'string',
-                  format: 'tid',
-                },
-              },
+      collection: {
+        type: 'object',
+        required: ['name'],
+        properties: {
+          externalId: {
+            type: 'string',
+            description:
+              'An external ID that can be used to identify this object in an external system such as a warehousing system',
+            maxLength: 64,
+          },
+          name: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 128,
+          },
+          collections: {
+            type: 'array',
+            items: {
+              type: 'string',
+              format: 'at-uri',
+            },
+          },
+          items: {
+            type: 'array',
+            description:
+              'Pkeys of xyz.noshdelivery.v0.catalog.item records that are in this collection. Ordered in the way they will be presented.',
+            items: {
+              type: 'string',
+              format: 'tid',
             },
           },
         },
-        output: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            required: ['item'],
-            properties: {
-              item: {
-                type: 'ref',
-                ref: 'lex:xyz.noshdelivery.v0.catalog.defs#itemView',
-              },
+      },
+      item: {
+        type: 'object',
+        required: ['name', 'priceMoney'],
+        properties: {
+          externalId: {
+            type: 'string',
+            description:
+              'An external ID that can be used to identify this object in an external system such as a warehousing system',
+            maxLength: 64,
+          },
+          suspended: {
+            type: 'boolean',
+            description:
+              'The item is currently available for ordering at this location',
+            default: false,
+          },
+          name: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 128,
+          },
+          description: {
+            type: 'string',
+            maxLength: 1024,
+          },
+          priceMoney: {
+            type: 'ref',
+            ref: 'lex:xyz.noshdelivery.v0.catalog.defs#priceMoney',
+          },
+          modifierGroups: {
+            type: 'array',
+            description:
+              'Pkeys of xyz.noshdelivery.v0.catalog.modifierGroup records that belong in this item. Ordered in the way they will be presented.',
+            items: {
+              type: 'string',
+              format: 'tid',
             },
           },
         },
@@ -2470,10 +2440,8 @@ export const ids = {
   XyzNoshdeliveryV0CatalogModifier: 'xyz.noshdelivery.v0.catalog.modifier',
   XyzNoshdeliveryV0CatalogModifierGroup:
     'xyz.noshdelivery.v0.catalog.modifierGroup',
-  XyzNoshdeliveryV0CatalogPutCatalog: 'xyz.noshdelivery.v0.catalog.putCatalog',
-  XyzNoshdeliveryV0CatalogPutCollection:
-    'xyz.noshdelivery.v0.catalog.putCollection',
-  XyzNoshdeliveryV0CatalogPutItem: 'xyz.noshdelivery.v0.catalog.putItem',
+  XyzNoshdeliveryV0CatalogPutCatalogObject:
+    'xyz.noshdelivery.v0.catalog.putCatalogObject',
   XyzNoshdeliveryV0MediaDefs: 'xyz.noshdelivery.v0.media.defs',
   XyzNoshdeliveryV0MediaImage: 'xyz.noshdelivery.v0.media.image',
   XyzNoshdeliveryV0MediaVideo: 'xyz.noshdelivery.v0.media.video',

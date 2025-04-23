@@ -1,7 +1,4 @@
 import {
-  XyzNoshdeliveryV0CatalogCatalog,
-  XyzNoshdeliveryV0CatalogCollection,
-  XyzNoshdeliveryV0CatalogItem,
   XyzNoshdeliveryV0MerchantGroup,
   XyzNoshdeliveryV0MerchantLocation,
 } from '@nosh/lexicon'
@@ -14,20 +11,26 @@ import {
   SqliteDialect,
   // ParseJSONResultsPlugin
 } from 'kysely'
-import { tidFromUri } from '#/utils/uri'
+import { tidFromUri, typeFromUri } from '#/utils/uri'
 import { InvalidRequestError } from '@atproto/xrpc-server'
-import { AvailabilityTimeOfDay } from './utils/time'
+import {
+  CatalogObject,
+  CatalogObjectData,
+  CatalogObjectType,
+  LexiconType,
+  lexiconTypeToCatalogObjectType,
+} from './types'
 
 export type DatabaseSchema = {
   adjacency_list: AdjacencyList
   merchant_group: MerchantGroup
   merchant_location: MerchantLocation
-  catalog: Catalog
-  catalog_collection: CatalogCollection
-  catalog_item: CatalogItem
-  catalog_modifier_group: CatalogModifierGroup
-  catalog_modifier: CatalogModifier
   cursor: Cursor
+  catalog_object: DBCatalogObject
+}
+
+export type DBCatalogObject = Omit<CatalogObject, 'data'> & {
+  data: string
 }
 
 export type Cursor = {
@@ -35,12 +38,11 @@ export type Cursor = {
   seq: number
 }
 
-type NodeType = 'catalog' | 'collection' | 'item'
 export type AdjacencyList = {
   parentTid: string
-  parentType: string
+  parentType: CatalogObjectType
   childTid: string
-  childType: string
+  childType: CatalogObjectType
 }
 
 export interface MerchantGroup {
@@ -63,62 +65,6 @@ export type MerchantLocation = {
   coordinates: string
   media?: MediaJson | null
   parentGroup: string
-}
-
-export type Catalog = {
-  tid: string
-  uri: string
-  externalId?: string | null
-  name: string
-  merchantLocation: string
-  availabilityPeriods: string
-  childCollections: string | null
-}
-
-export type CatalogCollection = {
-  tid: string
-  uri: string
-  externalId?: string | null
-  name: string
-  items: string
-  media: string | null
-  childCollections: string | null
-}
-
-export type CatalogItem = {
-  tid: string
-  uri: string
-  externalId?: string | null
-  name: string
-  description: string | null
-  media: string | null
-  priceMoney: string
-  suspended: boolean
-  modifierGroups: string
-}
-
-export type CatalogModifierGroup = {
-  tid: string
-  uri: string
-  externalId?: string | null
-  name: string
-  description: string | null
-  media: string | null
-  minimumSelection: number
-  maximumSelection: number
-  maximumOfEachModifier: number
-  modifiers: string
-}
-
-export type CatalogModifier = {
-  tid: string
-  uri: string
-  externalId?: string | null
-  name: string
-  suspended: boolean
-  description: string | null
-  priceMoney: string
-  childModifierGroups: string
 }
 
 // Migrations
@@ -172,66 +118,13 @@ migrations['001'] = {
       .execute()
 
     await db.schema
-      .createTable('catalog_modifier')
+      .createTable('catalog_object')
       .addColumn('tid', 'varchar', (col) => col.primaryKey())
       .addColumn('uri', 'varchar', (col) => col.unique())
       .addColumn('externalId', 'varchar')
       .addColumn('name', 'varchar', (col) => col.notNull())
-      .addColumn('description', 'varchar')
-      .addColumn('suspended', 'boolean', (col) =>
-        col.defaultTo(false).notNull(),
-      )
-      .addColumn('priceMoney', 'jsonb', (col) => col.notNull())
-      .addColumn('childModifierGroups', 'jsonb')
-      .execute()
-    await db.schema
-      .createTable('catalog_modifier_group')
-      .addColumn('tid', 'varchar', (col) => col.primaryKey())
-      .addColumn('uri', 'varchar', (col) => col.unique())
-      .addColumn('externalId', 'varchar')
-      .addColumn('name', 'varchar', (col) => col.notNull())
-      .addColumn('description', 'varchar')
-      .addColumn('media', 'jsonb')
-      .addColumn('minimumSelection', 'integer', (col) => col.notNull())
-      .addColumn('maximumSelection', 'integer', (col) => col.notNull())
-      .addColumn('maximumOfEachModifier', 'integer', (col) => col.notNull())
-      .addColumn('modifiers', 'jsonb')
-      .execute()
-    await db.schema
-      .createTable('catalog_item')
-      .addColumn('tid', 'varchar', (col) => col.primaryKey())
-      .addColumn('uri', 'varchar', (col) => col.unique())
-      .addColumn('externalId', 'varchar')
-      .addColumn('name', 'varchar', (col) => col.notNull())
-      .addColumn('description', 'varchar')
-      .addColumn('media', 'jsonb')
-      .addColumn('priceMoney', 'jsonb', (col) => col.notNull())
-      .addColumn('suspended', 'boolean', (col) =>
-        col.defaultTo(false).notNull(),
-      )
-      .addColumn('modifierGroups', 'jsonb')
-      .execute()
-    await db.schema
-      .createTable('catalog_collection')
-      .addColumn('tid', 'varchar', (col) => col.primaryKey())
-      .addColumn('uri', 'varchar', (col) => col.unique())
-      .addColumn('externalId', 'varchar')
-      .addColumn('name', 'varchar', (col) => col.notNull())
-      .addColumn('items', 'jsonb')
-      .addColumn('media', 'jsonb')
-      .addColumn('childCollections', 'jsonb')
-      .execute()
-    await db.schema
-      .createTable('catalog')
-      .addColumn('tid', 'varchar', (col) => col.primaryKey())
-      .addColumn('uri', 'varchar', (col) => col.unique())
-      .addColumn('externalId', 'varchar')
-      .addColumn('name', 'varchar', (col) => col.notNull())
-      .addColumn('merchantLocation', 'varchar', (col) =>
-        col.references('merchant_location.uri').notNull(),
-      )
-      .addColumn('availabilityPeriods', 'jsonb', (col) => col.notNull())
-      .addColumn('childCollections', 'jsonb')
+      .addColumn('type', 'varchar', (col) => col.notNull())
+      .addColumn('data', 'jsonb', (col) => col.notNull())
       .execute()
 
     await db.schema
@@ -285,9 +178,8 @@ export type Database = Kysely<DatabaseSchema>
 export const updateAdjacencyList = async (
   db: Database,
   parentTid: string,
-  parentType: NodeType,
-  childTids: string[],
-  childType: NodeType,
+  parentType: CatalogObjectType,
+  children: { childTid: string; childType: CatalogObjectType }[],
 ) => {
   try {
     // TODO this is not very efficient but whatevs
@@ -299,11 +191,11 @@ export const updateAdjacencyList = async (
       await tx
         .insertInto('adjacency_list')
         .values(
-          childTids.map((childTid) => ({
+          children.map((child) => ({
             parentTid,
             parentType,
-            childTid,
-            childType,
+            childTid: child.childTid,
+            childType: child.childType,
           })),
         )
         .onConflict((oc) => oc.doNothing())
@@ -313,6 +205,170 @@ export const updateAdjacencyList = async (
     console.error('error updating adjacency list', error)
     throw error
   }
+}
+
+function getCatalogObjectAdjacencyList(
+  catalogObjectData: CatalogObjectData,
+): Pick<AdjacencyList, 'childTid' | 'childType'>[] {
+  let adjacencyList: Pick<AdjacencyList, 'childTid' | 'childType'>[] = []
+
+  // TODO not great to be using the lexicon type here, but maybe it's the right thing? What is consistent?
+  switch (catalogObjectData.$type) {
+    case 'xyz.noshdelivery.v0.catalog.catalog': {
+      adjacencyList =
+        catalogObjectData.collections?.map((collection) => ({
+          childTid: collection,
+          childType: 'collection',
+        })) || []
+      break
+    }
+    case 'xyz.noshdelivery.v0.catalog.collection': {
+      adjacencyList =
+        catalogObjectData.items?.map((item) => ({
+          childTid: item,
+          childType: 'item',
+        })) || []
+      break
+    }
+    case 'xyz.noshdelivery.v0.catalog.item': {
+      adjacencyList = []
+      break
+    }
+    case 'xyz.noshdelivery.v0.catalog.modifierGroup': {
+      adjacencyList = []
+      break
+    }
+    case 'xyz.noshdelivery.v0.catalog.modifier': {
+      adjacencyList = []
+      break
+    }
+  }
+  return adjacencyList
+}
+
+export const upsertCatalogObjectRecord = async (
+  db: Database,
+  uri: string,
+  record: CatalogObjectData,
+) => {
+  const tid = tidFromUri(uri)
+  const type = lexiconTypeToCatalogObjectType[typeFromUri(uri) as LexiconType]
+  const data = JSON.stringify(record)
+
+  await db
+    .insertInto('catalog_object')
+    .values({
+      tid,
+      uri,
+      name: record.name,
+      type,
+      data,
+    })
+    .execute()
+  const adjacencyList = getCatalogObjectAdjacencyList(record)
+
+  await updateAdjacencyList(db, tid, type, adjacencyList)
+}
+
+export const getCatalogObject = async (
+  db: Database,
+  tid: string,
+): Promise<CatalogObject> => {
+  const object = await db
+    .selectFrom('catalog_object')
+    .where('tid', '=', tid)
+    .selectAll()
+    .executeTakeFirst()
+  if (!object) {
+    throw new InvalidRequestError('Catalog object not found')
+  }
+  return {
+    ...object,
+    data: JSON.parse(object.data),
+  }
+}
+
+export const findDescendantsOfType = async (
+  db: Database,
+  objectIds: string[],
+  objectTypes: CatalogObjectType[],
+): Promise<Record<CatalogObjectType, CatalogObject[]>> => {
+  const result = await db
+    .withRecursive('descendants', (cte) =>
+      cte
+        .selectFrom('catalog_object')
+        .select(['tid', 'type'])
+        .where('tid', 'in', objectIds)
+        .unionAll(
+          cte
+            .selectFrom('descendants')
+            .innerJoin('adjacency_list', (join) =>
+              join
+                .onRef('adjacency_list.parentTid', '=', 'descendants.tid')
+                .on(
+                  'adjacency_list.parentType',
+                  '=',
+                  'descendants.type' as CatalogObjectType,
+                ),
+            )
+            .innerJoin('catalog_object', (join) =>
+              join
+                .onRef('catalog_object.tid', '=', 'adjacency_list.childTid')
+                .on(
+                  'catalog_object.type',
+                  '=',
+                  'adjacency_list.childType' as CatalogObjectType,
+                ),
+            )
+            .select(['catalog_object.tid', 'catalog_object.type']),
+        ),
+    )
+    .selectFrom('descendants')
+    .innerJoin('catalog_object', 'catalog_object.tid', 'descendants.tid')
+    .selectAll('catalog_object')
+    .execute()
+
+  // Group results by type
+  const idsByType = result.reduce(
+    (acc, { tid, type }) => {
+      if (!acc[type as CatalogObjectType]) {
+        acc[type as CatalogObjectType] = []
+      }
+      acc[type as CatalogObjectType].push(tid)
+      return acc
+    },
+    {} as Record<CatalogObjectType, string[]>,
+  )
+
+  // Fetch all catalog objects for the found IDs, grouped by type
+  const finalResult: Record<CatalogObjectType, CatalogObject[]> =
+    objectTypes.reduce(
+      (acc, type) => {
+        acc[type] = []
+        return acc
+      },
+      {} as Record<CatalogObjectType, CatalogObject[]>,
+    )
+
+  // Fetch objects for each type
+  await Promise.all(
+    Object.entries(idsByType).map(async ([type, ids]) => {
+      if (ids.length > 0) {
+        const objects = await db
+          .selectFrom('catalog_object')
+          .where('tid', 'in', ids)
+          .selectAll()
+          .execute()
+
+        finalResult[type as CatalogObjectType] = objects.map((obj) => ({
+          ...obj,
+          data: JSON.parse(obj.data),
+        }))
+      }
+    }),
+  )
+
+  return finalResult
 }
 
 export const findAllCatalogsContainingItems = async (
@@ -328,20 +384,28 @@ export const findAllCatalogsContainingItems = async (
         .unionAll(
           cte
             .selectFrom('item_ancestors')
-            .innerJoin(
-              'adjacency_list',
-              'adjacency_list.childTid',
-              'item_ancestors.parentTid',
+            .innerJoin('adjacency_list', (join) =>
+              join
+                .onRef(
+                  'adjacency_list.childTid',
+                  '=',
+                  'item_ancestors.parentTid',
+                )
+                .on('adjacency_list.parentType', '=', 'catalog'),
             )
             .select(['item_ancestors.childTid', 'adjacency_list.parentTid']),
         ),
     )
     .selectFrom('item_ancestors')
-    .innerJoin('catalog', 'catalog.tid', 'item_ancestors.parentTid')
+    .innerJoin(
+      'catalog_object',
+      'catalog_object.tid',
+      'item_ancestors.parentTid',
+    )
     .select([
       'item_ancestors.childTid as itemTid',
-      'catalog.tid',
-      'catalog.name',
+      'catalog_object.tid',
+      'catalog_object.name',
     ])
     .execute()
   return result.reduce(
@@ -474,179 +538,13 @@ export const getShallowCatalogsForLocationUri = async (
   db: Database,
   uri: string,
 ): Promise<{
-  catalogs: Catalog[]
-  collections: CatalogCollection[]
-  items: CatalogItem[]
+  catalogs: CatalogObject[]
+  collections: CatalogObject[]
+  items: CatalogObject[]
 }> => {
-  const catalogs = await db
-    .selectFrom('catalog')
-    .where('merchantLocation', '=', uri)
-    .selectAll()
-    .execute()
-
-  const collectionsIds = catalogs.flatMap((catalog) => catalog.childCollections)
-
-  const collections = await db
-    .selectFrom('catalog_collection')
-    .where('tid', 'in', collectionsIds)
-    .selectAll()
-    .execute()
-
-  const itemsIds = collections.flatMap((collection) => collection.items)
-
-  const items = await db
-    .selectFrom('catalog_item')
-    .where('tid', 'in', itemsIds)
-    .selectAll()
-    .execute()
-
-  return { catalogs, collections, items }
-}
-
-export const getCatalogs = (db: Database, merchantUri: string) => {
-  return db
-    .selectFrom('catalog')
-    .where('merchantLocation', '=', merchantUri)
-    .selectAll()
-    .execute()
-}
-
-export const findCatalogByTid = async (
-  db: Database,
-  tid: string,
-): Promise<Catalog | undefined> => {
-  return await db
-    .selectFrom('catalog')
-    .where('tid', '=', tid)
-    .selectAll()
-    .executeTakeFirst()
-}
-
-export const upsertCatalogRecord = async (
-  db: Database,
-  uri: string,
-  record: XyzNoshdeliveryV0CatalogCatalog.Record,
-) => {
-  const catalog = {
-    tid: tidFromUri(uri),
-    uri,
-    name: record.name,
-    merchantLocation: record.merchantLocation,
-    availabilityPeriods: JSON.stringify(record.availabilityPeriods),
-    childCollections: JSON.stringify(record.childCollections),
+  return {
+    catalogs: [],
+    collections: [],
+    items: [],
   }
-  try {
-    await db
-      .insertInto('catalog')
-      .values(catalog)
-      .onConflict((oc) => oc.columns(['tid']).doUpdateSet(catalog))
-      .onConflict((oc) => oc.columns(['uri']).doUpdateSet(catalog))
-      .execute()
-  } catch (error) {
-    console.error('error upserting catalog', error)
-    throw error
-  }
-}
-
-export const findCollectionByTid = async (
-  db: Database,
-  tid: string,
-): Promise<CatalogCollection | undefined> => {
-  return await db
-    .selectFrom('catalog_collection')
-    .where('tid', '=', tid)
-    .selectAll()
-    .executeTakeFirst()
-}
-
-export const upsertCollectionRecord = async (
-  db: Database,
-  uri: string,
-  record: XyzNoshdeliveryV0CatalogCollection.Record,
-) => {
-  const collection = {
-    tid: tidFromUri(uri),
-    uri,
-    name: record.name,
-    items: JSON.stringify(record.items),
-    media: JSON.stringify(record.media),
-    childCollections: JSON.stringify(record.childCollections),
-  }
-  try {
-    await db
-      .insertInto('catalog_collection')
-      .values(collection)
-      .onConflict((oc) => oc.columns(['tid']).doUpdateSet(collection))
-      .onConflict((oc) => oc.columns(['uri']).doUpdateSet(collection))
-      .execute()
-  } catch (error) {
-    console.error('error upserting collection', error)
-    throw error
-  }
-}
-
-export const findItemByTid = async (
-  db: Database,
-  tid: string,
-): Promise<CatalogItem | undefined> => {
-  return await db
-    .selectFrom('catalog_item')
-    .where('tid', '=', tid)
-    .selectAll()
-    .executeTakeFirst()
-}
-
-export const upsertItemRecord = async (
-  db: Database,
-  uri: string,
-  record: XyzNoshdeliveryV0CatalogItem.Record,
-) => {
-  const item = {
-    tid: tidFromUri(uri),
-    uri,
-    name: record.name,
-    description: record.description,
-    media: JSON.stringify(record.media),
-    priceMoney: JSON.stringify(record.priceMoney),
-    suspended: record.suspended,
-    modifierGroups: JSON.stringify(record.modifierGroups),
-  }
-  try {
-    await db
-      .insertInto('catalog_item')
-      .values(item)
-      .onConflict((oc) => oc.columns(['tid']).doUpdateSet(item))
-      .onConflict((oc) => oc.columns(['uri']).doUpdateSet(item))
-      .execute()
-  } catch (error) {
-    console.error('error upserting item', error)
-    throw error
-  }
-}
-
-export const getItems = async (db: Database, itemIds: string[]) => {
-  return await db
-    .selectFrom('catalog_item')
-    .where('tid', 'in', itemIds)
-    .selectAll()
-    .execute()
-}
-
-export const getModifierGroups = async (
-  db: Database,
-  modifierGroupIds: string[],
-) => {
-  return await db
-    .selectFrom('catalog_modifier_group')
-    .where('tid', 'in', modifierGroupIds)
-    .selectAll()
-    .execute()
-}
-
-export const getModifiers = async (db: Database, modifierIds: string[]) => {
-  return await db
-    .selectFrom('catalog_modifier')
-    .where('tid', 'in', modifierIds)
-    .selectAll()
-    .execute()
 }

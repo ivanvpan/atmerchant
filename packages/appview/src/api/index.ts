@@ -6,6 +6,7 @@ import putGroup from './lexicon/merchant/putGroup'
 import getGroup from './lexicon/merchant/getGroup'
 import listLocations from './lexicon/merchant/listLocations'
 import putLocation from './lexicon/merchant/putLocation'
+import putCatalogObject from './lexicon/catalog/putCatalogObject'
 export * as health from './health'
 
 export default function (server: Server, ctx: AppContext) {
@@ -14,5 +15,6 @@ export default function (server: Server, ctx: AppContext) {
   getGroup(server, ctx)
   listLocations(server, ctx)
   putLocation(server, ctx)
+  putCatalogObject(server, ctx)
   return server
 }

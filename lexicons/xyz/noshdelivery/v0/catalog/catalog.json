@@ -30,7 +30,7 @@
               "ref": "xyz.noshdelivery.v0.catalog.defs#availabilityPeriod"
             }
           },
-          "childCollections": {
+          "collections": {
             "type": "array",
             "description": "Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented.",
             "items": {

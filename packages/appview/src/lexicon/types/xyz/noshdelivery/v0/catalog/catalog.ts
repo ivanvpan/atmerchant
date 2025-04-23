@@ -22,7 +22,7 @@ export interface Record {
   merchantLocation: string
   availabilityPeriods: XyzNoshdeliveryV0CatalogDefs.AvailabilityPeriod[]
   /** Pkeys of xyz.noshdelivery.v0.catalog.collection records that belong in this catalog. Ordered in the way they will be presented. */
-  childCollections?: string[]
+  collections?: string[]
   [k: string]: unknown
 }
 
