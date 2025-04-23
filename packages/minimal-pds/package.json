@@ -1,0 +1,37 @@
+{
+  "name": "@nosh/appview",
+  "packageManager": "yarn@4.3.1",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/index.ts | pino-pretty",
+    "typecheck": "tsc --noEmit",
+    "lexgen": "lex gen-server ./src/lexicon ../../lexicons/xyz/noshdelivery/v0/*/* ../../lexicons/com/atproto/*/*  ../../lexicons/community/lexicon/location/* --yes"
+  },
+  "devDependencies": {
+    "@atproto/lex-cli": "^0.7.1",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/compression": "^1",
+    "@types/cors": "^2",
+    "@types/express": "^5",
+    "@types/node": "^22.14.0",
+    "pino-pretty": "^13.0.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@atproto/api": "^0.14.20",
+    "@atproto/dev-env": "^0.3.114",
+    "@atproto/uri": "^0.1.1",
+    "@atproto/xrpc-server": "^0.7.15",
+    "@ipld/car": "^5.4.0",
+    "@ipld/dag-cbor": "^9.2.2",
+    "better-sqlite3": "^11.9.1",
+    "compression": "^1.8.0",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
+    "dotenv": "^16.4.7",
+    "envalid": "^8.0.0",
+    "express": "^4.21.2",
+    "kysely": "^0.27.6",
+    "pino": "^9.6.0"
+  }
+}
