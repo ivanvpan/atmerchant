@@ -1,8 +1,8 @@
 import type { AppContext } from '#/context'
 import type { Server } from '#/lexicon'
-import applyWrites from './lexicon/atproto/applyWrites'
-export * as health from './health'
+import putRecord from './lexicon/atproto/putRecord'
 
 export default function (server: Server, ctx: AppContext) {
+  putRecord(server, ctx)
   return server
 }

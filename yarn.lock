@@ -2478,6 +2478,33 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nosh/minimal-pds@workspace:packages/minimal-pds":
+  version: 0.0.0-use.local
+  resolution: "@nosh/minimal-pds@workspace:packages/minimal-pds"
+  dependencies:
+    "@atproto/api": "npm:^0.14.20"
+    "@atproto/lex-cli": "npm:^0.7.1"
+    "@atproto/repo": "npm:^0.8.0"
+    "@atproto/uri": "npm:^0.1.1"
+    "@atproto/xrpc-server": "npm:^0.7.15"
+    "@ipld/dag-cbor": "npm:^9.2.2"
+    "@types/compression": "npm:^1"
+    "@types/cors": "npm:^2"
+    "@types/express": "npm:^5"
+    "@types/node": "npm:^22.14.0"
+    compression: "npm:^1.8.0"
+    cors: "npm:^2.8.5"
+    dotenv: "npm:^16.4.7"
+    envalid: "npm:^8.0.0"
+    express: "npm:^4.21.2"
+    multiformats: "npm:^13.3.2"
+    pino: "npm:^9.6.0"
+    pino-pretty: "npm:^13.0.0"
+    tsx: "npm:^4.19.3"
+    typescript: "npm:^5.8.2"
+  languageName: unknown
+  linkType: soft
+
 "@npmcli/agent@npm:^3.0.0":
   version: 3.0.0
   resolution: "@npmcli/agent@npm:3.0.0"
