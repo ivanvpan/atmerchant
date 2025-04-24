@@ -3,6 +3,8 @@ import { AtUri } from '@atproto/uri'
 import { CommitData, WriteOpAction } from '@atproto/repo'
 import { RepoRecord } from '@atproto/lexicon'
 
+import { GeneratedAlways } from 'kysely'
+
 type ValidationStatus = 'valid' | 'unknown'
 
 export class InvalidRecordError extends Error {}
@@ -68,4 +70,72 @@ export type CommitOp = {
 export type CommitDataWithOps = CommitData & {
   ops: CommitOp[]
   prevData: CID | null
+}
+
+export type CarBlock = {
+  cid: CID
+  bytes: Uint8Array
+}
+
+// DB
+export interface AccountPref {
+  id: GeneratedAlways<number>
+  name: string
+  valueJson: string // json
+}
+
+export interface RepoRoot {
+  did: string
+  cid: string
+  rev: string
+  indexedAt: string
+}
+
+export interface DbRecord {
+  uri: string
+  cid: string
+  collection: string
+  rkey: string
+  repoRev: string
+  indexedAt: string
+  takedownRef: string | null
+}
+
+export interface Backlink {
+  uri: string
+  path: string
+  linkTo: string
+}
+
+export interface RepoBlock {
+  cid: string
+  repoRev: string
+  size: number
+  content: Uint8Array
+}
+
+export interface Blob {
+  cid: string
+  mimeType: string
+  size: number
+  tempKey: string | null
+  width: number | null
+  height: number | null
+  createdAt: string
+  takedownRef: string | null
+}
+
+export interface RecordBlob {
+  blobCid: string
+  recordUri: string
+}
+
+export type DatabaseSchema = {
+  account_pref: AccountPref
+  repo_root: RepoRoot
+  record: DbRecord
+  repo_block: RepoBlock
+  blob: Blob
+  record_blob: RecordBlob
+  backlink: Backlink
 }

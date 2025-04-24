@@ -2492,6 +2492,7 @@ __metadata:
     "@types/cors": "npm:^2"
     "@types/express": "npm:^5"
     "@types/node": "npm:^22.14.0"
+    "@types/varint": "npm:^6"
     compression: "npm:^1.8.0"
     cors: "npm:^2.8.5"
     dotenv: "npm:^16.4.7"
@@ -2502,6 +2503,8 @@ __metadata:
     pino-pretty: "npm:^13.0.0"
     tsx: "npm:^4.19.3"
     typescript: "npm:^5.8.2"
+    uint8arrays: "npm:^5.1.0"
+    varint: "npm:^6.0.0"
   languageName: unknown
   linkType: soft
 
@@ -3738,6 +3741,15 @@ __metadata:
     "@types/node": "npm:*"
     "@types/send": "npm:*"
   checksum: 10c0/26ec864d3a626ea627f8b09c122b623499d2221bbf2f470127f4c9ebfe92bd8a6bb5157001372d4c4bd0dd37a1691620217d9dc4df5aa8f779f3fd996b1c60ae
+  languageName: node
+  linkType: hard
+
+"@types/varint@npm:^6":
+  version: 6.0.3
+  resolution: "@types/varint@npm:6.0.3"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/d05bc5ea56542513b603877a9c22a1b7b0d5cb45874a89ea2658ac5762613078491015363a7a532b5f3b3d35d92abc01c63d12aafa401c1ac7e5155ee612827f
   languageName: node
   linkType: hard
 
@@ -8103,6 +8115,15 @@ __metadata:
   dependencies:
     multiformats: "npm:^9.4.2"
   checksum: 10c0/19efb7d2ba20ec2550d1ca5b453c01ad62e70098e6454d0a446b12991fa5f3286f8ee979e5cec020fac6b4cbbaad4597024dcc8b2c69365af95443cce1323e34
+  languageName: node
+  linkType: hard
+
+"uint8arrays@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "uint8arrays@npm:5.1.0"
+  dependencies:
+    multiformats: "npm:^13.0.0"
+  checksum: 10c0/e7587f97d03a17a608becd01b3ca52aa6db43e7ee6156c18b278c715a62f4f9e62ef2fe9432a3cd02791b6222a17578476a20b8e3ea37dd3b5ce454c6a8782a9
   languageName: node
   linkType: hard
 

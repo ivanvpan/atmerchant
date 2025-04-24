@@ -1,6 +1,6 @@
 import SqliteDb from 'better-sqlite3'
 import assert from 'node:assert'
-import { chunkArray, retry } from '@atproto/common'
+import { cborDecode, check, chunkArray, retry } from '@atproto/common'
 import {
   GeneratedAlways,
   Kysely,
@@ -13,73 +13,20 @@ import {
   UnknownRow,
   sql,
 } from 'kysely'
-import { CommitDataWithOps } from '#/types'
+import { CommitDataWithOps, DatabaseSchema, RepoBlock } from '#/types'
 import { CID } from 'multiformats/cid'
-import { BlockMap, cborToLexRecord, CidSet, WriteOpAction } from '@atproto/repo'
+import {
+  BlockMap,
+  CarBlock,
+  cborToLexRecord,
+  CidSet,
+  CommitData,
+  RepoStorage,
+  WriteOpAction,
+} from '@atproto/repo'
 import { AtUri } from '@atproto/uri'
 import { RepoRecord, lexToIpld } from '@atproto/lexicon'
 
-export interface AccountPref {
-  id: GeneratedAlways<number>
-  name: string
-  valueJson: string // json
-}
-
-export interface RepoRoot {
-  did: string
-  cid: string
-  rev: string
-  indexedAt: string
-}
-
-export interface DbRecord {
-  uri: string
-  cid: string
-  collection: string
-  rkey: string
-  repoRev: string
-  indexedAt: string
-  takedownRef: string | null
-}
-
-export interface Backlink {
-  uri: string
-  path: string
-  linkTo: string
-}
-
-export interface RepoBlock {
-  cid: string
-  repoRev: string
-  size: number
-  content: Uint8Array
-}
-
-export interface Blob {
-  cid: string
-  mimeType: string
-  size: number
-  tempKey: string | null
-  width: number | null
-  height: number | null
-  createdAt: string
-  takedownRef: string | null
-}
-
-export interface RecordBlob {
-  blobCid: string
-  recordUri: string
-}
-
-export type DatabaseSchema = {
-  account_pref: AccountPref
-  repo_root: RepoRoot
-  record: DbRecord
-  repo_block: RepoBlock
-  blob: Blob
-  record_blob: RecordBlob
-  backlink: Backlink
-}
 
 const last = <T>(arr: T[]) => arr[arr.length - 1]
 const DELAYS = [1, 2, 5, 10, 15, 20, 25, 25, 25, 50, 50, 100]
@@ -350,89 +297,6 @@ export async function down(db: Kysely<unknown>): Promise<void> {
   await db.schema.dropTable('repo_root').execute()
 }
 
-export async function updateRoot(
-  db: Database<DatabaseSchema>,
-  cid: CID,
-  did: string,
-  rev: string,
-  isCreate = false,
-): Promise<void> {
-  if (isCreate) {
-    await db.db
-      .insertInto('repo_root')
-      .values({
-        did: did,
-        cid: cid.toString(),
-        rev: rev,
-        indexedAt: new Date().toISOString(),
-      })
-      .execute()
-  } else {
-    await db.db
-      .updateTable('repo_root')
-      .set({
-        cid: cid.toString(),
-        rev: rev,
-        indexedAt: new Date().toISOString(),
-      })
-      .execute()
-  }
-}
-
-async function putMany(
-  db: Database<DatabaseSchema>,
-  toPut: BlockMap,
-  rev: string,
-): Promise<void> {
-  const chunkArray = <T>(arr: T[], chunkSize: number): T[][] => {
-    return arr.reduce((acc, cur, i) => {
-      const chunkI = Math.floor(i / chunkSize)
-      if (!acc[chunkI]) {
-        acc[chunkI] = []
-      }
-      acc[chunkI].push(cur)
-      return acc
-    }, [] as T[][])
-  }
-
-  const blocks: RepoBlock[] = []
-  toPut.forEach((bytes, cid) => {
-    blocks.push({
-      cid: cid.toString(),
-      repoRev: rev,
-      size: bytes.length,
-      content: bytes,
-    })
-  })
-  await Promise.all(
-    chunkArray(blocks, 50).map((batch) =>
-      db.db
-        .insertInto('repo_block')
-        .values(batch)
-        .onConflict((oc) => oc.doNothing())
-        .execute(),
-    ),
-  )
-}
-
-async function deleteMany(db: Database<DatabaseSchema>, cids: CID[]) {
-  if (cids.length < 1) return
-  const cidStrs = cids.map((c) => c.toString())
-  await db.db.deleteFrom('repo_block').where('cid', 'in', cidStrs).execute()
-}
-
-export async function applyCommit(
-  db: Database<DatabaseSchema>,
-  commit: CommitDataWithOps,
-  did: string,
-  isCreate?: boolean,
-) {
-  await Promise.all([
-    updateRoot(db, commit.cid, did, commit.rev, isCreate),
-    putMany(db, commit.newBlocks, commit.rev),
-    deleteMany(db, commit.removedCids.toList()),
-  ])
-}
 
 export async function indexRecord(
   db: Database<DatabaseSchema>,
@@ -504,19 +368,6 @@ export async function deleteRecord(db: Database<DatabaseSchema>, uri: AtUri) {
   console.info({ uri }, 'deleted indexed record')
 }
 
-export async function getRootDetailed(
-  db: Database<DatabaseSchema>,
-): Promise<{ cid: CID; rev: string }> {
-  const res = await db.db
-    .selectFrom('repo_root')
-    .select(['cid', 'rev'])
-    .limit(1)
-    .executeTakeFirstOrThrow()
-  return {
-    cid: CID.parse(res.cid),
-    rev: res.rev,
-  }
-}
 export async function getRecord(
   db: Database<DatabaseSchema>,
   uri: AtUri,
@@ -550,30 +401,6 @@ export async function getRecord(
     indexedAt: record.indexedAt,
     takedownRef: record.takedownRef ? record.takedownRef.toString() : null,
   }
-}
-
-export async function getBlocks(
-  db: Database<DatabaseSchema>,
-  cids: CID[],
-): Promise<{ blocks: BlockMap; missing: CID[] }> {
-  const missing = new CidSet(cids)
-  const missingStr = cids.map((c) => c.toString())
-  const blocks = new BlockMap()
-  await Promise.all(
-    chunkArray(missingStr, 500).map(async (batch) => {
-      const res = await db.db
-        .selectFrom('repo_block')
-        .where('repo_block.cid', 'in', batch)
-        .select(['repo_block.cid as cid', 'repo_block.content as content'])
-        .execute()
-      for (const row of res) {
-        const cid = CID.parse(row.cid)
-        blocks.set(cid, row.content)
-        missing.delete(cid)
-      }
-    }),
-  )
-  return { blocks, missing: missing.toList() }
 }
 
 export async function getDuplicateRecordCids(

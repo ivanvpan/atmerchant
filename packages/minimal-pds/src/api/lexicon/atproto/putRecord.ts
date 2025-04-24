@@ -20,7 +20,8 @@ import {
   BadCommitSwapError,
   PreparedDelete,
 } from '#/types'
-import { applyCommit, deleteRecord, getBlocks, getDuplicateRecordCids, getRecord, getRootDetailed, indexRecord, updateRoot } from '#/db'
+import { deleteRecord, getDuplicateRecordCids, getRecord, indexRecord } from '#/db'
+import { SqlRepoTransactor } from '#/services/storage'
 
 export const dataToCborBlock = async (data: unknown) => {
   const cborCodec = await import('@ipld/dag-cbor')
@@ -154,72 +155,8 @@ const signingKey: crypto.Keypair = {
   },
 }
 
-// async function formatCommit(toWrite: RecordWriteOp | RecordWriteOp[], keypair: crypto.Keypair): Promise<CommitData> {
-//   const writes = Array.isArray(toWrite) ? toWrite : [toWrite]
-//   const leaves = new BlockMap()
-
-//   let data = this.data
-//   for (const write of writes) {
-//     if (write.action === WriteOpAction.Create) {
-//       const cid = await leaves.add(write.record)
-//       const dataKey = write.collection + '/' + write.rkey
-//       data = await data.add(dataKey, cid)
-//     } else if (write.action === WriteOpAction.Update) {
-//       const cid = await leaves.add(write.record)
-//       const dataKey = write.collection + '/' + write.rkey
-//       data = await data.update(dataKey, cid)
-//     } else if (write.action === WriteOpAction.Delete) {
-//       const dataKey = write.collection + '/' + write.rkey
-//       data = await data.delete(dataKey)
-//     }
-//   }
-
-//   const dataCid = await data.getPointer()
-//   const diff = await DataDiff.of(data, this.data)
-//   const newBlocks = diff.newMstBlocks
-//   const removedCids = diff.removedCids
-
-//   const proofs = await Promise.all(writes.map((op) => data.getCoveringProof(formatDataKey(op.collection, op.rkey))))
-//   const relevantBlocks = proofs.reduce((acc, cur) => {
-//     return acc.addMap(cur)
-//   }, new BlockMap())
-
-//   const addedLeaves = leaves.getMany(diff.newLeafCids.toList())
-//   if (addedLeaves.missing.length > 0) {
-//     throw new Error(`Missing leaf blocks: ${addedLeaves.missing}`)
-//   }
-//   newBlocks.addMap(addedLeaves.blocks)
-//   relevantBlocks.addMap(addedLeaves.blocks)
-
-//   const rev = TID.nextStr(this.commit.rev)
-//   const commit = await signCommit(
-//     {
-//       did: this.did,
-//       version: 3,
-//       rev,
-//       prev: null, // added for backwards compatibility with v2
-//       data: dataCid,
-//     },
-//     keypair,
-//   )
-//   const commitBlock = await dataToCborBlock(lexToIpld(commit))
-//   if (!commitBlock.cid.equals(this.cid)) {
-//     newBlocks.set(commitBlock.cid, commitBlock.bytes)
-//     relevantBlocks.set(commitBlock.cid, commitBlock.bytes)
-//     removedCids.add(this.cid)
-//   }
-
-//   return {
-//     cid: commitBlock.cid,
-//     rev,
-//     since: this.commit.rev,
-//     prev: this.cid,
-//     newBlocks,
-//     relevantBlocks,
-//     removedCids,
-//   }
-// }
-
+// `processWrites` and `formatCommit` are from RepoTransactor pds/src/actor-store/repo/transactor.ts. Repo transactor wraps SqlRepoTransactor
+// Pulled out because RepoTransactor deals with blobs and queueing blog processing which pulls it just too much stuff
 async function processWrites(
   writes: PreparedWrite[],
   did: string,
@@ -231,6 +168,7 @@ async function processWrites(
     throw new InvalidRequestError('Too many writes. Max: 200')
   }
 
+  const storage = new SqlRepoTransactor(ctx.db, did)
   const commit = await formatCommit(ctx, did, writes, swapCommitCid)
   // Do not allow commits > 2MB
   if (commit.relevantBlocks.byteSize > 2000000) {
@@ -239,7 +177,7 @@ async function processWrites(
 
   await Promise.all([
     // persist the commit to repo storage
-    applyCommit(ctx.db, commit, did),
+    storage.applyCommit(commit),
     // & send to indexing
     // ctx.indexWrites(writes, commit.rev),
     async () => {
@@ -269,7 +207,8 @@ async function formatCommit(
 ): Promise<CommitDataWithOps> {
   // this is not in a txn, so this won't actually hold the lock,
   // we just check if it is currently held by another txn
-  const currRoot = await getRootDetailed(ctx.db)
+  const storage = new SqlRepoTransactor(ctx.db, did)
+  const currRoot = await storage.getRootDetailed()
   if (!currRoot) {
     throw new InvalidRequestError(`No repo root found for ${did}`)
   }
@@ -317,7 +256,7 @@ async function formatCommit(
     }
   }
 
-  const repo = await Repo.load(this.storage, currRoot.cid)
+  const repo = await Repo.load(storage, currRoot.cid)
   const prevData = repo.commit.data
   const writeOps = writes.map(writeToOp)
   const commit = await repo.formatCommit(writeOps, signingKey)
@@ -332,7 +271,7 @@ async function formatCommit(
   // (for instance a record that was moved but cid stayed the same)
   const newRecordBlocks = commit.relevantBlocks.getMany(newRecordCids)
   if (newRecordBlocks.missing.length > 0) {
-    const missingBlocks = await getBlocks(ctx.db, newRecordBlocks.missing)
+    const missingBlocks = await storage.getBlocks(newRecordBlocks.missing)
     commit.relevantBlocks.addMap(missingBlocks.blocks)
   }
   return {
@@ -400,7 +339,8 @@ export default function (server: Server, ctx: AppContext) {
       })()
 
       if (commit !== null) {
-        await updateRoot(ctx.db, commit.cid, did, commit.rev).catch((err: any) => {
+        const storage = new SqlRepoTransactor(ctx.db, did)
+        await storage.updateRoot(commit.cid, commit.rev).catch((err: any) => {
           ctx.logger.error({ err, did, cid: commit.cid, rev: commit.rev }, 'failed to update account root')
         })
       }
