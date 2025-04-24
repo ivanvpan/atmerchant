@@ -7,14 +7,13 @@ import cors from 'cors'
 import express from 'express'
 import { pino } from 'pino'
 
-import API, { health } from '#/api'
+import API from '#/api'
 import type { AppContext } from '#/context'
-// import { createDb, migrateToLatest } from '#/db'
 import * as error from '#/error'
-// import { createFirehoseIngester, createJetstreamIngester } from '#/ingestors'
 import { createServer } from '#/lexicon'
 import { env } from '#/env'
 import { XRPCError } from '@atproto/xrpc-server'
+import { createDb } from './db'
 
 export class Server {
   constructor(
@@ -34,6 +33,7 @@ export class Server {
 
     const ctx = {
       logger,
+      db: createDb(path.resolve(__dirname, 'db.sqlite')),
     }
 
     // Subscribe to events on the firehose
@@ -68,7 +68,6 @@ export class Server {
 
     server = API(server, ctx)
 
-    app.use(health.createRouter(ctx))
     // app.use(oauth.createRouter(ctx))
     app.use(server.xrpc.router)
     app.use(error.createHandler(ctx))

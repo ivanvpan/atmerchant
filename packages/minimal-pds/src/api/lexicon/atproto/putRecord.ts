@@ -5,86 +5,18 @@ import { sha256 } from 'multiformats/hashes/sha2'
 import { Server } from '#/lexicon'
 import { AtUri } from '@atproto/uri'
 import {
-  BlockMap,
-  Commit,
   CommitData,
-  RecordWriteOp,
   WriteOpAction,
   cborToLex,
   formatDataKey,
-  signCommit,
   Repo,
 } from '@atproto/repo'
-import { TID, util } from '@atproto/common'
+import { TID } from '@atproto/common'
 import { InvalidRequestError } from '@atproto/xrpc-server'
 import { RepoRecord, lexToIpld } from '@atproto/lexicon'
+import { InvalidRecordError, PreparedCreate, PreparedUpdate, PreparedWrite, CommitDataWithOps, CommitOp, BadRecordSwapError, BadCommitSwapError } from '#/types'
+import { applyCommit } from '#/db'
 
-type ValidationStatus = 'valid' | 'unknown'
-
-export class InvalidRecordError extends Error {}
-
-export class BadCommitSwapError extends Error {
-  constructor(public cid: CID) {
-    super(`Commit was at ${cid.toString()}`)
-  }
-}
-
-export class BadRecordSwapError extends Error {
-  constructor(public cid: CID | null) {
-    super(`Record was at ${cid?.toString() ?? 'null'}`)
-  }
-}
-
-export type PreparedCreate = {
-  action: WriteOpAction.Create
-  uri: AtUri
-  cid: CID
-  swapCid?: CID | null
-  record: RepoRecord
-  blobs: []
-  validationStatus: ValidationStatus
-}
-
-export type PreparedUpdate = {
-  action: WriteOpAction.Update
-  uri: AtUri
-  cid: CID
-  swapCid?: CID | null
-  record: RepoRecord
-  blobs: []
-  validationStatus: ValidationStatus
-}
-
-export type PreparedDelete = {
-  action: WriteOpAction.Delete
-  uri: AtUri
-  swapCid?: CID | null
-}
-
-export type PreparedWrite = PreparedCreate | PreparedUpdate | PreparedDelete
-
-export interface Signer {
-  jwtAlg: string
-  sign(msg: Uint8Array): Promise<Uint8Array>
-}
-
-export interface Didable {
-  did(): string
-}
-
-export interface Keypair extends Signer, Didable {}
-
-export type CommitOp = {
-  action: 'create' | 'update' | 'delete'
-  path: string
-  cid: CID | null
-  prev?: CID
-}
-
-export type CommitDataWithOps = CommitData & {
-  ops: CommitOp[]
-  prevData: CID | null
-}
 
 export const dataToCborBlock = async (data: unknown) => {
   const cborCodec = await import('@ipld/dag-cbor')
@@ -159,7 +91,7 @@ export const prepareUpdate = async (opts: {
   const { did, collection, rkey, swapCid, validate } = opts
   const maybeValidate = validate !== false
   const record = setCollectionName(collection, opts.record, maybeValidate)
-  let validationStatus: ValidationStatus
+  // let validationStatus: ValidationStatus
   // if (maybeValidate) {
   //   validationStatus = assertValidRecordWithStatus(record, {
   //     requireLexicon: validate === true,
@@ -242,7 +174,7 @@ export const prepareUpdate = async (opts: {
 //   }
 // }
 
-async function processWrites(writes: PreparedWrite[], swapCommitCid?: CID, ctx: AppContext): Promise<CommitDataWithOps> {
+async function processWrites(writes: PreparedWrite[], ctx: AppContext, swapCommitCid?: CID): Promise<CommitDataWithOps> {
   ctx.db.assertTransaction()
   if (writes.length > 200) {
     throw new InvalidRequestError('Too many writes. Max: 200')
@@ -256,7 +188,7 @@ async function processWrites(writes: PreparedWrite[], swapCommitCid?: CID, ctx: 
 
   await Promise.all([
     // persist the commit to repo storage
-    ctx.storage.applyCommit(commit),
+    applyCommit(ctx.db, commit, did),
     // & send to indexing
     ctx.indexWrites(writes, commit.rev),
     // process blobs
@@ -391,8 +323,8 @@ export default function (server: Server, ctx: AppContext) {
           }
         }
 
-        const commit = await actorTxn.repo
-          .processWrites([write], swapCommitCid)
+        const commit = await 
+          processWrites([write], ctx, swapCommitCid)
           .catch((err: BadCommitSwapError | BadRecordSwapError) => {
             if (err instanceof BadCommitSwapError || err instanceof BadRecordSwapError) {
               throw new InvalidRequestError(err.message, 'InvalidSwap')

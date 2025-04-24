@@ -13,6 +13,9 @@ import {
   UnknownRow,
   sql,
 } from 'kysely'
+import { CommitDataWithOps } from '#/types'
+import { CID } from 'multiformats/cid'
+import { BlockMap } from '@atproto/repo'
 
 export interface AccountPref {
   id: GeneratedAlways<number>
@@ -343,4 +346,86 @@ export async function down(db: Kysely<unknown>): Promise<void> {
   await db.schema.dropTable('record').execute()
   await db.schema.dropTable('repo_block').execute()
   await db.schema.dropTable('repo_root').execute()
+}
+async function updateRoot(
+  db: Database<DatabaseSchema>,
+  cid: CID,
+  did: string,
+  rev: string,
+  isCreate = false,
+): Promise<void> {
+  if (isCreate) {
+    await db.db
+      .insertInto('repo_root')
+      .values({
+        did: did,
+        cid: cid.toString(),
+        rev: rev,
+        indexedAt: new Date().toISOString(),
+      })
+      .execute()
+  } else {
+    await db.db
+      .updateTable('repo_root')
+      .set({
+        cid: cid.toString(),
+        rev: rev,
+        indexedAt: new Date().toISOString(),
+      })
+      .execute()
+  }
+}
+async function putMany(
+  db: Database<DatabaseSchema>,
+  toPut: BlockMap,
+  rev: string,
+): Promise<void> {
+  const chunkArray = <T>(arr: T[], chunkSize: number): T[][] => {
+    return arr.reduce((acc, cur, i) => {
+      const chunkI = Math.floor(i / chunkSize)
+      if (!acc[chunkI]) {
+        acc[chunkI] = []
+      }
+      acc[chunkI].push(cur)
+      return acc
+    }, [] as T[][])
+  }
+
+  const blocks: RepoBlock[] = []
+  toPut.forEach((bytes, cid) => {
+    blocks.push({
+      cid: cid.toString(),
+      repoRev: rev,
+      size: bytes.length,
+      content: bytes,
+    })
+  })
+  await Promise.all(
+    chunkArray(blocks, 50).map((batch) =>
+      db.db
+        .insertInto('repo_block')
+        .values(batch)
+        .onConflict((oc) => oc.doNothing())
+        .execute(),
+    ),
+  )
+}
+
+async function deleteMany(db: Database<DatabaseSchema>, cids: CID[]) {
+  if (cids.length < 1) return
+  const cidStrs = cids.map((c) => c.toString())
+  await db.db.deleteFrom('repo_block').where('cid', 'in', cidStrs).execute()
+}
+
+export async function applyCommit(
+  db: Database<DatabaseSchema>,
+  commit: CommitDataWithOps,
+  did: string,
+  isCreate?: boolean,
+) {
+  await Promise.all([
+    updateRoot(db, commit.cid, did, commit.rev, isCreate),
+    putMany(db, commit.newBlocks, commit.rev),
+    deleteMany(db, commit.removedCids.toList()),
+  ])
 }

@@ -1,80 +1,71 @@
-import {
-  XyzNoshdeliveryV0CatalogCatalog,
-  XyzNoshdeliveryV0CatalogCollection,
-  XyzNoshdeliveryV0CatalogItem,
-  XyzNoshdeliveryV0CatalogModifierGroup,
-  XyzNoshdeliveryV0CatalogModifier,
-} from '@nosh/lexicon'
-import { schemaDict } from './lexicon/lexicons'
+import { CID } from 'multiformats/cid'
+import { AtUri } from '@atproto/uri'
+import { CommitData, WriteOpAction } from '@atproto/repo'
+import { RepoRecord } from '@atproto/lexicon'
 
-export type CatalogObjectType =
-  | 'catalog'
-  | 'collection'
-  | 'item'
-  | 'modifierGroup'
-  | 'modifier'
+type ValidationStatus = 'valid' | 'unknown'
 
-export type BaseCatalogObject = {
-  type: CatalogObjectType
-  tid: string
-  uri: string
-  name: string
-  externalId?: string
+export class InvalidRecordError extends Error {}
+
+export class BadCommitSwapError extends Error {
+  constructor(public cid: CID) {
+    super(`Commit was at ${cid.toString()}`)
+  }
 }
 
-export type CatalogObject =
-  | (BaseCatalogObject & {
-      type: 'catalog'
-      data: XyzNoshdeliveryV0CatalogCatalog.Record
-    })
-  | (BaseCatalogObject & {
-      type: 'collection'
-      data: XyzNoshdeliveryV0CatalogCollection.Record
-    })
-  | (BaseCatalogObject & {
-      type: 'item'
-      data: XyzNoshdeliveryV0CatalogItem.Record
-    })
-  | (BaseCatalogObject & {
-      type: 'modifierGroup'
-      data: XyzNoshdeliveryV0CatalogModifierGroup.Record
-    })
-  | (BaseCatalogObject & {
-      type: 'modifier'
-      data: XyzNoshdeliveryV0CatalogModifier.Record
-    })
-
-export type CatalogObjectData =
-  | XyzNoshdeliveryV0CatalogCatalog.Record
-  | XyzNoshdeliveryV0CatalogCollection.Record
-  | XyzNoshdeliveryV0CatalogItem.Record
-  | XyzNoshdeliveryV0CatalogModifierGroup.Record
-  | XyzNoshdeliveryV0CatalogModifier.Record
-
-export type LexiconType =
-  | XyzNoshdeliveryV0CatalogCatalog.Record['$type']
-  | XyzNoshdeliveryV0CatalogCollection.Record['$type']
-  | XyzNoshdeliveryV0CatalogItem.Record['$type']
-  | XyzNoshdeliveryV0CatalogModifierGroup.Record['$type']
-  | XyzNoshdeliveryV0CatalogModifier.Record['$type']
-
-// Is this sane?
-export const typeToLexiconType: Record<CatalogObjectType, LexiconType> = {
-  catalog: schemaDict.XyzNoshdeliveryV0CatalogCatalog.id,
-  collection: schemaDict.XyzNoshdeliveryV0CatalogCollection.id,
-  item: schemaDict.XyzNoshdeliveryV0CatalogItem.id,
-  modifierGroup: schemaDict.XyzNoshdeliveryV0CatalogModifierGroup.id,
-  modifier: schemaDict.XyzNoshdeliveryV0CatalogModifier.id,
+export class BadRecordSwapError extends Error {
+  constructor(public cid: CID | null) {
+    super(`Record was at ${cid?.toString() ?? 'null'}`)
+  }
 }
 
-// TODO this a many-to-one mapping
-export const lexiconTypeToCatalogObjectType: Record<
-  LexiconType,
-  CatalogObjectType
-> = {
-  [schemaDict.XyzNoshdeliveryV0CatalogCatalog.id]: 'catalog',
-  [schemaDict.XyzNoshdeliveryV0CatalogCollection.id]: 'collection',
-  [schemaDict.XyzNoshdeliveryV0CatalogItem.id]: 'item',
-  [schemaDict.XyzNoshdeliveryV0CatalogModifierGroup.id]: 'modifierGroup',
-  [schemaDict.XyzNoshdeliveryV0CatalogModifier.id]: 'modifier',
+export type PreparedCreate = {
+  action: WriteOpAction.Create
+  uri: AtUri
+  cid: CID
+  swapCid?: CID | null
+  record: RepoRecord
+  blobs: []
+  validationStatus: ValidationStatus
+}
+
+export type PreparedUpdate = {
+  action: WriteOpAction.Update
+  uri: AtUri
+  cid: CID
+  swapCid?: CID | null
+  record: RepoRecord
+  blobs: []
+  validationStatus: ValidationStatus
+}
+
+export type PreparedDelete = {
+  action: WriteOpAction.Delete
+  uri: AtUri
+  swapCid?: CID | null
+}
+
+export type PreparedWrite = PreparedCreate | PreparedUpdate | PreparedDelete
+
+export interface Signer {
+  jwtAlg: string
+  sign(msg: Uint8Array): Promise<Uint8Array>
+}
+
+export interface Didable {
+  did(): string
+}
+
+export interface Keypair extends Signer, Didable {}
+
+export type CommitOp = {
+  action: 'create' | 'update' | 'delete'
+  path: string
+  cid: CID | null
+  prev?: CID
+}
+
+export type CommitDataWithOps = CommitData & {
+  ops: CommitOp[]
+  prevData: CID | null
 }
