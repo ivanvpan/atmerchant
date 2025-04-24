@@ -186,10 +186,14 @@ export class SqlRepoReader extends ReadableBlockstore {
 
     if (cursor) {
       // use this syntax to ensure we hit the index
-      builder = builder.where(
-        sql`((${ref('repoRev')}, ${ref('cid')}) < (${
-          cursor.rev
-        }, ${cursor.cid.toString()}))`,
+      builder = builder.where((eb) => 
+        eb.and([
+          eb('repoRev', '<', cursor.rev),
+          eb.or([
+            eb('repoRev', '=', cursor.rev),
+            eb('cid', '<', cursor.cid.toString())
+          ])
+        ])
       )
     }
     if (since) {
