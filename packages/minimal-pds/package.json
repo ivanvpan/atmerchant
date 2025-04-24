@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "tsx watch --clear-screen=false src/index.ts | pino-pretty",
     "typecheck": "tsc --noEmit",
-    "lexgen": "lex gen-server ./src/lexicon ../../lexicons/xyz/noshdelivery/v0/*/* ../../lexicons/com/atproto/*/*  ../../lexicons/community/lexicon/location/* --yes",
+    "lexgen": "lex gen-server ./src/lexicon ../../lexicons/com/atproto/*/*  --yes",
     "test": "jest"
   },
   "devDependencies": {

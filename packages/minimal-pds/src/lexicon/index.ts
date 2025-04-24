@@ -8,15 +8,7 @@ import {
   type AuthVerifier,
   type StreamAuthVerifier,
 } from '@atproto/xrpc-server'
-import { schemas } from './lexicons.js'
-import * as XyzNoshdeliveryV0CatalogGetItemsDetails from './types/xyz/noshdelivery/v0/catalog/getItemsDetails.js'
-import * as XyzNoshdeliveryV0CatalogGetShallowCatalogView from './types/xyz/noshdelivery/v0/catalog/getShallowCatalogView.js'
-import * as XyzNoshdeliveryV0CatalogPutCatalogObject from './types/xyz/noshdelivery/v0/catalog/putCatalogObject.js'
-import * as XyzNoshdeliveryV0MerchantGetGroup from './types/xyz/noshdelivery/v0/merchant/getGroup.js'
-import * as XyzNoshdeliveryV0MerchantListGroups from './types/xyz/noshdelivery/v0/merchant/listGroups.js'
-import * as XyzNoshdeliveryV0MerchantListLocations from './types/xyz/noshdelivery/v0/merchant/listLocations.js'
-import * as XyzNoshdeliveryV0MerchantPutGroup from './types/xyz/noshdelivery/v0/merchant/putGroup.js'
-import * as XyzNoshdeliveryV0MerchantPutLocation from './types/xyz/noshdelivery/v0/merchant/putLocation.js'
+import { schemas } from './lexicons'
 import * as ComAtprotoRepoApplyWrites from './types/com/atproto/repo/applyWrites.js'
 import * as ComAtprotoRepoCreateRecord from './types/com/atproto/repo/createRecord.js'
 import * as ComAtprotoRepoDeleteRecord from './types/com/atproto/repo/deleteRecord.js'
@@ -34,163 +26,11 @@ export function createServer(options?: XrpcOptions): Server {
 
 export class Server {
   xrpc: XrpcServer
-  xyz: XyzNS
   com: ComNS
-  community: CommunityNS
 
   constructor(options?: XrpcOptions) {
     this.xrpc = createXrpcServer(schemas, options)
-    this.xyz = new XyzNS(this)
     this.com = new ComNS(this)
-    this.community = new CommunityNS(this)
-  }
-}
-
-export class XyzNS {
-  _server: Server
-  noshdelivery: XyzNoshdeliveryNS
-
-  constructor(server: Server) {
-    this._server = server
-    this.noshdelivery = new XyzNoshdeliveryNS(server)
-  }
-}
-
-export class XyzNoshdeliveryNS {
-  _server: Server
-  v0: XyzNoshdeliveryV0NS
-
-  constructor(server: Server) {
-    this._server = server
-    this.v0 = new XyzNoshdeliveryV0NS(server)
-  }
-}
-
-export class XyzNoshdeliveryV0NS {
-  _server: Server
-  catalog: XyzNoshdeliveryV0CatalogNS
-  media: XyzNoshdeliveryV0MediaNS
-  merchant: XyzNoshdeliveryV0MerchantNS
-
-  constructor(server: Server) {
-    this._server = server
-    this.catalog = new XyzNoshdeliveryV0CatalogNS(server)
-    this.media = new XyzNoshdeliveryV0MediaNS(server)
-    this.merchant = new XyzNoshdeliveryV0MerchantNS(server)
-  }
-}
-
-export class XyzNoshdeliveryV0CatalogNS {
-  _server: Server
-
-  constructor(server: Server) {
-    this._server = server
-  }
-
-  getItemsDetails<AV extends AuthVerifier>(
-    cfg: ConfigOf<
-      AV,
-      XyzNoshdeliveryV0CatalogGetItemsDetails.Handler<ExtractAuth<AV>>,
-      XyzNoshdeliveryV0CatalogGetItemsDetails.HandlerReqCtx<ExtractAuth<AV>>
-    >,
-  ) {
-    const nsid = 'xyz.noshdelivery.v0.catalog.getItemsDetails' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
-  getShallowCatalogView<AV extends AuthVerifier>(
-    cfg: ConfigOf<
-      AV,
-      XyzNoshdeliveryV0CatalogGetShallowCatalogView.Handler<ExtractAuth<AV>>,
-      XyzNoshdeliveryV0CatalogGetShallowCatalogView.HandlerReqCtx<
-        ExtractAuth<AV>
-      >
-    >,
-  ) {
-    const nsid = 'xyz.noshdelivery.v0.catalog.getShallowCatalogView' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
-  putCatalogObject<AV extends AuthVerifier>(
-    cfg: ConfigOf<
-      AV,
-      XyzNoshdeliveryV0CatalogPutCatalogObject.Handler<ExtractAuth<AV>>,
-      XyzNoshdeliveryV0CatalogPutCatalogObject.HandlerReqCtx<ExtractAuth<AV>>
-    >,
-  ) {
-    const nsid = 'xyz.noshdelivery.v0.catalog.putCatalogObject' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-}
-
-export class XyzNoshdeliveryV0MediaNS {
-  _server: Server
-
-  constructor(server: Server) {
-    this._server = server
-  }
-}
-
-export class XyzNoshdeliveryV0MerchantNS {
-  _server: Server
-
-  constructor(server: Server) {
-    this._server = server
-  }
-
-  getGroup<AV extends AuthVerifier>(
-    cfg: ConfigOf<
-      AV,
-      XyzNoshdeliveryV0MerchantGetGroup.Handler<ExtractAuth<AV>>,
-      XyzNoshdeliveryV0MerchantGetGroup.HandlerReqCtx<ExtractAuth<AV>>
-    >,
-  ) {
-    const nsid = 'xyz.noshdelivery.v0.merchant.getGroup' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
-  listGroups<AV extends AuthVerifier>(
-    cfg: ConfigOf<
-      AV,
-      XyzNoshdeliveryV0MerchantListGroups.Handler<ExtractAuth<AV>>,
-      XyzNoshdeliveryV0MerchantListGroups.HandlerReqCtx<ExtractAuth<AV>>
-    >,
-  ) {
-    const nsid = 'xyz.noshdelivery.v0.merchant.listGroups' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
-  listLocations<AV extends AuthVerifier>(
-    cfg: ConfigOf<
-      AV,
-      XyzNoshdeliveryV0MerchantListLocations.Handler<ExtractAuth<AV>>,
-      XyzNoshdeliveryV0MerchantListLocations.HandlerReqCtx<ExtractAuth<AV>>
-    >,
-  ) {
-    const nsid = 'xyz.noshdelivery.v0.merchant.listLocations' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
-  putGroup<AV extends AuthVerifier>(
-    cfg: ConfigOf<
-      AV,
-      XyzNoshdeliveryV0MerchantPutGroup.Handler<ExtractAuth<AV>>,
-      XyzNoshdeliveryV0MerchantPutGroup.HandlerReqCtx<ExtractAuth<AV>>
-    >,
-  ) {
-    const nsid = 'xyz.noshdelivery.v0.merchant.putGroup' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
-  putLocation<AV extends AuthVerifier>(
-    cfg: ConfigOf<
-      AV,
-      XyzNoshdeliveryV0MerchantPutLocation.Handler<ExtractAuth<AV>>,
-      XyzNoshdeliveryV0MerchantPutLocation.HandlerReqCtx<ExtractAuth<AV>>
-    >,
-  ) {
-    const nsid = 'xyz.noshdelivery.v0.merchant.putLocation' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
   }
 }
 
@@ -329,34 +169,6 @@ export class ComAtprotoRepoNS {
   ) {
     const nsid = 'com.atproto.repo.uploadBlob' // @ts-ignore
     return this._server.xrpc.method(nsid, cfg)
-  }
-}
-
-export class CommunityNS {
-  _server: Server
-  lexicon: CommunityLexiconNS
-
-  constructor(server: Server) {
-    this._server = server
-    this.lexicon = new CommunityLexiconNS(server)
-  }
-}
-
-export class CommunityLexiconNS {
-  _server: Server
-  location: CommunityLexiconLocationNS
-
-  constructor(server: Server) {
-    this._server = server
-    this.location = new CommunityLexiconLocationNS(server)
-  }
-}
-
-export class CommunityLexiconLocationNS {
-  _server: Server
-
-  constructor(server: Server) {
-    this._server = server
   }
 }
 
