@@ -8,7 +8,9 @@ describe('PDS Server', () => {
 
   beforeAll(async () => {
     // Start the server
+    console.log('Starting server')
     server = await Server.create()
+    console.log('Server started')
     
     // Create an XRPC client pointing to the server
     client = new AtpAgent({
