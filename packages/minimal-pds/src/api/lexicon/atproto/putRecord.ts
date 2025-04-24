@@ -2,10 +2,18 @@ import { AppContext } from '#/context'
 import { CID } from 'multiformats/cid'
 import * as Block from 'multiformats/block'
 import { sha256 } from 'multiformats/hashes/sha2'
-import * as crypto from '@atproto/crypto'
 import { Server } from '#/lexicon'
 import { AtUri } from '@atproto/uri'
-import { WriteOpAction, cborToLex, formatDataKey, Repo, RecordDeleteOp, RecordWriteOp, RecordCreateOp, RecordUpdateOp } from '@atproto/repo'
+import {
+  WriteOpAction,
+  cborToLex,
+  formatDataKey,
+  Repo,
+  RecordDeleteOp,
+  RecordWriteOp,
+  RecordCreateOp,
+  RecordUpdateOp,
+} from '@atproto/repo'
 import { TID } from '@atproto/common'
 import { InvalidRequestError } from '@atproto/xrpc-server'
 import { RepoRecord, lexToIpld } from '@atproto/lexicon'
@@ -146,15 +154,6 @@ export const writeToOp = (write: PreparedWrite): RecordWriteOp => {
   }
 }
 
-const signingKey: crypto.Keypair = {
-  did: () => 'did:plc:ufa7rl6agtfdqje6bant3wsb',
-  jwtAlg: 'EdDSA',
-  sign: async (msg: Uint8Array) => {
-    // TODO: sign message
-    return new Uint8Array()
-  },
-}
-
 // `processWrites` and `formatCommit` are from RepoTransactor pds/src/actor-store/repo/transactor.ts. Repo transactor wraps SqlRepoTransactor
 // Pulled out because RepoTransactor deals with blobs and queueing blog processing which pulls it just too much stuff
 async function processWrites(
@@ -186,7 +185,15 @@ async function processWrites(
         writes.map(async (write) => {
           // TOOD? What is indexing
           if (write.action === WriteOpAction.Create || write.action === WriteOpAction.Update) {
-            await indexRecord(ctx.db, write.uri, write.cid, write.record, write.action, commit.rev, new Date().toISOString())
+            await indexRecord(
+              ctx.db,
+              write.uri,
+              write.cid,
+              write.record,
+              write.action,
+              commit.rev,
+              new Date().toISOString(),
+            )
           } else if (write.action === WriteOpAction.Delete) {
             await deleteRecord(ctx.db, write.uri)
           }
@@ -205,8 +212,9 @@ async function formatCommit(
   writes: PreparedWrite[],
   swapCommit?: CID,
 ): Promise<CommitDataWithOps> {
-  // this is not in a txn, so this won't actually hold the lock,
-  // we just check if it is currently held by another txn
+  // Create a new keypair?
+  // Create a new repo?
+
   const storage = new SqlRepoTransactor(ctx.db, did)
   const currRoot = await storage.getRootDetailed()
   if (!currRoot) {
@@ -259,7 +267,8 @@ async function formatCommit(
   const repo = await Repo.load(storage, currRoot.cid)
   const prevData = repo.commit.data
   const writeOps = writes.map(writeToOp)
-  const commit = await repo.formatCommit(writeOps, signingKey)
+  const keypair = await ctx.accountManager.getAccount(storage)
+  const commit = await repo.formatCommit(writeOps, keypair)
 
   // find blocks that would be deleted but are referenced by another record
   const dupeRecordCids = await getDuplicateRecordCids(ctx.db, commit.removedCids.toList(), delAndUpdateUris)

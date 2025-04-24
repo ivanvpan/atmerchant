@@ -35,7 +35,7 @@
     "express": "^4.21.2",
     "multiformats": "^9.9.0",
     "pino": "^9.6.0",
-    "uint8arrays": "^5.1.0",
+    "uint8arrays": "3.0.0",
     "varint": "^6.0.0"
   }
 }

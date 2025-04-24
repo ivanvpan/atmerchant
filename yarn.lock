@@ -2931,6 +2931,7 @@ __metadata:
     "@atproto/repo": "npm:^0.8.0"
     "@atproto/uri": "npm:^0.1.1"
     "@atproto/xrpc-server": "npm:^0.7.15"
+    "@did-plc/lib": "npm:^0.0.4"
     "@ipld/dag-cbor": "npm:^9.2.2"
     "@jest/globals": "npm:^29.7.0"
     "@types/compression": "npm:^1"
@@ -2951,7 +2952,7 @@ __metadata:
     ts-jest: "npm:^29.1.2"
     tsx: "npm:^4.19.3"
     typescript: "npm:^5.8.2"
-    uint8arrays: "npm:^5.1.0"
+    uint8arrays: "npm:3.0.0"
     varint: "npm:^6.0.0"
   languageName: unknown
   linkType: soft
@@ -10128,15 +10129,6 @@ __metadata:
   dependencies:
     multiformats: "npm:^9.4.2"
   checksum: 10c0/19efb7d2ba20ec2550d1ca5b453c01ad62e70098e6454d0a446b12991fa5f3286f8ee979e5cec020fac6b4cbbaad4597024dcc8b2c69365af95443cce1323e34
-  languageName: node
-  linkType: hard
-
-"uint8arrays@npm:^5.1.0":
-  version: 5.1.0
-  resolution: "uint8arrays@npm:5.1.0"
-  dependencies:
-    multiformats: "npm:^13.0.0"
-  checksum: 10c0/e7587f97d03a17a608becd01b3ca52aa6db43e7ee6156c18b278c715a62f4f9e62ef2fe9432a3cd02791b6222a17578476a20b8e3ea37dd3b5ce454c6a8782a9
   languageName: node
   linkType: hard
 

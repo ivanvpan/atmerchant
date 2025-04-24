@@ -78,6 +78,11 @@ export type CarBlock = {
 }
 
 // DB
+export interface DidAccount {
+  did: string
+  privateKey: string
+}
+
 export interface AccountPref {
   id: GeneratedAlways<number>
   name: string
@@ -138,4 +143,5 @@ export type DatabaseSchema = {
   blob: Blob
   record_blob: RecordBlob
   backlink: Backlink
+  did_account: DidAccount
 }

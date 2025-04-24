@@ -1,8 +1,7 @@
 import SqliteDb from 'better-sqlite3'
 import assert from 'node:assert'
-import { cborDecode, check, chunkArray, retry } from '@atproto/common'
+import { retry } from '@atproto/common'
 import {
-  GeneratedAlways,
   Kysely,
   KyselyPlugin,
   PluginTransformQueryArgs,
@@ -13,30 +12,16 @@ import {
   UnknownRow,
   sql,
 } from 'kysely'
-import { CommitDataWithOps, DatabaseSchema, RepoBlock } from '#/types'
+import { DatabaseSchema } from '#/types'
 import { CID } from 'multiformats/cid'
-import {
-  BlockMap,
-  CarBlock,
-  cborToLexRecord,
-  CidSet,
-  CommitData,
-  RepoStorage,
-  WriteOpAction,
-} from '@atproto/repo'
+import { BlockMap, cborToLexRecord, CidSet, WriteOpAction } from '@atproto/repo'
 import { AtUri } from '@atproto/uri'
-import { RepoRecord, lexToIpld } from '@atproto/lexicon'
-
+import { RepoRecord } from '@atproto/lexicon'
 
 const last = <T>(arr: T[]) => arr[arr.length - 1]
 const DELAYS = [1, 2, 5, 10, 15, 20, 25, 25, 25, 50, 50, 100]
 const TOTALS = [0, 1, 3, 8, 18, 33, 53, 78, 103, 128, 178, 228]
-const RETRY_ERRORS = new Set([
-  'SQLITE_BUSY',
-  'SQLITE_BUSY_SNAPSHOT',
-  'SQLITE_BUSY_RECOVERY',
-  'SQLITE_BUSY_TIMEOUT',
-])
+const RETRY_ERRORS = new Set(['SQLITE_BUSY', 'SQLITE_BUSY_SNAPSHOT', 'SQLITE_BUSY_RECOVERY', 'SQLITE_BUSY_TIMEOUT'])
 
 export const retrySqlite = <T>(fn: () => Promise<T>): Promise<T> => {
   return retry(fn, {
@@ -92,9 +77,7 @@ export class Database<Schema> {
     await sql`PRAGMA journal_mode = WAL`.execute(this.db)
   }
 
-  async transactionNoRetry<T>(
-    fn: (db: Database<Schema>) => T | PromiseLike<T>,
-  ): Promise<T> {
+  async transactionNoRetry<T>(fn: (db: Database<Schema>) => T | PromiseLike<T>): Promise<T> {
     this.assertNotTransaction()
     const leakyTxPlugin = new LeakyTxPlugin()
     const { hooks, txRes } = await this.db
@@ -118,9 +101,7 @@ export class Database<Schema> {
     return txRes
   }
 
-  async transaction<T>(
-    fn: (db: Database<Schema>) => T | PromiseLike<T>,
-  ): Promise<T> {
+  async transaction<T>(fn: (db: Database<Schema>) => T | PromiseLike<T>): Promise<T> {
     return retrySqlite(() => this.transactionNoRetry(fn))
   }
 
@@ -176,9 +157,7 @@ class LeakyTxPlugin implements KyselyPlugin {
     return args.node
   }
 
-  async transformResult(
-    args: PluginTransformResultArgs,
-  ): Promise<QueryResult<UnknownRow>> {
+  async transformResult(args: PluginTransformResultArgs): Promise<QueryResult<UnknownRow>> {
     return args.result
   }
 }
@@ -195,6 +174,12 @@ export const createDb = (location: string): Database<DatabaseSchema> => {
 
 export async function up(db: Kysely<unknown>): Promise<void> {
   await db.schema
+    .createTable('did_account')
+    .addColumn('did', 'varchar', (col) => col.primaryKey())
+    .addColumn('privateKey', 'varchar', (col) => col.notNull())
+    .execute()
+
+  await db.schema
     .createTable('repo_root')
     .addColumn('did', 'varchar', (col) => col.primaryKey())
     .addColumn('cid', 'varchar', (col) => col.notNull())
@@ -210,11 +195,7 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .addColumn('content', 'blob', (col) => col.notNull())
     .execute()
 
-  await db.schema
-    .createIndex('repo_block_repo_rev_idx')
-    .on('repo_block')
-    .columns(['repoRev', 'cid'])
-    .execute()
+  await db.schema.createIndex('repo_block_repo_rev_idx').on('repo_block').columns(['repoRev', 'cid']).execute()
 
   await db.schema
     .createTable('record')
@@ -226,21 +207,9 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .addColumn('indexedAt', 'varchar', (col) => col.notNull())
     .addColumn('takedownRef', 'varchar')
     .execute()
-  await db.schema
-    .createIndex('record_cid_idx')
-    .on('record')
-    .column('cid')
-    .execute()
-  await db.schema
-    .createIndex('record_collection_idx')
-    .on('record')
-    .column('collection')
-    .execute()
-  await db.schema
-    .createIndex('record_repo_rev_idx')
-    .on('record')
-    .column('repoRev')
-    .execute()
+  await db.schema.createIndex('record_cid_idx').on('record').column('cid').execute()
+  await db.schema.createIndex('record_collection_idx').on('record').column('collection').execute()
+  await db.schema.createIndex('record_repo_rev_idx').on('record').column('repoRev').execute()
 
   await db.schema
     .createTable('blob')
@@ -253,11 +222,7 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .addColumn('createdAt', 'varchar', (col) => col.notNull())
     .addColumn('takedownRef', 'varchar')
     .execute()
-  await db.schema
-    .createIndex('blob_tempkey_idx')
-    .on('blob')
-    .column('tempKey')
-    .execute()
+  await db.schema.createIndex('blob_tempkey_idx').on('blob').column('tempKey').execute()
 
   await db.schema
     .createTable('record_blob')
@@ -273,11 +238,7 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .addColumn('linkTo', 'varchar', (col) => col.notNull())
     .addPrimaryKeyConstraint('backlinks_pkey', ['uri', 'path'])
     .execute()
-  await db.schema
-    .createIndex('backlink_link_to_idx')
-    .on('backlink')
-    .columns(['path', 'linkTo'])
-    .execute()
+  await db.schema.createIndex('backlink_link_to_idx').on('backlink').columns(['path', 'linkTo']).execute()
 
   await db.schema
     .createTable('account_pref')
@@ -296,7 +257,6 @@ export async function down(db: Kysely<unknown>): Promise<void> {
   await db.schema.dropTable('repo_block').execute()
   await db.schema.dropTable('repo_root').execute()
 }
-
 
 // Most of these are pulled from RecordTransactor pds/src/actor-store/record/sql-record-transactor.ts
 export async function indexRecord(
@@ -358,12 +318,8 @@ export async function indexRecord(
 
 export async function deleteRecord(db: Database<DatabaseSchema>, uri: AtUri) {
   console.debug({ uri }, 'deleting indexed record')
-  const deleteQuery = db.db
-    .deleteFrom('record')
-    .where('uri', '=', uri.toString())
-  const backlinkQuery = db.db
-    .deleteFrom('backlink')
-    .where('uri', '=', uri.toString())
+  const deleteQuery = db.db.deleteFrom('record').where('uri', '=', uri.toString())
+  const backlinkQuery = db.db.deleteFrom('backlink').where('uri', '=', uri.toString())
   await Promise.all([deleteQuery.execute(), backlinkQuery.execute()])
 
   console.info({ uri }, 'deleted indexed record')

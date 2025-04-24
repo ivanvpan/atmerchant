@@ -14,7 +14,7 @@ import { createServer } from '#/lexicon'
 import { env } from '#/env'
 import { XRPCError } from '@atproto/xrpc-server'
 import { createDb } from './db'
-
+import { AccountManager } from './services/account'
 export class Server {
   constructor(
     public app: express.Application,
@@ -31,9 +31,11 @@ export class Server {
     // const baseIdResolver = createIdResolver()
     // const resolver = createBidirectionalResolver(baseIdResolver)
 
+    const db = createDb(path.resolve(__dirname, 'db.sqlite'))
     const ctx = {
       logger,
-      db: createDb(path.resolve(__dirname, 'db.sqlite')),
+      db,
+      accountManager: new AccountManager(db),
     }
 
     // Subscribe to events on the firehose
@@ -57,12 +59,7 @@ export class Server {
       },
       errorParser: (err: unknown) => {
         console.log(err)
-        return new XRPCError(
-          500,
-          (err as Error).message || 'hello',
-          undefined,
-          (err as Error).stack?.split('\n'),
-        )
+        return new XRPCError(500, (err as Error).message || 'hello', undefined, (err as Error).stack?.split('\n'))
       },
     })
 
@@ -74,10 +71,7 @@ export class Server {
 
     // Serve static files from the frontend build - prod only
     if (env.isProduction) {
-      const frontendPath = path.resolve(
-        __dirname,
-        '../../../packages/client/dist',
-      )
+      const frontendPath = path.resolve(__dirname, '../../../packages/client/dist')
 
       // Check if the frontend build exists
       if (fs.existsSync(frontendPath)) {
@@ -108,9 +102,7 @@ export class Server {
     // Use the port from env (should be 3001 for the API server)
     const httpServer = app.listen(PORT)
     await events.once(httpServer, 'listening')
-    logger.info(
-      `API Server (${NODE_ENV}) running on port http://${HOST}:${PORT}`,
-    )
+    logger.info(`API Server (${NODE_ENV}) running on port http://${HOST}:${PORT}`)
 
     return new Server(app, httpServer, ctx)
   }

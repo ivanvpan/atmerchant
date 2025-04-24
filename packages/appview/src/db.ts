@@ -1,7 +1,4 @@
-import {
-  XyzNoshdeliveryV0MerchantGroup,
-  XyzNoshdeliveryV0MerchantLocation,
-} from '@nosh/lexicon'
+import { XyzNoshdeliveryV0MerchantGroup, XyzNoshdeliveryV0MerchantLocation } from '@nosh/lexicon'
 import SqliteDb from 'better-sqlite3'
 import {
   Kysely,
@@ -106,16 +103,8 @@ migrations['001'] = {
       .addColumn('childTid', 'varchar')
       .addColumn('childType', 'varchar')
       .execute()
-    await db.schema
-      .createIndex('adjacency_list_parent_tid_idx')
-      .on('adjacency_list')
-      .column('parentTid')
-      .execute()
-    await db.schema
-      .createIndex('adjacency_list_child_tid_idx')
-      .on('adjacency_list')
-      .column('childTid')
-      .execute()
+    await db.schema.createIndex('adjacency_list_parent_tid_idx').on('adjacency_list').column('parentTid').execute()
+    await db.schema.createIndex('adjacency_list_child_tid_idx').on('adjacency_list').column('childTid').execute()
 
     await db.schema
       .createTable('catalog_object')
@@ -145,9 +134,7 @@ migrations['001'] = {
       .addColumn('timezone', 'varchar', (col) => col.notNull())
       .addColumn('coordinates', 'jsonb', (col) => col.notNull())
       .addColumn('media', 'jsonb')
-      .addColumn('parentGroup', 'varchar', (col) =>
-        col.references('merchant_group.uri').notNull(),
-      )
+      .addColumn('parentGroup', 'varchar', (col) => col.references('merchant_group.uri').notNull())
       .execute()
   },
   async down(db: Kysely<unknown>) {
@@ -184,10 +171,7 @@ export const updateAdjacencyList = async (
   try {
     // TODO this is not very efficient but whatevs
     await db.transaction().execute(async (tx) => {
-      await tx
-        .deleteFrom('adjacency_list')
-        .where('parentTid', '=', parentTid)
-        .execute()
+      await tx.deleteFrom('adjacency_list').where('parentTid', '=', parentTid).execute()
       await tx
         .insertInto('adjacency_list')
         .values(
@@ -246,11 +230,7 @@ function getCatalogObjectAdjacencyList(
   return adjacencyList
 }
 
-export const upsertCatalogObjectRecord = async (
-  db: Database,
-  uri: string,
-  record: CatalogObjectData,
-) => {
+export const upsertCatalogObjectRecord = async (db: Database, uri: string, record: CatalogObjectData) => {
   const tid = tidFromUri(uri)
   const type = lexiconTypeToCatalogObjectType[typeFromUri(uri) as LexiconType]
   const data = JSON.stringify(record)
@@ -270,15 +250,8 @@ export const upsertCatalogObjectRecord = async (
   await updateAdjacencyList(db, tid, type, adjacencyList)
 }
 
-export const getCatalogObject = async (
-  db: Database,
-  tid: string,
-): Promise<CatalogObject> => {
-  const object = await db
-    .selectFrom('catalog_object')
-    .where('tid', '=', tid)
-    .selectAll()
-    .executeTakeFirst()
+export const getCatalogObject = async (db: Database, tid: string): Promise<CatalogObject> => {
+  const object = await db.selectFrom('catalog_object').where('tid', '=', tid).selectAll().executeTakeFirst()
   if (!object) {
     throw new InvalidRequestError('Catalog object not found')
   }
@@ -305,20 +278,12 @@ export const findDescendantsOfType = async (
             .innerJoin('adjacency_list', (join) =>
               join
                 .onRef('adjacency_list.parentTid', '=', 'descendants.tid')
-                .on(
-                  'adjacency_list.parentType',
-                  '=',
-                  'descendants.type' as CatalogObjectType,
-                ),
+                .on('adjacency_list.parentType', '=', 'descendants.type' as CatalogObjectType),
             )
             .innerJoin('catalog_object', (join) =>
               join
                 .onRef('catalog_object.tid', '=', 'adjacency_list.childTid')
-                .on(
-                  'catalog_object.type',
-                  '=',
-                  'adjacency_list.childType' as CatalogObjectType,
-                ),
+                .on('catalog_object.type', '=', 'adjacency_list.childType' as CatalogObjectType),
             )
             .select(['catalog_object.tid', 'catalog_object.type']),
         ),
@@ -341,24 +306,19 @@ export const findDescendantsOfType = async (
   )
 
   // Fetch all catalog objects for the found IDs, grouped by type
-  const finalResult: Record<CatalogObjectType, CatalogObject[]> =
-    objectTypes.reduce(
-      (acc, type) => {
-        acc[type] = []
-        return acc
-      },
-      {} as Record<CatalogObjectType, CatalogObject[]>,
-    )
+  const finalResult: Record<CatalogObjectType, CatalogObject[]> = objectTypes.reduce(
+    (acc, type) => {
+      acc[type] = []
+      return acc
+    },
+    {} as Record<CatalogObjectType, CatalogObject[]>,
+  )
 
   // Fetch objects for each type
   await Promise.all(
     Object.entries(idsByType).map(async ([type, ids]) => {
       if (ids.length > 0) {
-        const objects = await db
-          .selectFrom('catalog_object')
-          .where('tid', 'in', ids)
-          .selectAll()
-          .execute()
+        const objects = await db.selectFrom('catalog_object').where('tid', 'in', ids).selectAll().execute()
 
         finalResult[type as CatalogObjectType] = objects.map((obj) => ({
           ...obj,
@@ -386,27 +346,15 @@ export const findAllCatalogsContainingItems = async (
             .selectFrom('item_ancestors')
             .innerJoin('adjacency_list', (join) =>
               join
-                .onRef(
-                  'adjacency_list.childTid',
-                  '=',
-                  'item_ancestors.parentTid',
-                )
+                .onRef('adjacency_list.childTid', '=', 'item_ancestors.parentTid')
                 .on('adjacency_list.parentType', '=', 'catalog'),
             )
             .select(['item_ancestors.childTid', 'adjacency_list.parentTid']),
         ),
     )
     .selectFrom('item_ancestors')
-    .innerJoin(
-      'catalog_object',
-      'catalog_object.tid',
-      'item_ancestors.parentTid',
-    )
-    .select([
-      'item_ancestors.childTid as itemTid',
-      'catalog_object.tid',
-      'catalog_object.name',
-    ])
+    .innerJoin('catalog_object', 'catalog_object.tid', 'item_ancestors.parentTid')
+    .select(['item_ancestors.childTid as itemTid', 'catalog_object.tid', 'catalog_object.name'])
     .execute()
   return result.reduce(
     (acc, row) => {
@@ -420,20 +368,11 @@ export const findAllCatalogsContainingItems = async (
   )
 }
 
-export const findMerchantGroupByTid = async (
-  db: Database,
-  tid: string,
-): Promise<MerchantGroup | undefined> => {
-  return await db
-    .selectFrom('merchant_group')
-    .where('tid', '=', tid)
-    .selectAll()
-    .executeTakeFirst()
+export const findMerchantGroupByTid = async (db: Database, tid: string): Promise<MerchantGroup | undefined> => {
+  return await db.selectFrom('merchant_group').where('tid', '=', tid).selectAll().executeTakeFirst()
 }
 
-export const findAllMerchantGroups = async (
-  db: Database,
-): Promise<MerchantGroup[]> => {
+export const findAllMerchantGroups = async (db: Database): Promise<MerchantGroup[]> => {
   return await db.selectFrom('merchant_group').selectAll().execute()
 }
 
@@ -458,10 +397,7 @@ export const upsertMerchantGroupRecord = async (
       .execute()
     // console.log('created merchant group', group.uri)
   } catch (error) {
-    if (
-      error instanceof Error &&
-      error.message.includes('UNIQUE constraint failed')
-    ) {
+    if (error instanceof Error && error.message.includes('UNIQUE constraint failed')) {
       console.log('merchant group already exists', group.uri)
     } else {
       console.error('error upserting merchant group', error)
@@ -470,39 +406,21 @@ export const upsertMerchantGroupRecord = async (
   }
 }
 
-export const findMerchantLocationsByGroupTid = async (
-  db: Database,
-  tid: string,
-): Promise<MerchantLocation[]> => {
+export const findMerchantLocationsByGroupTid = async (db: Database, tid: string): Promise<MerchantLocation[]> => {
   const groupUri = (await findMerchantGroupByTid(db, tid))?.uri
   if (!groupUri) {
     throw new InvalidRequestError('Group not found')
   }
-  return await db
-    .selectFrom('merchant_location')
-    .where('parentGroup', '=', groupUri)
-    .selectAll()
-    .execute()
+  return await db.selectFrom('merchant_location').where('parentGroup', '=', groupUri).selectAll().execute()
 }
 
 // TODO the duplication of the above function and this one needs to be dealt with
-export const findMerchantLocationsByGroupUri = async (
-  db: Database,
-  groupUri: string,
-): Promise<MerchantLocation[]> => {
-  return await db
-    .selectFrom('merchant_location')
-    .where('parentGroup', '=', groupUri)
-    .selectAll()
-    .execute()
+export const findMerchantLocationsByGroupUri = async (db: Database, groupUri: string): Promise<MerchantLocation[]> => {
+  return await db.selectFrom('merchant_location').where('parentGroup', '=', groupUri).selectAll().execute()
 }
 
 export const getMerchantLocation = async (db: Database, tid: string) => {
-  return await db
-    .selectFrom('merchant_location')
-    .where('tid', '=', tid)
-    .selectAll()
-    .executeTakeFirst()
+  return await db.selectFrom('merchant_location').where('tid', '=', tid).selectAll().executeTakeFirst()
 }
 
 export const upsertMerchantLocationRecord = async (
