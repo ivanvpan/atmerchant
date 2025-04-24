@@ -298,6 +298,7 @@ export async function down(db: Kysely<unknown>): Promise<void> {
 }
 
 
+// Most of these are pulled from RecordTransactor pds/src/actor-store/record/sql-record-transactor.ts
 export async function indexRecord(
   db: Database<DatabaseSchema>,
   uri: AtUri,

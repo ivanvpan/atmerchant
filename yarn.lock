@@ -2473,7 +2473,7 @@ __metadata:
   dependencies:
     "@atproto/lex-cli": "npm:^0.7.1"
     "@atproto/xrpc": "npm:^0.6.12"
-    multiformats: "npm:^13.3.2"
+    multiformats: "npm:^9.9.0"
     typescript: "npm:^5.8.2"
   languageName: unknown
   linkType: soft
@@ -2498,7 +2498,7 @@ __metadata:
     dotenv: "npm:^16.4.7"
     envalid: "npm:^8.0.0"
     express: "npm:^4.21.2"
-    multiformats: "npm:^13.3.2"
+    multiformats: "npm:^9.9.0"
     pino: "npm:^9.6.0"
     pino-pretty: "npm:^13.0.0"
     tsx: "npm:^4.19.3"
@@ -6250,7 +6250,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"multiformats@npm:^13.0.0, multiformats@npm:^13.1.0, multiformats@npm:^13.3.2":
+"multiformats@npm:^13.0.0, multiformats@npm:^13.1.0":
   version: 13.3.2
   resolution: "multiformats@npm:13.3.2"
   checksum: 10c0/a2c6f17b04d6a9cd5d0cb7d07e32dc4f3be82804d44fc056357a98e449340a7ad37d0789da41186ccd8c953e0cf783be3b71f03a00b0a84788689f544ecade46
