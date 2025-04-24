@@ -1,6 +1,6 @@
 import SqliteDb from 'better-sqlite3'
 import assert from 'node:assert'
-import { retry } from '@atproto/common'
+import { chunkArray, retry } from '@atproto/common'
 import {
   GeneratedAlways,
   Kysely,
@@ -15,7 +15,9 @@ import {
 } from 'kysely'
 import { CommitDataWithOps } from '#/types'
 import { CID } from 'multiformats/cid'
-import { BlockMap } from '@atproto/repo'
+import { BlockMap, cborToLexRecord, CidSet, WriteOpAction } from '@atproto/repo'
+import { AtUri } from '@atproto/uri'
+import { RepoRecord, lexToIpld } from '@atproto/lexicon'
 
 export interface AccountPref {
   id: GeneratedAlways<number>
@@ -30,7 +32,7 @@ export interface RepoRoot {
   indexedAt: string
 }
 
-export interface Record {
+export interface DbRecord {
   uri: string
   cid: string
   collection: string
@@ -72,7 +74,7 @@ export interface RecordBlob {
 export type DatabaseSchema = {
   account_pref: AccountPref
   repo_root: RepoRoot
-  record: Record
+  record: DbRecord
   repo_block: RepoBlock
   blob: Blob
   record_blob: RecordBlob
@@ -347,7 +349,8 @@ export async function down(db: Kysely<unknown>): Promise<void> {
   await db.schema.dropTable('repo_block').execute()
   await db.schema.dropTable('repo_root').execute()
 }
-async function updateRoot(
+
+export async function updateRoot(
   db: Database<DatabaseSchema>,
   cid: CID,
   did: string,
@@ -375,6 +378,7 @@ async function updateRoot(
       .execute()
   }
 }
+
 async function putMany(
   db: Database<DatabaseSchema>,
   toPut: BlockMap,
@@ -428,4 +432,165 @@ export async function applyCommit(
     putMany(db, commit.newBlocks, commit.rev),
     deleteMany(db, commit.removedCids.toList()),
   ])
+}
+
+export async function indexRecord(
+  db: Database<DatabaseSchema>,
+  uri: AtUri,
+  cid: CID,
+  record: RepoRecord | null,
+  // biome-ignore lint/style/useDefaultParameterLast: <explanation>
+  action: WriteOpAction.Create | WriteOpAction.Update = WriteOpAction.Create,
+  repoRev: string,
+  timestamp?: string,
+) {
+  console.debug({ uri }, 'indexing record')
+  const row = {
+    uri: uri.toString(),
+    cid: cid.toString(),
+    collection: uri.collection,
+    rkey: uri.rkey,
+    repoRev: repoRev,
+    indexedAt: timestamp || new Date().toISOString(),
+  }
+  if (!uri.hostname.startsWith('did:')) {
+    throw new Error('Expected indexed URI to contain DID')
+    // biome-ignore lint/style/noUselessElse: <explanation>
+  } else if (row.collection.length < 1) {
+    throw new Error('Expected indexed URI to contain a collection')
+    // biome-ignore lint/style/noUselessElse: <explanation>
+  } else if (row.rkey.length < 1) {
+    throw new Error('Expected indexed URI to contain a record key')
+  }
+
+  // Track current version of record
+  await db.db
+    .insertInto('record')
+    .values(row)
+    .onConflict((oc) =>
+      oc.column('uri').doUpdateSet({
+        cid: row.cid,
+        repoRev: repoRev,
+        indexedAt: row.indexedAt,
+      }),
+    )
+    .execute()
+
+  // TODO what are backlinks for?
+  // if (record !== null) {
+  //   // Maintain backlinks
+  //   const backlinks = getBacklinks(uri, record)
+  //   if (action === WriteOpAction.Update) {
+  //     // On update just recreate backlinks from scratch for the record, so we can clear out
+  //     // the old ones. E.g. for weird cases like updating a follow to be for a different did.
+  //     await this.removeBacklinksByUri(uri)
+  //   }
+  //   await this.addBacklinks(backlinks)
+  // }
+
+  console.info({ uri }, 'indexed record')
+}
+
+export async function deleteRecord(db: Database<DatabaseSchema>, uri: AtUri) {
+  console.debug({ uri }, 'deleting indexed record')
+  const deleteQuery = db.db
+    .deleteFrom('record')
+    .where('uri', '=', uri.toString())
+  const backlinkQuery = db.db
+    .deleteFrom('backlink')
+    .where('uri', '=', uri.toString())
+  await Promise.all([deleteQuery.execute(), backlinkQuery.execute()])
+
+  console.info({ uri }, 'deleted indexed record')
+}
+
+export async function getRootDetailed(
+  db: Database<DatabaseSchema>,
+): Promise<{ cid: CID; rev: string }> {
+  const res = await db.db
+    .selectFrom('repo_root')
+    .select(['cid', 'rev'])
+    .limit(1)
+    .executeTakeFirstOrThrow()
+  return {
+    cid: CID.parse(res.cid),
+    rev: res.rev,
+  }
+}
+export async function getRecord(
+  db: Database<DatabaseSchema>,
+  uri: AtUri,
+  cid: string | null,
+  includeSoftDeleted = false,
+): Promise<{
+  uri: string
+  cid: string
+  value: Record<string, unknown>
+  indexedAt: string
+  takedownRef: string | null
+} | null> {
+  const { ref } = db.db.dynamic
+  let builder = db.db
+    .selectFrom('record')
+    .innerJoin('repo_block', 'repo_block.cid', 'record.cid')
+    .where('record.uri', '=', uri.toString())
+    .selectAll()
+  // .if(!includeSoftDeleted, (qb) =>
+  //   qb.where(notSoftDeletedClause(ref('record'))),
+  // )
+  if (cid) {
+    builder = builder.where('record.cid', '=', cid)
+  }
+  const record = await builder.executeTakeFirst()
+  if (!record) return null
+  return {
+    uri: record.uri,
+    cid: record.cid,
+    value: cborToLexRecord(record.content),
+    indexedAt: record.indexedAt,
+    takedownRef: record.takedownRef ? record.takedownRef.toString() : null,
+  }
+}
+
+export async function getBlocks(
+  db: Database<DatabaseSchema>,
+  cids: CID[],
+): Promise<{ blocks: BlockMap; missing: CID[] }> {
+  const missing = new CidSet(cids)
+  const missingStr = cids.map((c) => c.toString())
+  const blocks = new BlockMap()
+  await Promise.all(
+    chunkArray(missingStr, 500).map(async (batch) => {
+      const res = await db.db
+        .selectFrom('repo_block')
+        .where('repo_block.cid', 'in', batch)
+        .select(['repo_block.cid as cid', 'repo_block.content as content'])
+        .execute()
+      for (const row of res) {
+        const cid = CID.parse(row.cid)
+        blocks.set(cid, row.content)
+        missing.delete(cid)
+      }
+    }),
+  )
+  return { blocks, missing: missing.toList() }
+}
+
+export async function getDuplicateRecordCids(
+  db: Database<DatabaseSchema>,
+  cids: CID[],
+  touchedUris: AtUri[],
+): Promise<CID[]> {
+  if (touchedUris.length === 0 || cids.length === 0) {
+    return []
+  }
+  const cidStrs = cids.map((c) => c.toString())
+  const uriStrs = touchedUris.map((u) => u.toString())
+  const res = await db.db
+    .selectFrom('record')
+    .where('cid', 'in', cidStrs)
+    .where('uri', 'not in', uriStrs)
+    .select('cid')
+    .execute()
+  return res.map((row) => CID.parse(row.cid))
 }

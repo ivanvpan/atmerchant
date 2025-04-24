@@ -2,21 +2,25 @@ import { AppContext } from '#/context'
 import { CID } from 'multiformats/cid'
 import * as Block from 'multiformats/block'
 import { sha256 } from 'multiformats/hashes/sha2'
+import * as crypto from '@atproto/crypto'
 import { Server } from '#/lexicon'
 import { AtUri } from '@atproto/uri'
-import {
-  CommitData,
-  WriteOpAction,
-  cborToLex,
-  formatDataKey,
-  Repo,
-} from '@atproto/repo'
+import { WriteOpAction, cborToLex, formatDataKey, Repo, RecordDeleteOp, RecordWriteOp, RecordCreateOp, RecordUpdateOp } from '@atproto/repo'
 import { TID } from '@atproto/common'
 import { InvalidRequestError } from '@atproto/xrpc-server'
 import { RepoRecord, lexToIpld } from '@atproto/lexicon'
-import { InvalidRecordError, PreparedCreate, PreparedUpdate, PreparedWrite, CommitDataWithOps, CommitOp, BadRecordSwapError, BadCommitSwapError } from '#/types'
-import { applyCommit } from '#/db'
-
+import {
+  InvalidRecordError,
+  PreparedCreate,
+  PreparedUpdate,
+  PreparedWrite,
+  CommitDataWithOps,
+  CommitOp,
+  BadRecordSwapError,
+  BadCommitSwapError,
+  PreparedDelete,
+} from '#/types'
+import { applyCommit, deleteRecord, getBlocks, getDuplicateRecordCids, getRecord, getRootDetailed, indexRecord, updateRoot } from '#/db'
 
 export const dataToCborBlock = async (data: unknown) => {
   const cborCodec = await import('@ipld/dag-cbor')
@@ -108,6 +112,48 @@ export const prepareUpdate = async (opts: {
   }
 }
 
+export const createWriteToOp = (write: PreparedCreate): RecordCreateOp => ({
+  action: WriteOpAction.Create,
+  collection: write.uri.collection,
+  rkey: write.uri.rkey,
+  record: write.record,
+})
+
+export const updateWriteToOp = (write: PreparedUpdate): RecordUpdateOp => ({
+  action: WriteOpAction.Update,
+  collection: write.uri.collection,
+  rkey: write.uri.rkey,
+  record: write.record,
+})
+
+export const deleteWriteToOp = (write: PreparedDelete): RecordDeleteOp => ({
+  action: WriteOpAction.Delete,
+  collection: write.uri.collection,
+  rkey: write.uri.rkey,
+})
+
+export const writeToOp = (write: PreparedWrite): RecordWriteOp => {
+  switch (write.action) {
+    case WriteOpAction.Create:
+      return createWriteToOp(write)
+    case WriteOpAction.Update:
+      return updateWriteToOp(write)
+    case WriteOpAction.Delete:
+      return deleteWriteToOp(write)
+    default:
+      throw new Error(`Unrecognized action: ${write}`)
+  }
+}
+
+const signingKey: crypto.Keypair = {
+  did: () => 'did:plc:ufa7rl6agtfdqje6bant3wsb',
+  jwtAlg: 'EdDSA',
+  sign: async (msg: Uint8Array) => {
+    // TODO: sign message
+    return new Uint8Array()
+  },
+}
+
 // async function formatCommit(toWrite: RecordWriteOp | RecordWriteOp[], keypair: crypto.Keypair): Promise<CommitData> {
 //   const writes = Array.isArray(toWrite) ? toWrite : [toWrite]
 //   const leaves = new BlockMap()
@@ -174,13 +220,18 @@ export const prepareUpdate = async (opts: {
 //   }
 // }
 
-async function processWrites(writes: PreparedWrite[], ctx: AppContext, swapCommitCid?: CID): Promise<CommitDataWithOps> {
+async function processWrites(
+  writes: PreparedWrite[],
+  did: string,
+  ctx: AppContext,
+  swapCommitCid?: CID,
+): Promise<CommitDataWithOps> {
   ctx.db.assertTransaction()
   if (writes.length > 200) {
     throw new InvalidRequestError('Too many writes. Max: 200')
   }
 
-  const commit = await formatCommit(writes, swapCommitCid)
+  const commit = await formatCommit(ctx, did, writes, swapCommitCid)
   // Do not allow commits > 2MB
   if (commit.relevantBlocks.byteSize > 2000000) {
     throw new InvalidRequestError('Too many writes. Max event size: 2MB')
@@ -190,96 +241,106 @@ async function processWrites(writes: PreparedWrite[], ctx: AppContext, swapCommi
     // persist the commit to repo storage
     applyCommit(ctx.db, commit, did),
     // & send to indexing
-    ctx.indexWrites(writes, commit.rev),
+    // ctx.indexWrites(writes, commit.rev),
+    async () => {
+      ctx.db.assertTransaction()
+      await Promise.all(
+        writes.map(async (write) => {
+          // TOOD? What is indexing
+          if (write.action === WriteOpAction.Create || write.action === WriteOpAction.Update) {
+            await indexRecord(ctx.db, write.uri, write.cid, write.record, write.action, commit.rev, new Date().toISOString())
+          } else if (write.action === WriteOpAction.Delete) {
+            await deleteRecord(ctx.db, write.uri)
+          }
+        }),
+      )
+    },
     // process blobs
     // ctx.blob.processWriteBlobs(commit.rev, writes),
   ])
   return commit
 }
 
-  async function formatCommit(
-    writes: PreparedWrite[],
-    swapCommit?: CID,
-  ): Promise<CommitDataWithOps> {
-    // this is not in a txn, so this won't actually hold the lock,
-    // we just check if it is currently held by another txn
-    const currRoot = await this.storage.getRootDetailed()
-    if (!currRoot) {
-      throw new InvalidRequestError(`No repo root found for ${this.did}`)
+async function formatCommit(
+  ctx: AppContext,
+  did: string,
+  writes: PreparedWrite[],
+  swapCommit?: CID,
+): Promise<CommitDataWithOps> {
+  // this is not in a txn, so this won't actually hold the lock,
+  // we just check if it is currently held by another txn
+  const currRoot = await getRootDetailed(ctx.db)
+  if (!currRoot) {
+    throw new InvalidRequestError(`No repo root found for ${did}`)
+  }
+  if (swapCommit && !currRoot.cid.equals(swapCommit)) {
+    throw new BadCommitSwapError(currRoot.cid)
+  }
+  // cache last commit since there's likely overlap
+  // await this.storage.cacheRev(currRoot.rev)
+  const newRecordCids: CID[] = []
+  const delAndUpdateUris: AtUri[] = []
+  const commitOps: CommitOp[] = []
+  for (const write of writes) {
+    const { action, uri, swapCid } = write
+    if (action !== WriteOpAction.Delete) {
+      newRecordCids.push(write.cid)
     }
-    if (swapCommit && !currRoot.cid.equals(swapCommit)) {
-      throw new BadCommitSwapError(currRoot.cid)
+    if (action !== WriteOpAction.Create) {
+      delAndUpdateUris.push(uri)
     }
-    // cache last commit since there's likely overlap
-    await this.storage.cacheRev(currRoot.rev)
-    const newRecordCids: CID[] = []
-    const delAndUpdateUris: AtUri[] = []
-    const commitOps: CommitOp[] = []
-    for (const write of writes) {
-      const { action, uri, swapCid } = write
-      if (action !== WriteOpAction.Delete) {
-        newRecordCids.push(write.cid)
-      }
-      if (action !== WriteOpAction.Create) {
-        delAndUpdateUris.push(uri)
-      }
-      const record = await this.record.getRecord(uri, null, true)
-      const currRecord = record ? CID.parse(record.cid) : null
+    const record = await getRecord(ctx.db, uri, null, true)
+    const currRecord = record ? CID.parse(record.cid) : null
 
-      const op: CommitOp = {
-        action,
-        path: formatDataKey(uri.collection, uri.rkey),
-        cid: write.action === WriteOpAction.Delete ? null : write.cid,
-      }
-      if (currRecord) {
-        op.prev = currRecord
-      }
-      commitOps.push(op)
-      if (swapCid !== undefined) {
-        if (action === WriteOpAction.Create && swapCid !== null) {
-          throw new BadRecordSwapError(currRecord) // There should be no current record for a create
-        }
-        if (action === WriteOpAction.Update && swapCid === null) {
-          throw new BadRecordSwapError(currRecord) // There should be a current record for an update
-        }
-        if (action === WriteOpAction.Delete && swapCid === null) {
-          throw new BadRecordSwapError(currRecord) // There should be a current record for a delete
-        }
-        if ((currRecord || swapCid) && !currRecord?.equals(swapCid)) {
-          throw new BadRecordSwapError(currRecord)
-        }
-      }
+    const op: CommitOp = {
+      action,
+      path: formatDataKey(uri.collection, uri.rkey),
+      cid: write.action === WriteOpAction.Delete ? null : write.cid,
     }
-
-    const repo = await Repo.load(this.storage, currRoot.cid)
-    const prevData = repo.commit.data
-    const writeOps = writes.map(writeToOp)
-    const commit = await repo.formatCommit(writeOps, this.signingKey)
-
-    // find blocks that would be deleted but are referenced by another record
-    const dupeRecordCids = await this.getDuplicateRecordCids(
-      commit.removedCids.toList(),
-      delAndUpdateUris,
-    )
-    for (const cid of dupeRecordCids) {
-      commit.removedCids.delete(cid)
+    if (currRecord) {
+      op.prev = currRecord
     }
-
-    // find blocks that are relevant to ops but not included in diff
-    // (for instance a record that was moved but cid stayed the same)
-    const newRecordBlocks = commit.relevantBlocks.getMany(newRecordCids)
-    if (newRecordBlocks.missing.length > 0) {
-      const missingBlocks = await this.storage.getBlocks(
-        newRecordBlocks.missing,
-      )
-      commit.relevantBlocks.addMap(missingBlocks.blocks)
-    }
-    return {
-      ...commit,
-      ops: commitOps,
-      prevData,
+    commitOps.push(op)
+    if (swapCid !== undefined) {
+      if (action === WriteOpAction.Create && swapCid !== null) {
+        throw new BadRecordSwapError(currRecord) // There should be no current record for a create
+      }
+      if (action === WriteOpAction.Update && swapCid === null) {
+        throw new BadRecordSwapError(currRecord) // There should be a current record for an update
+      }
+      if (action === WriteOpAction.Delete && swapCid === null) {
+        throw new BadRecordSwapError(currRecord) // There should be a current record for a delete
+      }
+      if ((currRecord || swapCid) && !currRecord?.equals(swapCid)) {
+        throw new BadRecordSwapError(currRecord)
+      }
     }
   }
+
+  const repo = await Repo.load(this.storage, currRoot.cid)
+  const prevData = repo.commit.data
+  const writeOps = writes.map(writeToOp)
+  const commit = await repo.formatCommit(writeOps, signingKey)
+
+  // find blocks that would be deleted but are referenced by another record
+  const dupeRecordCids = await getDuplicateRecordCids(ctx.db, commit.removedCids.toList(), delAndUpdateUris)
+  for (const cid of dupeRecordCids) {
+    commit.removedCids.delete(cid)
+  }
+
+  // find blocks that are relevant to ops but not included in diff
+  // (for instance a record that was moved but cid stayed the same)
+  const newRecordBlocks = commit.relevantBlocks.getMany(newRecordCids)
+  if (newRecordBlocks.missing.length > 0) {
+    const missingBlocks = await getBlocks(ctx.db, newRecordBlocks.missing)
+    commit.relevantBlocks.addMap(missingBlocks.blocks)
+  }
+  return {
+    ...commit,
+    ops: commitOps,
+    prevData,
+  }
+}
 
 export default function (server: Server, ctx: AppContext) {
   server.com.atproto.repo.putRecord({
@@ -292,8 +353,8 @@ export default function (server: Server, ctx: AppContext) {
       const swapCommitCid = swapCommit ? CID.parse(swapCommit) : undefined
       const swapRecordCid = typeof swapRecord === 'string' ? CID.parse(swapRecord) : swapRecord
 
-      const { commit, write } = await ctx.actorStore.transact(did, async (actorTxn) => {
-        const current = await actorTxn.record.getRecord(uri, null, true)
+      const { commit, write } = await (async () => {
+        const current = await getRecord(ctx.db, uri, null, true)
         const isUpdate = current !== null
 
         const writeInfo = {
@@ -323,23 +384,23 @@ export default function (server: Server, ctx: AppContext) {
           }
         }
 
-        const commit = await 
-          processWrites([write], ctx, swapCommitCid)
-          .catch((err: BadCommitSwapError | BadRecordSwapError) => {
+        const commit = await processWrites([write], did, ctx, swapCommitCid).catch(
+          (err: BadCommitSwapError | BadRecordSwapError) => {
             if (err instanceof BadCommitSwapError || err instanceof BadRecordSwapError) {
               throw new InvalidRequestError(err.message, 'InvalidSwap')
             } else {
               throw err
             }
-          })
+          },
+        )
 
         // await ctx.sequencer.sequenceCommit(did, commit)
 
         return { commit, write }
-      })
+      })()
 
       if (commit !== null) {
-        await ctx.accountManager.updateRepoRoot(did, commit.cid, commit.rev).catch((err: any) => {
+        await updateRoot(ctx.db, commit.cid, did, commit.rev).catch((err: any) => {
           ctx.logger.error({ err, did, cid: commit.cid, rev: commit.rev }, 'failed to update account root')
         })
       }
