@@ -102,7 +102,6 @@ export class Server {
     }
 
     // Use the port from env (should be 3001 for the API server)
-    console.log('========================== Starting server')
     const httpServer = app.listen(PORT)
     await events.once(httpServer, 'listening')
     logger.info(`API Server (${NODE_ENV}) running on port http://${HOST}:${PORT}`)

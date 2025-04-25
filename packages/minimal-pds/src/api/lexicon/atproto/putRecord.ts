@@ -30,12 +30,12 @@ import {
 } from '#/types'
 import { deleteRecord, getDuplicateRecordCids, getRecord, indexRecord } from '#/db'
 import { SqlRepoTransactor } from '#/services/storage'
+import * as cbor from '@ipld/dag-cbor'
 
 export const dataToCborBlock = async (data: unknown) => {
-  const cborCodec = await import('@ipld/dag-cbor')
   return Block.encode({
     value: data,
-    codec: cborCodec,
+    codec: cbor,
     hasher: sha256,
   })
 }
@@ -43,10 +43,10 @@ export const dataToCborBlock = async (data: unknown) => {
 async function cidForSafeRecord(record: RepoRecord) {
   try {
     const block = await dataToCborBlock(lexToIpld(record))
-    cborToLex(block.bytes)
     return block.cid
   } catch (err) {
     // Block does not properly transform between lex and cbor
+    console.log('Bad record:', err)
     throw new InvalidRecordError('Bad record')
   }
 }
@@ -162,7 +162,7 @@ async function processWrites(
   ctx: AppContext,
   swapCommitCid?: CID,
 ): Promise<CommitDataWithOps> {
-  ctx.db.assertTransaction()
+  // ctx.db.assertTransaction()
   if (writes.length > 200) {
     throw new InvalidRequestError('Too many writes. Max: 200')
   }
@@ -179,8 +179,7 @@ async function processWrites(
     storage.applyCommit(commit),
     // & send to indexing
     // ctx.indexWrites(writes, commit.rev),
-    async () => {
-      ctx.db.assertTransaction()
+    (async () => {
       await Promise.all(
         writes.map(async (write) => {
           // TOOD? What is indexing
@@ -199,7 +198,7 @@ async function processWrites(
           }
         }),
       )
-    },
+    })(),
     // process blobs
     // ctx.blob.processWriteBlobs(commit.rev, writes),
   ])
@@ -267,7 +266,7 @@ async function formatCommit(
   const repo = await Repo.load(storage, currRoot.cid)
   const prevData = repo.commit.data
   const writeOps = writes.map(writeToOp)
-  const keypair = await ctx.accountManager.getAccount(storage)
+  const keypair = await ctx.accountManager.createOrGetAccount(storage)
   const commit = await repo.formatCommit(writeOps, keypair)
 
   // find blocks that would be deleted but are referenced by another record
@@ -294,8 +293,9 @@ export default function (server: Server, ctx: AppContext) {
   server.com.atproto.repo.putRecord({
     handler: async ({ input, req, res }) => {
       const { repo, collection, rkey, record, validate, swapCommit, swapRecord } = input.body
-
       const did = 'did:plc:ufa7rl6agtfdqje6bant3wsb'
+      const storage = new SqlRepoTransactor(ctx.db, did)
+      await ctx.accountManager.createOrGetAccount(storage)
 
       const uri = AtUri.make(did, collection, rkey)
       const swapCommitCid = swapCommit ? CID.parse(swapCommit) : undefined
@@ -348,7 +348,6 @@ export default function (server: Server, ctx: AppContext) {
       })()
 
       if (commit !== null) {
-        const storage = new SqlRepoTransactor(ctx.db, did)
         await storage.updateRoot(commit.cid, commit.rev).catch((err: any) => {
           ctx.logger.error({ err, did, cid: commit.cid, rev: commit.rev }, 'failed to update account root')
         })

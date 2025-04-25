@@ -13,7 +13,7 @@ export class AccountManager {
   }
 
   // Returns a mock account
-  async getAccount(storage: SqlRepoTransactor): Promise<crypto.Keypair> {
+  async createOrGetAccount(storage: SqlRepoTransactor): Promise<crypto.Keypair> {
     const did = 'did:plc:ufa7rl6agtfdqje6bant3wsb'
     const base64PrivateKey = 'DnksijpIIN+hxqVO1XIpYg/8CpQT1Rh7MBNIVQBlNQk='
     const key = await crypto.Secp256k1Keypair.import(uint8arrays.fromString(base64PrivateKey, 'base64pad'))

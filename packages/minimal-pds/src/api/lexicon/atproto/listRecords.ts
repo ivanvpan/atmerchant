@@ -26,20 +26,20 @@ async function listRecordsForCollection(opts: {
     .selectAll()
 
   // prioritize cursor but fall back to soon-to-be-depcreated rkey start/end
-  if (cursor !== undefined) {
-    if (reverse) {
-      builder = builder.where('record.rkey', '>', cursor)
-    } else {
-      builder = builder.where('record.rkey', '<', cursor)
-    }
-  } else {
-    if (rkeyStart !== undefined) {
-      builder = builder.where('record.rkey', '>', rkeyStart)
-    }
-    if (rkeyEnd !== undefined) {
-      builder = builder.where('record.rkey', '<', rkeyEnd)
-    }
-  }
+  // if (cursor !== undefined) {
+  //   if (reverse) {
+  //     builder = builder.where('record.rkey', '>', cursor)
+  //   } else {
+  //     builder = builder.where('record.rkey', '<', cursor)
+  //   }
+  // } else {
+  //   if (rkeyStart !== undefined) {
+  //     builder = builder.where('record.rkey', '>', rkeyStart)
+  //   }
+  //   if (rkeyEnd !== undefined) {
+  //     builder = builder.where('record.rkey', '<', rkeyEnd)
+  //   }
+  // }
   const res = await builder.execute()
   return res.map((row) => {
     return {
@@ -63,7 +63,7 @@ export default function (server: Server, ctx: AppContext) {
       return {
         encoding: 'application/json',
         body: {
-          records: [],
+          records,
         },
       }
     },

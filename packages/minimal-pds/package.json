@@ -27,7 +27,7 @@
     "@atproto/repo": "^0.8.0",
     "@atproto/uri": "^0.1.1",
     "@atproto/xrpc-server": "^0.7.15",
-    "@ipld/dag-cbor": "^9.2.2",
+    "@ipld/dag-cbor": "^7.0.3",
     "compression": "^1.8.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
