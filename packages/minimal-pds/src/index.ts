@@ -100,6 +100,7 @@ export class Server {
     }
 
     // Use the port from env (should be 3001 for the API server)
+    console.log('========================== Starting server')
     const httpServer = app.listen(PORT)
     await events.once(httpServer, 'listening')
     logger.info(`API Server (${NODE_ENV}) running on port http://${HOST}:${PORT}`)
@@ -120,16 +121,19 @@ export class Server {
 }
 
 const run = async () => {
-  const server = await Server.create()
+  // Only auto-start the server if not in test mode
+  if (process.env.NODE_ENV !== 'test') {
+    const server = await Server.create()
 
-  const onCloseSignal = async () => {
-    setTimeout(() => process.exit(1), 10000).unref() // Force shutdown after 10s
-    await server.close()
-    process.exit(0)
+    const onCloseSignal = async () => {
+      setTimeout(() => process.exit(1), 10000).unref() // Force shutdown after 10s
+      await server.close()
+      process.exit(0)
+    }
+
+    process.on('SIGINT', onCloseSignal)
+    process.on('SIGTERM', onCloseSignal)
   }
-
-  process.on('SIGINT', onCloseSignal)
-  process.on('SIGTERM', onCloseSignal)
 }
 
 run()
