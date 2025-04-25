@@ -13,7 +13,7 @@ import * as error from '#/error'
 import { createServer } from '#/lexicon'
 import { env } from '#/env'
 import { XRPCError } from '@atproto/xrpc-server'
-import { createDb } from './db'
+import { createDb, migrateToLatest } from './db'
 import { AccountManager } from './services/account'
 export class Server {
   constructor(
@@ -32,6 +32,8 @@ export class Server {
     // const resolver = createBidirectionalResolver(baseIdResolver)
 
     const db = createDb(path.resolve(__dirname, 'db.sqlite'))
+    await migrateToLatest(db)
+
     const ctx = {
       logger,
       db,

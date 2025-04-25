@@ -18,21 +18,16 @@ describe('PDS Server', () => {
 
   afterAll(async () => {
     if (server) {
-      // Ensure server is properly closed
       await server.close()
-      // Give the server time to fully close
-      await new Promise((resolve) => setTimeout(resolve, 1000))
     }
   })
 
-  it('should start and 404', async () => {
+  it('should start and list records', async () => {
     // Not an awesome test. There is no health check endpoint.
-    try {
-      const response = await client.com.atproto.server.getSession()
-    } catch (error) {
-      expect(true).toBe(true)
-      return
-    }
-    expect(true).toBe(false)
+    const response = await client.com.atproto.repo.listRecords({
+      repo: 'did:plc:ufa7rl6agtfdqje6bant3wsb',
+      collection: 'xyz.noshdelivery.v0.merchant.location',
+    })
+    expect(response.data.records).toEqual([])
   })
 })
