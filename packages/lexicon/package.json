@@ -12,6 +12,6 @@
   },
   "dependencies": {
     "@atproto/xrpc": "^0.6.12",
-    "multiformats": "^13.3.2"
+    "multiformats": "^9.9.0"
   }
 }
