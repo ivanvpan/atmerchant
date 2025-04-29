@@ -9,9 +9,10 @@ import * as objectHash from 'object-hash'
 export type fullfillmentType = 'DELIVERY' | 'PICKUP'
 
 export interface Preferences {
+  // In nosh we have global delivery and pickup preferences, not per-cart. This makes much simpler UX
+  // but precludes  more complex functionality like group orders
   // fullfillmentType: fullfillmentType
-  // address, etc. ? In nosh we have global delivery and pickup preferences, not per-cart. This makes much simpler UX
-  // but precludes things like group orders
+  // address: Address
 }
 
 export interface CartModifierGroup {
@@ -51,4 +52,11 @@ export function itemsAreEquivalent(item1: CartItem, item2: CartItem) {
   return smartHash(item1) === smartHash(item2)
 }
 
-export function addItemToCart(cart: Cart, item: CartItem) {}
+export function addItemToCart(cart: Cart, item: CartItem) {
+  const existingItem = cart.cartItems.find((cartItem) => itemsAreEquivalent(cartItem, item))
+  if (existingItem) {
+    existingItem.quantity += item.quantity
+  } else {
+    cart.cartItems.push(item)
+  }
+}

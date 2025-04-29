@@ -1,4 +1,4 @@
-import { addItemToCart, CartItem, itemsAreEquivalent, CartModifierGroup } from './cart'
+import { addItemToCart, CartItem, itemsAreEquivalent, CartModifierGroup, Cart } from './cart'
 
 describe('cart', () => {
   describe('itemsAreEquivalent', () => {
@@ -98,6 +98,59 @@ describe('cart', () => {
         itemNotes: 'spicy!',
       }
       expect(itemsAreEquivalent(item1, item2)).toBe(false)
+    })
+  })
+  describe('addItemToCart', () => {
+    it('should add an item to the cart', () => {
+      const cart: Cart = {
+        id: '123',
+        merchantId: '456',
+        orderNotes: 'test',
+        preferences: {
+          deliveryType: 'DELIVERY',
+          pickupType: 'PICKUP',
+        },
+        cartItems: [],
+      }
+      const item: CartItem = {
+        itemCatalogId: '123',
+        quantity: 2,
+        modifierGroups: [],
+      }
+      addItemToCart(cart, item)
+      expect(cart.cartItems).toEqual([item])
+    })
+
+    it('should increment quantity if item already exists', () => {
+      const cart: Cart = {
+        id: '123',
+        merchantId: '456',
+        orderNotes: 'test',
+        preferences: {
+          deliveryType: 'DELIVERY',
+          pickupType: 'PICKUP',
+        },
+        cartItems: [
+          {
+            itemCatalogId: '123',
+            quantity: 1,
+            modifierGroups: [],
+          },
+        ],
+      }
+      const item: CartItem = {
+        itemCatalogId: '123',
+        quantity: 2,
+        modifierGroups: [],
+      }
+      addItemToCart(cart, item)
+      expect(cart.cartItems).toEqual([
+        {
+          itemCatalogId: '123',
+          quantity: 3,
+          modifierGroups: [],
+        },
+      ])
     })
   })
 })
