@@ -14,21 +14,22 @@ export interface Preferences {
   // but precludes things like group orders
 }
 
-export interface ModifierGroup {
+export interface CartModifierGroup {
   modifierGroupId: string
-  modifiers: Modifier[]
+  modifiers: CartModifier[]
 }
 
-export interface Modifier {
+export interface CartModifier {
   modifierId: string
   quantity: number
-  childModifierGroups?: ModifierGroup[]
+  childModifierGroups?: CartModifierGroup[]
 }
 
 export interface CartItem {
   itemCatalogId: string
   quantity: number
-  modifierGroups?: ModifierGroup[]
+  itemNotes?: string
+  modifierGroups?: CartModifierGroup[]
 }
 
 export interface Cart {
@@ -40,7 +41,14 @@ export interface Cart {
 }
 
 export function itemsAreEquivalent(item1: CartItem, item2: CartItem) {
-  return objectHash(item1) === objectHash(item2)
+  const smartHash = (obj: any) => {
+    const IGNORE_KEYS = ['quantity']
+    return objectHash(obj, {
+      unorderedArrays: true, // Treat arrays as unordered sets
+      excludeKeys: (key) => IGNORE_KEYS.includes(key),
+    })
+  }
+  return smartHash(item1) === smartHash(item2)
 }
 
 export function addItemToCart(cart: Cart, item: CartItem) {}
