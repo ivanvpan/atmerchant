@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@atproto/api": "^0.14.7",
+    "@nosh/lexicon": "workspace:*",
     "@automerge/automerge-repo": "^1.2.1",
     "@automerge/automerge-repo-network-broadcastchannel": "^1.2.1",
     "@automerge/automerge-repo-storage-indexeddb": "^1.2.1",
