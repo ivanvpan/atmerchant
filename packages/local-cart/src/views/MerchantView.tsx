@@ -65,16 +65,14 @@ function useCatalog() {
 function Collection({ collection, items }: { collection: CollectionRecord; items: Record<string, ItemRecord> }) {
   return (
     <div>
-      {collection.value.name} - {collection.uri}
-      <ul>
-        {collection.value.items?.map((itemId) => {
-          const item = items[itemId]
-          if (!item) {
-            return `Missing item ${itemId}`
-          }
-          return <Item key={itemId} item={item} />
-        })}
-      </ul>
+      <h3>{collection.value.name}</h3>
+      {collection.value.items?.map((itemId) => {
+        const item = items[itemId]
+        if (!item) {
+          return `Missing item ${itemId}`
+        }
+        return <Item key={itemId} item={item} />
+      })}
     </div>
   )
 }
@@ -82,7 +80,7 @@ function Collection({ collection, items }: { collection: CollectionRecord; items
 function Item({ item }: { item: ItemRecord }) {
   return (
     <div>
-      {item.value.name} - {item.uri}: ${item.value.priceMoney.amount}
+      {item.value.name}: ${item.value.priceMoney.amount}
     </div>
   )
 }
@@ -98,12 +96,10 @@ function Catalog({
 }) {
   return (
     <div>
-      {catalog.value.name} - {catalog.uri}
-      <ul>
-        {catalog.value.collections?.map((collectionId) => (
-          <Collection key={collectionId} collection={collections[collectionId]} items={items} />
-        ))}
-      </ul>
+      <h2>{catalog.value.name}</h2>
+      {catalog.value.collections?.map((collectionId) => (
+        <Collection key={collectionId} collection={collections[collectionId]} items={items} />
+      ))}
     </div>
   )
 }
@@ -113,11 +109,11 @@ function MerchantView() {
   return (
     <>
       <h3>Catalogs</h3>
-      <ul>
-        {Object.values(catalog).map((record) => (
+      {Object.values(catalog).map((record) => (
+        <div key={record.uri}>
           <Catalog key={record.uri} catalog={record} collections={collections} items={items} />
-        ))}
-      </ul>
+        </div>
+      ))}
     </>
   )
 }

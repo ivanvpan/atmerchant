@@ -4571,6 +4571,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/object-hash@npm:^3":
+  version: 3.0.6
+  resolution: "@types/object-hash@npm:3.0.6"
+  checksum: 10c0/a5450cafdbc33c840be2c36fb1ace96cce7aa580177cf68dbdbda80f18938207692d74c76403321c99f43460ac31981c4af7fe8b49eca1570f8e9a4c01eaf33d
+  languageName: node
+  linkType: hard
+
 "@types/qs@npm:*":
   version: 6.9.18
   resolution: "@types/qs@npm:6.9.18"
@@ -8411,10 +8418,15 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "local-cart@workspace:packages/local-cart"
   dependencies:
+    "@atproto/api": "npm:^0.14.7"
     "@automerge/automerge-repo": "npm:^1.2.1"
     "@automerge/automerge-repo-network-broadcastchannel": "npm:^1.2.1"
     "@automerge/automerge-repo-storage-indexeddb": "npm:^1.2.1"
     "@eslint/js": "npm:^9.22.0"
+    "@jest/globals": "npm:^29.7.0"
+    "@nosh/lexicon": "workspace:*"
+    "@types/jest": "npm:^29.5.12"
+    "@types/object-hash": "npm:^3"
     "@types/react": "npm:^19.0.10"
     "@types/react-dom": "npm:^19.0.4"
     "@vitejs/plugin-react": "npm:^4.3.4"
@@ -8422,8 +8434,11 @@ __metadata:
     eslint-plugin-react-hooks: "npm:^5.2.0"
     eslint-plugin-react-refresh: "npm:^0.4.19"
     globals: "npm:^16.0.0"
+    jest: "npm:^29.7.0"
+    object-hash: "npm:^3.0.0"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
+    ts-jest: "npm:^29.1.2"
     typescript: "npm:~5.7.2"
     typescript-eslint: "npm:^8.26.1"
     vite: "npm:^6.3.1"
@@ -8999,6 +9014,13 @@ __metadata:
   version: 4.1.1
   resolution: "object-assign@npm:4.1.1"
   checksum: 10c0/1f4df9945120325d041ccf7b86f31e8bcc14e73d29171e37a7903050e96b81323784ec59f93f102ec635bcf6fa8034ba3ea0a8c7e69fa202b87ae3b6cec5a414
+  languageName: node
+  linkType: hard
+
+"object-hash@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "object-hash@npm:3.0.0"
+  checksum: 10c0/a06844537107b960c1c8b96cd2ac8592a265186bfa0f6ccafe0d34eabdb526f6fa81da1f37c43df7ed13b12a4ae3457a16071603bcd39d8beddb5f08c37b0f47
   languageName: node
   linkType: hard
 
