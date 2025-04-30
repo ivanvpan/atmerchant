@@ -3,6 +3,7 @@ import { DocHandle, isValidAutomergeUrl, Repo } from '@automerge/automerge-repo'
 import { IndexedDBStorageAdapter } from '@automerge/automerge-repo-storage-indexeddb'
 import { BroadcastChannelNetworkAdapter } from '@automerge/automerge-repo-network-broadcastchannel'
 import { addItemToCart, Cart, CartItem, removeItemFromCart } from '../tools/cart'
+import { useCatalog } from '../tools/useCatalog'
 
 const INDEX_DB_NAME = 'xyz.noshdelivery.cart'
 
@@ -28,6 +29,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     cartItems: [],
   })
   const [doc, setDoc] = useState<DocHandle<Cart> | null>(null)
+  const { catalogs } = useCatalog()
 
   useEffect(() => {
     const cartUrl = localStorage.getItem('xyz.noshdelivery.cart:cartUrl')
