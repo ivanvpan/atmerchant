@@ -88,10 +88,8 @@ describe('catalogs', () => {
   describe('pruneCatalogs', () => {
     it('should leave catalog unchanged if everything is available', () => {
       const catalogs = makeCatalogs()
-      console.log('catalogs', JSON.stringify(catalogs, null, 2))
       const mondayMidDay = dayjs().tz('America/New_York').day(1).hour(13).minute(0).toDate()
       const prunedCatalogs = pruneCatalogs(catalogs, mondayMidDay, 'America/New_York')
-      console.log(JSON.stringify(prunedCatalogs, null, 2))
       expect(prunedCatalogs).toEqual(catalogs)
     })
     it('should remove unavailable items', () => {

@@ -1,15 +1,98 @@
 import { addItemToCart, CartItem, itemsAreEquivalent, CartModifierGroup, Cart } from './cart'
+import { Catalog, Collection, Item, ModifierGroup } from './catalog'
+
+function listToMap<T extends { id: string }>(objects: T[]) {
+  return Object.fromEntries(objects.map((obj) => [obj.id, obj]))
+}
+function makeCatalogs() {
+  const catalog: Catalog = {
+    id: '1',
+    name: 'Test Catalog',
+    description: 'Test Description',
+    merchantLocation: '1',
+    availabilityPeriods: [
+      {
+        dayOfWeek: 'MONDAY',
+        start: {
+          localHour: 10,
+          localMinute: 0,
+        },
+        end: {
+          localHour: 18,
+          localMinute: 0,
+        },
+      },
+    ],
+    collections: ['1'],
+  }
+  const collection: Collection = {
+    id: '1',
+    name: 'Test Collection',
+    description: 'Test Description',
+    items: ['1', '2'],
+    childCollections: [],
+  }
+  const item1: Item = {
+    id: '1',
+    name: 'Test Item 1',
+    description: 'Test Description',
+    priceMoney: {
+      currency: 'USD',
+      amount: 10,
+    },
+    suspended: false,
+    modifierGroups: ['1'],
+  }
+  const item2: Item = {
+    id: '2',
+    name: 'Test Item 2',
+    description: 'Test Description',
+    priceMoney: {
+      currency: 'USD',
+      amount: 10,
+    },
+    suspended: false,
+    modifierGroups: ['1'],
+  }
+  const modifierGroup1: ModifierGroup = {
+    id: '1',
+    name: 'Test Modifier Group 1',
+    minimumSelection: 0,
+    maximumSelection: 1,
+    maximumOfEachModifier: 1,
+    modifiers: ['1'],
+  }
+
+  const modifier1 = {
+    id: '1',
+    name: 'Test Modifier 1',
+    priceMoney: {
+      currency: 'USD',
+      amount: 10,
+    },
+    suspended: false,
+    childModifierGroups: [],
+  }
+
+  return {
+    catalogs: listToMap([catalog]),
+    collections: listToMap([collection]),
+    items: listToMap([item1, item2]),
+    modifierGroups: listToMap([modifierGroup1]),
+    modifiers: listToMap([modifier1]),
+  }
+}
 
 describe('cart', () => {
   describe('itemsAreEquivalent', () => {
     it('should return true for basic equivalent items', () => {
       const item1: CartItem = {
-        itemCatalogId: '123',
+        itemId: '123',
         quantity: 1,
         modifierGroups: [],
       }
       const item2: CartItem = {
-        itemCatalogId: '123',
+        itemId: '123',
         quantity: 1,
         modifierGroups: [],
       }
@@ -18,12 +101,12 @@ describe('cart', () => {
 
     it('should ignore quantity', () => {
       const item1: CartItem = {
-        itemCatalogId: '123',
+        itemId: '123',
         quantity: 1,
         modifierGroups: [],
       }
       const item2: CartItem = {
-        itemCatalogId: '123',
+        itemId: '123',
         quantity: 2,
         modifierGroups: [],
       }
@@ -74,12 +157,12 @@ describe('cart', () => {
       }
 
       const item1: CartItem = {
-        itemCatalogId: '123',
+        itemId: '123',
         quantity: 1,
         modifierGroups: [modifierGroup1, modifierGroup2],
       }
       const item2: CartItem = {
-        itemCatalogId: '123',
+        itemId: '123',
         quantity: 1,
         modifierGroups: [modifierGroup2, modifierGroup1],
       }
@@ -88,12 +171,12 @@ describe('cart', () => {
 
     it('should treat items notes as not equivalent', () => {
       const item1: CartItem = {
-        itemCatalogId: '123',
+        itemId: '123',
         quantity: 1,
         itemNotes: 'no spice!',
       }
       const item2: CartItem = {
-        itemCatalogId: '123',
+        itemId: '123',
         quantity: 1,
         itemNotes: 'spicy!',
       }
@@ -113,11 +196,11 @@ describe('cart', () => {
         cartItems: [],
       }
       const item: CartItem = {
-        itemCatalogId: '123',
+        itemId: '1',
         quantity: 2,
         modifierGroups: [],
       }
-      addItemToCart(cart, item)
+      addItemToCart(cart, item, makeCatalogs())
       expect(cart.cartItems).toEqual([item])
     })
 
@@ -132,21 +215,21 @@ describe('cart', () => {
         },
         cartItems: [
           {
-            itemCatalogId: '123',
+            itemId: '1',
             quantity: 1,
             modifierGroups: [],
           },
         ],
       }
       const item: CartItem = {
-        itemCatalogId: '123',
+        itemId: '1',
         quantity: 2,
         modifierGroups: [],
       }
-      addItemToCart(cart, item)
+      addItemToCart(cart, item, makeCatalogs())
       expect(cart.cartItems).toEqual([
         {
-          itemCatalogId: '123',
+          itemId: '1',
           quantity: 3,
           modifierGroups: [],
         },
