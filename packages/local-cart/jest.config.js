@@ -7,7 +7,9 @@ export default {
       tsconfig: {
         paths: {
           '#/*': ['./src/*']
-        }
+        },
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true
       }
     }]
   },
@@ -19,6 +21,6 @@ export default {
   setupFiles: ['<rootDir>/src/jestSetup.ts'],
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   transformIgnorePatterns: [
-    'node_modules/(?!(@atproto|@automerge)/)'
+    'node_modules/(?!(@atproto|@automerge|lodash)/)'
   ]
 } 

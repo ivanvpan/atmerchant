@@ -1,4 +1,4 @@
-import * as objectHash from 'object-hash'
+import objectHash from 'object-hash'
 import { Catalogs } from './catalog'
 
 // TODO
@@ -77,6 +77,9 @@ export function validateCartItem(item: CartItem, catalogs: Catalogs): CartValida
 
 export function addItemToCart(cart: Cart, item: CartItem) {
   const existingItem = cart.cartItems.find((cartItem) => itemsAreEquivalent(cartItem, item))
+
+  //   const { isItemAvailable } = getAvailabilityFunctions(catalogs, timezone)
+
   if (existingItem) {
     existingItem.quantity += item.quantity
   } else {
