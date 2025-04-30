@@ -105,7 +105,6 @@ export function pruneCatalogs(catalogs: Catalogs, date: Date, timezone: string):
   })
 
   const isItemAvailable = memoize((itemId: string): boolean => {
-    console.log('isItemAvailable', itemId)
     const item = catalogs.items[itemId]
     if (!item || item.suspended) {
       return false
@@ -123,12 +122,10 @@ export function pruneCatalogs(catalogs: Catalogs, date: Date, timezone: string):
       return false
     }
 
-    console.log('item is available', itemId)
     return true
   })
 
   const isCollectionAvailable = memoize((collectionId: string): boolean => {
-    console.log('isCollectionAvailable', collectionId)
     const collection = catalogs.collections[collectionId]
     if (!collection) {
       return false
@@ -137,7 +134,6 @@ export function pruneCatalogs(catalogs: Catalogs, date: Date, timezone: string):
   })
 
   const isCatalogAvailable = memoize((catalogId: string): boolean => {
-    console.log('isCatalogAvailable', catalogId)
     const catalog = catalogs.catalogs[catalogId]
     if (!catalog) {
       return false
@@ -177,7 +173,7 @@ export function pruneCatalogs(catalogs: Catalogs, date: Date, timezone: string):
       .filter((modifierGroup) => isModifierGroupAvailable(modifierGroup.id))
     const mappedModifierGroups = availableModifierGroups.map((modifierGroup) => ({
       ...modifierGroup,
-      modifierIds: populateModifiers(completeCatalog, modifierGroup.modifiers),
+      modifiers: populateModifiers(completeCatalog, modifierGroup.modifiers),
     }))
     Object.assign(completeCatalog.modifierGroups, listToMap(mappedModifierGroups))
     return mappedModifierGroups.map((modifierGroup) => modifierGroup.id)
@@ -188,12 +184,10 @@ export function pruneCatalogs(catalogs: Catalogs, date: Date, timezone: string):
       .map((itemId) => catalogs.items[itemId])
       .filter(isTruthy)
       .filter((item) => isItemAvailable(item.id))
-    console.log('availableItems', availableItems, itemIds)
     const mappedItems = availableItems.map((item) => ({
       ...item,
       modifierGroups: populateModifierGroups(completeCatalog, item.modifierGroups),
     }))
-    console.log('mappedItems', mappedItems)
     Object.assign(completeCatalog.items, listToMap(mappedItems))
     return mappedItems.map((item) => item.id)
   }
@@ -203,7 +197,6 @@ export function pruneCatalogs(catalogs: Catalogs, date: Date, timezone: string):
       .map((collectionId) => catalogs.collections[collectionId])
       .filter(isTruthy)
       .filter((collection) => isCollectionAvailable(collection.id))
-    console.log('availableCollections', availableCollections, collectionIds)
     const mappedCollections = availableCollections
       .map((collection) => {
         return {
@@ -212,7 +205,6 @@ export function pruneCatalogs(catalogs: Catalogs, date: Date, timezone: string):
         }
       })
       .filter((collection) => collection.items.length > 0)
-    console.log('mappedCollections', mappedCollections)
     Object.assign(completeCatalog.collections, listToMap(mappedCollections))
     return mappedCollections.map((collection) => collection.id)
   }

@@ -42,7 +42,7 @@ function makeCatalogs() {
       amount: 10,
     },
     suspended: false,
-    modifierGroups: [],
+    modifierGroups: ['1'],
   }
   const item2: Item = {
     id: '2',
@@ -53,7 +53,7 @@ function makeCatalogs() {
       amount: 10,
     },
     suspended: false,
-    modifierGroups: [],
+    modifierGroups: ['1'],
   }
   const modifierGroup1: ModifierGroup = {
     id: '1',
@@ -64,27 +64,9 @@ function makeCatalogs() {
     modifiers: ['1'],
   }
 
-  const modifierGroup2 = {
-    id: '2',
-    name: 'Test Modifier Group 2',
-    minimumSelection: 0,
-    maximumSelection: 1,
-    maximumOfEachModifier: 1,
-    modifiers: ['2'],
-  }
   const modifier1 = {
     id: '1',
     name: 'Test Modifier 1',
-    priceMoney: {
-      currency: 'USD',
-      amount: 10,
-    },
-    suspended: false,
-    childModifierGroups: [],
-  }
-  const modifier2: Modifier = {
-    id: '2',
-    name: 'Test Modifier 2',
     priceMoney: {
       currency: 'USD',
       amount: 10,
@@ -97,10 +79,8 @@ function makeCatalogs() {
     catalogs: listToMap([catalog]),
     collections: listToMap([collection]),
     items: listToMap([item1, item2]),
-    // modifierGroups: listToMap([modifierGroup1, modifierGroup2]),
-    // modifiers: listToMap([modifier1, modifier2]),
-    modifierGroups: {},
-    modifiers: {},
+    modifierGroups: listToMap([modifierGroup1]),
+    modifiers: listToMap([modifier1]),
   }
 }
 
@@ -113,6 +93,28 @@ describe('catalogs', () => {
       const prunedCatalogs = pruneCatalogs(catalogs, mondayMidDay, 'America/New_York')
       console.log(JSON.stringify(prunedCatalogs, null, 2))
       expect(prunedCatalogs).toEqual(catalogs)
+    })
+    it('should remove unavailable items', () => {
+      const catalogs = makeCatalogs()
+      catalogs.items['1'].suspended = true
+      const mondayMidDay = dayjs().tz('America/New_York').day(1).hour(13).minute(0).toDate()
+      const prunedCatalogs = pruneCatalogs(catalogs, mondayMidDay, 'America/New_York')
+      expect(prunedCatalogs.items['1']).toBeUndefined()
+      expect(prunedCatalogs.collections['1'].items).toEqual(['2'])
+    })
+    it('should cascade removals', () => {
+      const catalogs = makeCatalogs()
+      catalogs.modifierGroups['1'].minimumSelection = 2
+      catalogs.modifierGroups['1'].maximumSelection = 2
+      const mondayMidDay = dayjs().tz('America/New_York').day(1).hour(13).minute(0).toDate()
+      const prunedCatalogs = pruneCatalogs(catalogs, mondayMidDay, 'America/New_York')
+      expect(prunedCatalogs).toEqual({
+        catalogs: {},
+        collections: {},
+        items: {},
+        modifierGroups: {},
+        modifiers: {},
+      })
     })
   })
 })
