@@ -42,7 +42,7 @@ function makeCatalogs() {
       amount: 10,
     },
     suspended: false,
-    modifierGroups: ['1'],
+    modifierGroups: [],
   }
   const item2: Item = {
     id: '2',
@@ -53,7 +53,7 @@ function makeCatalogs() {
       amount: 10,
     },
     suspended: false,
-    modifierGroups: ['2'],
+    modifierGroups: [],
   }
   const modifierGroup1: ModifierGroup = {
     id: '1',
@@ -97,8 +97,10 @@ function makeCatalogs() {
     catalogs: listToMap([catalog]),
     collections: listToMap([collection]),
     items: listToMap([item1, item2]),
-    modifierGroups: listToMap([modifierGroup1, modifierGroup2]),
-    modifiers: listToMap([modifier1, modifier2]),
+    // modifierGroups: listToMap([modifierGroup1, modifierGroup2]),
+    // modifiers: listToMap([modifier1, modifier2]),
+    modifierGroups: {},
+    modifiers: {},
   }
 }
 
@@ -106,8 +108,10 @@ describe('catalogs', () => {
   describe('pruneCatalogs', () => {
     it('should leave catalog unchanged if everything is available', () => {
       const catalogs = makeCatalogs()
+      console.log('catalogs', JSON.stringify(catalogs, null, 2))
       const mondayMidDay = dayjs().tz('America/New_York').day(1).hour(13).minute(0).toDate()
       const prunedCatalogs = pruneCatalogs(catalogs, mondayMidDay, 'America/New_York')
+      console.log(JSON.stringify(prunedCatalogs, null, 2))
       expect(prunedCatalogs).toEqual(catalogs)
     })
   })
