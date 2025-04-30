@@ -16,6 +16,7 @@
     "@automerge/automerge-repo-network-broadcastchannel": "^1.2.1",
     "@automerge/automerge-repo-storage-indexeddb": "^1.2.1",
     "@nosh/lexicon": "workspace:*",
+    "lodash.memoize": "^4.1.2",
     "object-hash": "^3.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
@@ -24,6 +25,7 @@
     "@eslint/js": "^9.22.0",
     "@jest/globals": "^29.7.0",
     "@types/jest": "^29.5.12",
+    "@types/lodash.memoize": "^4",
     "@types/object-hash": "^3",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",

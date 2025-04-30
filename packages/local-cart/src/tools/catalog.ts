@@ -1,4 +1,5 @@
 import { isActiveCatalog } from './time'
+import memoize from 'lodash/memoize'
 
 type DayOfWeek = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
 
@@ -69,13 +70,51 @@ export interface Catalogs {
   modifiers: Record<string, Modifier>
 }
 
-function isItemAvailable(itemId: string, catalogs: Catalogs): boolean {
-  const item = catalogs.items[itemId]
-  if (!item) {
+function isModifierAvailable(modifierId: string, catalogs: Catalogs): boolean {
+  const modifier = catalogs.modifiers[modifierId]
+  if (!modifier) {
     return false
   }
-  // TODO check modifier groups
-  return !item.suspended
+  return !modifier.suspended
+}
+
+function isModifierGroupAvailable(modifierGroupId: string, catalogs: Catalogs): boolean {
+  const modifierGroup = catalogs.modifierGroups[modifierGroupId]
+  if (!modifierGroup) {
+    return false
+  }
+  const availableModifiers = modifierGroup.modifiers.filter((modifierId) => isModifierAvailable(modifierId, catalogs))
+
+  if (
+    modifierGroup.maximumOfEachModifier &&
+    modifierGroup.minimumSelection &&
+    availableModifiers.length * modifierGroup.maximumOfEachModifier < modifierGroup.minimumSelection
+  ) {
+    return false
+  }
+
+  return availableModifiers.length > 0 && availableModifiers.length >= modifierGroup.minimumSelection
+}
+
+function isItemAvailable(itemId: string, catalogs: Catalogs): boolean {
+  const item = catalogs.items[itemId]
+  if (!item || item.suspended) {
+    return false
+  }
+  const requiredGroups = item.modifierGroups.filter(
+    (modifierGroupId) =>
+      catalogs.modifierGroups[modifierGroupId] && catalogs.modifierGroups[modifierGroupId].minimumSelection > 0,
+  )
+
+  const unavailableRequiredGroups = requiredGroups.filter(
+    (modifierGroupId) => !isModifierGroupAvailable(modifierGroupId, catalogs),
+  )
+
+  if (unavailableRequiredGroups.length > 0) {
+    return false
+  }
+
+  return true
 }
 
 function isCollectionAvailable(collectionId: string, catalogs: Catalogs): boolean {
@@ -99,8 +138,18 @@ function isCatalogAvailable(catalogId: string, catalogs: Catalogs): boolean {
 
 // Return the catalogs but without any items that are suspended or unavailable for some reason
 export function pruneCatalogs(catalogs: Catalogs): Catalogs {
-  const filterMap = <T>(map: Record<string, T>, filter: (value: T, catalogs: Catalogs) => boolean) =>
-    Object.fromEntries(Object.entries(map).filter(([_, value]) => filter(value, catalogs)))
+  const partiallyApplyCatalog = (
+    availabilityFunction: (id: string, catalogs: Catalogs) => boolean,
+    catalogs: Catalogs,
+  ) => {
+    return (id: string) => availabilityFunction(id, catalogs)
+  }
+
+  const catalogAvailable = memoize(partiallyApplyCatalog(isCatalogAvailable, catalogs))
+  const collectionAvailable = memoize(partiallyApplyCatalog(isCollectionAvailable, catalogs))
+  const itemAvailable = memoize(partiallyApplyCatalog(isItemAvailable, catalogs))
+  const modifierGroupAvailable = memoize(partiallyApplyCatalog(isModifierGroupAvailable, catalogs))
+  const modifierAvailable = memoize(partiallyApplyCatalog(isModifierAvailable, catalogs))
 
   return {
     catalogs: filterMap(catalogs.catalogs, (catalog) => isCatalogAvailable(catalog.id, catalogs)),
