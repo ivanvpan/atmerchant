@@ -234,6 +234,7 @@
     },
     "availabilityPeriod": {
       "type": "object",
+      "required": ["dayOfWeek", "start", "end"],
       "properties": {
         "start": {
           "type": "ref",
@@ -259,6 +260,7 @@
     },
     "availabilityTimeOfDay": {
       "type": "object",
+      "required": ["localHour", "localMinute"],
       "properties": {
         "localHour": {
           "type": "integer",

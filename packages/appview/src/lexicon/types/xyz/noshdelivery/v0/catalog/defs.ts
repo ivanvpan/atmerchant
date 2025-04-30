@@ -150,9 +150,9 @@ export function validateModifierView<V>(v: V) {
 
 export interface AvailabilityPeriod {
   $type?: 'xyz.noshdelivery.v0.catalog.defs#availabilityPeriod'
-  start?: AvailabilityTimeOfDay
-  end?: AvailabilityTimeOfDay
-  dayOfWeek?:
+  start: AvailabilityTimeOfDay
+  end: AvailabilityTimeOfDay
+  dayOfWeek:
     | 'MONDAY'
     | 'TUESDAY'
     | 'WEDNESDAY'
@@ -174,8 +174,8 @@ export function validateAvailabilityPeriod<V>(v: V) {
 
 export interface AvailabilityTimeOfDay {
   $type?: 'xyz.noshdelivery.v0.catalog.defs#availabilityTimeOfDay'
-  localHour?: number
-  localMinute?: number
+  localHour: number
+  localMinute: number
 }
 
 const hashAvailabilityTimeOfDay = 'availabilityTimeOfDay'

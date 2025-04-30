@@ -8,7 +8,7 @@ import {
   type AuthVerifier,
   type StreamAuthVerifier,
 } from '@atproto/xrpc-server'
-import { schemas } from './lexicons'
+import { schemas } from './lexicons.js'
 import * as ComAtprotoRepoApplyWrites from './types/com/atproto/repo/applyWrites.js'
 import * as ComAtprotoRepoCreateRecord from './types/com/atproto/repo/createRecord.js'
 import * as ComAtprotoRepoDeleteRecord from './types/com/atproto/repo/deleteRecord.js'
