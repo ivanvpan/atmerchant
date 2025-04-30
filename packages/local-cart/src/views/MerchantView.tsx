@@ -10,6 +10,7 @@ import {
 import { useState, useEffect } from 'react'
 import { AtUri } from '@atproto/api'
 import { Catalog, Catalogs, Collection, Item, Modifier, ModifierGroup } from '../tools/catalog'
+import { useCart } from '../context/CartContext'
 const REPO = 'did:plc:ufa7rl6agtfdqje6bant3wsb'
 const pdsClient = new AtpAgent({
   service: `http://localhost:3001`,
@@ -149,9 +150,21 @@ function CollectionView({ collection, items }: { collection: Collection; items: 
 }
 
 function ItemView({ item }: { item: Item }) {
+  const { addItem } = useCart()
+
+  const handleAddToCart = () => {
+    addItem({
+      id: item.id,
+      name: item.name,
+      price: item.priceMoney.amount,
+      quantity: 1,
+    })
+  }
+
   return (
     <div>
       {item.name}: ${item.priceMoney.amount}
+      <button onClick={handleAddToCart}>Add to Cart</button>
     </div>
   )
 }

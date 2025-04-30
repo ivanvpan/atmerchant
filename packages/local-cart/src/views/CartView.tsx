@@ -1,56 +1,26 @@
-import { useEffect, useState } from 'react'
-import { DocHandle, isValidAutomergeUrl, Repo } from '@automerge/automerge-repo'
-import { IndexedDBStorageAdapter } from '@automerge/automerge-repo-storage-indexeddb'
-import { BroadcastChannelNetworkAdapter } from '@automerge/automerge-repo-network-broadcastchannel' // broadcast in browser, across tabs for example
-
-// const LOCAL_STORAGE_INDEX = 'xyz.noshdelivery.cart:indexUrl'
-const INDEX_DB_NAME = 'xyz.noshdelivery.cart'
-
-const repo = new Repo({
-  storage: new IndexedDBStorageAdapter(INDEX_DB_NAME),
-  network: [new BroadcastChannelNetworkAdapter()],
-})
-
-interface CartDoc {
-  text: string
-}
+import { useCart } from '../context/CartContext'
 
 function CartView() {
-  const [text, setText] = useState('')
-  const [doc, setDoc] = useState<DocHandle<CartDoc> | null>(null)
-  useEffect(() => {
-    const cartUrl = localStorage.getItem('xyz.noshdelivery.cart:cartUrl')
-    let cartHandle
-
-    if (isValidAutomergeUrl(cartUrl)) {
-      cartHandle = repo.find<CartDoc>(cartUrl)
-    } else {
-      // create a new index doc
-      cartHandle = repo.create<CartDoc>({
-        text: 'Hello',
-      })
-      localStorage.setItem('xyz.noshdelivery.cart:cartUrl', cartHandle.url)
-    }
-
-    cartHandle.on('change', ({ doc }: { doc: CartDoc }) => {
-      console.log('new text is ', doc.text)
-      setText(doc.text)
-    })
-    setDoc(cartHandle || null)
-  }, [])
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setText(e.target.value)
-    doc?.change((d) => {
-      d.text = e.target.value
-    })
-  }
+  const { cart, removeItem, updateQuantity } = useCart()
 
   return (
-    <>
-      <input type="text" value={text} onChange={handleChange} />
-      <p>{text}</p>
-    </>
+    <div>
+      <h2>Cart</h2>
+      {cart.cartItems.map((item) => (
+        <div key={item.itemId}>
+          <span>{item.itemId}</span>
+          <span>${item.quantity}</span>
+          <input
+            type="number"
+            value={item.quantity}
+            onChange={(e) => updateQuantity(item.itemId, parseInt(e.target.value))}
+            min="1"
+          />
+          <button onClick={() => removeItem(item.itemId)}>Remove</button>
+        </div>
+      ))}
+      {cart.cartItems.length === 0 && <p>Your cart is empty</p>}
+    </div>
   )
 }
 

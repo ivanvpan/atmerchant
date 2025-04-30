@@ -22,6 +22,7 @@ export interface CartModifier {
 }
 
 export interface CartItem {
+  id: string
   itemId: string
   quantity: number
   itemNotes?: string
@@ -29,7 +30,6 @@ export interface CartItem {
 }
 
 export interface Cart {
-  id: string
   merchantId: string
   orderNotes?: string
   preferences: Preferences
@@ -316,4 +316,16 @@ export function addItemToCart(cart: Cart, item: CartItem, catalogs: Catalogs) {
   } else {
     cart.cartItems.push(item)
   }
+  return cart
+}
+
+export function removeItemFromCart(cart: Cart, id: string) {
+  cart.cartItems = cart.cartItems.filter((item) => item.id !== id)
+  return cart
+}
+
+export function updateItem(cart: Cart, itemId: string, item: CartItem) {
+  cart.cartItems = cart.cartItems.filter((item) => item.itemId !== itemId)
+  cart.cartItems.push(item)
+  return cart
 }
