@@ -9,7 +9,7 @@ import {
 } from '@nosh/lexicon'
 import { useState, useEffect } from 'react'
 import { AtUri } from '@atproto/api'
-import { Catalog, Collection, Item, Modifier, ModifierGroup } from '../tools/menu'
+import { Catalog, Catalogs, Collection, Item, Modifier, ModifierGroup } from '../tools/catalog'
 const REPO = 'did:plc:ufa7rl6agtfdqje6bant3wsb'
 const pdsClient = new AtpAgent({
   service: `http://localhost:3001`,
@@ -40,14 +40,6 @@ type CollectionRecord = ComAtprotoRepoListRecords.Record & { value: XyzNoshdeliv
 type ItemRecord = ComAtprotoRepoListRecords.Record & { value: XyzNoshdeliveryV0CatalogItem.Record }
 type ModifierGroupRecord = ComAtprotoRepoListRecords.Record & { value: XyzNoshdeliveryV0CatalogModifierGroup.Record }
 type ModifierRecord = ComAtprotoRepoListRecords.Record & { value: XyzNoshdeliveryV0CatalogModifier.Record }
-
-interface Catalogs {
-  catalogs: Record<string, Catalog>
-  collections: Record<string, Collection>
-  items: Record<string, Item>
-  modifierGroups: Record<string, ModifierGroup>
-  modifiers: Record<string, Modifier>
-}
 
 // This should not be done ad-hoc. The best solution to convert records with backward and forward
 // compatibility seems to be Cambria, which is meant specifically for this purpose.

@@ -1,4 +1,5 @@
 import * as objectHash from 'object-hash'
+import { Catalogs } from './catalog'
 
 // TODO
 // check duplicates
@@ -41,6 +42,15 @@ export interface Cart {
   cartItems: CartItem[]
 }
 
+export enum CartValidationErrorCode {
+  MODIFIER_ABOVE_MAXIMUM = 'MODIFIER_ABOVE_MAXIMUM',
+  MODIFIER_UNAVAILABLE = 'MODIFIER_UNAVAILABLE',
+  ITEM_UNAVAILABLE = 'ITEM_UNAVAILABLE',
+  MODIFIER_GROUP_UNAVAILABLE = 'MODIFIER_GROUP_UNAVAILABLE',
+  MODIFIER_GROUP_TOTAL_ABOVE_MAXIMUM = 'MODIFIER_GROUP_TOTAL_ABOVE_MAXIMUM',
+  MODIFIER_GROUP_TOTAL_BELOW_MINIMUM = 'MODIFIER_GROUP_TOTAL_BELOW_MINIMUM',
+}
+
 export function itemsAreEquivalent(item1: CartItem, item2: CartItem) {
   const smartHash = (obj: any) => {
     const IGNORE_KEYS = ['quantity']
@@ -50,6 +60,19 @@ export function itemsAreEquivalent(item1: CartItem, item2: CartItem) {
     })
   }
   return smartHash(item1) === smartHash(item2)
+}
+
+export function validateCartItem(item: CartItem, catalogs: Catalogs): CartValidationErrorCode[] {
+  const errors: CartValidationErrorCode[] = []
+
+  const catalogItem = catalogs.items[item.itemCatalogId]
+  if (!catalogItem || catalogItem.suspended) {
+    errors.push(CartValidationErrorCode.ITEM_UNAVAILABLE)
+  }
+
+  // Does item belong to a catalog that is active?
+
+  return errors
 }
 
 export function addItemToCart(cart: Cart, item: CartItem) {
