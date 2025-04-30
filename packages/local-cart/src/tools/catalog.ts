@@ -70,92 +70,85 @@ export interface Catalogs {
   modifiers: Record<string, Modifier>
 }
 
-function isModifierAvailable(modifierId: string, catalogs: Catalogs): boolean {
-  const modifier = catalogs.modifiers[modifierId]
-  if (!modifier) {
-    return false
-  }
-  return !modifier.suspended
-}
-
-function isModifierGroupAvailable(modifierGroupId: string, catalogs: Catalogs): boolean {
-  const modifierGroup = catalogs.modifierGroups[modifierGroupId]
-  if (!modifierGroup) {
-    return false
-  }
-  const availableModifiers = modifierGroup.modifiers.filter((modifierId) => isModifierAvailable(modifierId, catalogs))
-
-  if (
-    modifierGroup.maximumOfEachModifier &&
-    modifierGroup.minimumSelection &&
-    availableModifiers.length * modifierGroup.maximumOfEachModifier < modifierGroup.minimumSelection
-  ) {
-    return false
-  }
-
-  return availableModifiers.length > 0 && availableModifiers.length >= modifierGroup.minimumSelection
-}
-
-function isItemAvailable(itemId: string, catalogs: Catalogs): boolean {
-  const item = catalogs.items[itemId]
-  if (!item || item.suspended) {
-    return false
-  }
-  const requiredGroups = item.modifierGroups.filter(
-    (modifierGroupId) =>
-      catalogs.modifierGroups[modifierGroupId] && catalogs.modifierGroups[modifierGroupId].minimumSelection > 0,
-  )
-
-  const unavailableRequiredGroups = requiredGroups.filter(
-    (modifierGroupId) => !isModifierGroupAvailable(modifierGroupId, catalogs),
-  )
-
-  if (unavailableRequiredGroups.length > 0) {
-    return false
-  }
-
-  return true
-}
-
-function isCollectionAvailable(collectionId: string, catalogs: Catalogs): boolean {
-  const collection = catalogs.collections[collectionId]
-  if (!collection) {
-    return false
-  }
-  return collection.items.some((itemId) => isItemAvailable(itemId, catalogs))
-}
-
-function isCatalogAvailable(catalogId: string, catalogs: Catalogs): boolean {
-  const catalog = catalogs.catalogs[catalogId]
-  if (!catalog) {
-    return false
-  }
-  return (
-    isActiveCatalog(catalog.availabilityPeriods || [], catalog.merchantLocation) &&
-    catalog.collections.some((collectionId) => isCollectionAvailable(collectionId, catalogs))
-  )
-}
-
 // Return the catalogs but without any items that are suspended or unavailable for some reason
-export function pruneCatalogs(catalogs: Catalogs): Catalogs {
-  const partiallyApplyCatalog = (
-    availabilityFunction: (id: string, catalogs: Catalogs) => boolean,
-    catalogs: Catalogs,
-  ) => {
-    return (id: string) => availabilityFunction(id, catalogs)
-  }
+export function getAvailabilityFunctions(catalogs: Catalogs): {
+  isModifierAvailable: (modifierId: string) => boolean
+  isModifierGroupAvailable: (modifierGroupId: string) => boolean
+  isItemAvailable: (itemId: string) => boolean
+  isCollectionAvailable: (collectionId: string) => boolean
+  isCatalogAvailable: (catalogId: string) => boolean
+} {
+  const isModifierAvailable = memoize((modifierId: string): boolean => {
+    const modifier = catalogs.modifiers[modifierId]
+    if (!modifier) {
+      return false
+    }
+    return !modifier.suspended
+  })
 
-  const catalogAvailable = memoize(partiallyApplyCatalog(isCatalogAvailable, catalogs))
-  const collectionAvailable = memoize(partiallyApplyCatalog(isCollectionAvailable, catalogs))
-  const itemAvailable = memoize(partiallyApplyCatalog(isItemAvailable, catalogs))
-  const modifierGroupAvailable = memoize(partiallyApplyCatalog(isModifierGroupAvailable, catalogs))
-  const modifierAvailable = memoize(partiallyApplyCatalog(isModifierAvailable, catalogs))
+  const isModifierGroupAvailable = memoize((modifierGroupId: string): boolean => {
+    const modifierGroup = catalogs.modifierGroups[modifierGroupId]
+    if (!modifierGroup) {
+      return false
+    }
+    const availableModifiers = modifierGroup.modifiers.filter((modifierId) => isModifierAvailable(modifierId))
+
+    if (
+      modifierGroup.maximumOfEachModifier &&
+      modifierGroup.minimumSelection &&
+      availableModifiers.length * modifierGroup.maximumOfEachModifier < modifierGroup.minimumSelection
+    ) {
+      return false
+    }
+
+    return availableModifiers.length > 0 && availableModifiers.length >= modifierGroup.minimumSelection
+  })
+
+  const isItemAvailable = memoize((itemId: string): boolean => {
+    const item = catalogs.items[itemId]
+    if (!item || item.suspended) {
+      return false
+    }
+    const requiredGroups = item.modifierGroups.filter(
+      (modifierGroupId) =>
+        catalogs.modifierGroups[modifierGroupId] && catalogs.modifierGroups[modifierGroupId].minimumSelection > 0,
+    )
+
+    const unavailableRequiredGroups = requiredGroups.filter(
+      (modifierGroupId) => !isModifierGroupAvailable(modifierGroupId),
+    )
+
+    if (unavailableRequiredGroups.length > 0) {
+      return false
+    }
+
+    return true
+  })
+
+  const isCollectionAvailable = memoize((collectionId: string): boolean => {
+    const collection = catalogs.collections[collectionId]
+    if (!collection) {
+      return false
+    }
+    return collection.items.some((itemId) => isItemAvailable(itemId))
+  })
+
+  const isCatalogAvailable = memoize((catalogId: string): boolean => {
+    const catalog = catalogs.catalogs[catalogId]
+    if (!catalog) {
+      return false
+    }
+    return (
+      isActiveCatalog(catalog.availabilityPeriods || [], catalog.merchantLocation) &&
+      catalog.collections.some((collectionId) => isCollectionAvailable(collectionId))
+    )
+  })
 
   return {
-    catalogs: filterMap(catalogs.catalogs, (catalog) => isCatalogAvailable(catalog.id, catalogs)),
-    collections: filterMap(catalogs.collections, (collection) => isCollectionAvailable(collection.id, catalogs)),
-    items: filterMap(catalogs.items, (item) => isItemAvailable(item.id, catalogs)),
-    modifierGroups: {},
-    modifiers: {},
+    isModifierAvailable,
+    isModifierGroupAvailable,
+    isItemAvailable,
+    isCollectionAvailable,
+    isCatalogAvailable,
   }
 }
