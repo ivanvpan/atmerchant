@@ -31,7 +31,7 @@ function extractRkey(uri: string) {
 
 function listToMap<T extends { uri: string; value: any }>(list: T[], recordToObject: (record: T) => any) {
   return list.reduce((acc: Record<string, any>, item) => {
-    acc[extractRkey(item.uri)] = recordToObject(item.value)
+    acc[extractRkey(item.uri)] = recordToObject(item)
     return acc
   }, {})
 }

@@ -1,5 +1,6 @@
 import objectHash from 'object-hash'
 import { Catalogs, ModifierGroup } from './catalog'
+import cloneDeep from 'lodash.clonedeep'
 
 export type fullfillmentType = 'DELIVERY' | 'PICKUP'
 
@@ -302,6 +303,7 @@ export function itemsAreEquivalent(item1: CartItem, item2: CartItem) {
   return smartHash(item1) === smartHash(item2)
 }
 
+// In-place
 export function addItemToCart(cart: Cart, item: CartItem, catalogs: Catalogs) {
   const errorMap = validateItem(item.itemId, item.modifierGroups || [], catalogs)
   const erroroneous = errorMap[item.itemId]?.[0]

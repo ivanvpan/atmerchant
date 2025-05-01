@@ -4,10 +4,14 @@ import { useCatalog } from '../tools/useCatalog'
 
 function CollectionView({ collectionId, catalogs }: { collectionId: string; catalogs: Catalogs }) {
   const collection = catalogs.collections[collectionId]
+  if (!collection) {
+    return null
+  }
+
   return (
     <div>
       <h3>{collection.name}</h3>
-      {collection.items?.map((itemId) => {
+      {collection.items.map((itemId) => {
         const item = catalogs.items[itemId]
         if (!item) {
           return `Missing item ${itemId}`
@@ -20,6 +24,10 @@ function CollectionView({ collectionId, catalogs }: { collectionId: string; cata
 
 function ItemView({ itemId, catalogs }: { itemId: string; catalogs: Catalogs }) {
   const item = catalogs.items[itemId]
+  if (!item) {
+    return null
+  }
+
   const { addItem } = useCart()
 
   const handleAddToCart = () => {
@@ -33,7 +41,10 @@ function ItemView({ itemId, catalogs }: { itemId: string; catalogs: Catalogs }) 
 
   return (
     <div>
-      {item.name}: ${item.priceMoney.amount}
+      <div>
+        <span>{item.name}</span>
+        <span>${item.priceMoney.amount}</span>
+      </div>
       <button onClick={handleAddToCart}>Add to Cart</button>
     </div>
   )
@@ -41,10 +52,13 @@ function ItemView({ itemId, catalogs }: { itemId: string; catalogs: Catalogs }) 
 
 function CatalogView({ catalogId, catalogs }: { catalogId: string; catalogs: Catalogs }) {
   const catalog = catalogs.catalogs[catalogId]
+  if (!catalog) {
+    return null
+  }
   return (
     <div>
       <h2>{catalog.name}</h2>
-      {Object.keys(catalog.collections).map((collectionId) => (
+      {catalog.collections.map((collectionId) => (
         <CollectionView key={collectionId} collectionId={collectionId} catalogs={catalogs} />
       ))}
     </div>

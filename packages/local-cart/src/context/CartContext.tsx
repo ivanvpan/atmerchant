@@ -66,7 +66,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const updateItem = (item: CartItem) => {
     doc?.change((d) => {
-      removeItemFromCart(d, item.id)
       addItemToCart(d, item, catalogs)
     })
   }
