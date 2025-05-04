@@ -66,7 +66,15 @@ function CatalogView({ catalogId, catalogs }: { catalogId: string; catalogs: Cat
 }
 
 function MerchantView() {
-  const { catalogs } = useCatalog()
+  // const { catalogs } = useCatalog()
+  // temp
+  const catalogs = {
+    catalogs: {},
+    collections: {},
+    items: {},
+    modifierGroups: {},
+    modifiers: {},
+  }
   return (
     <>
       <h3>Catalogs</h3>

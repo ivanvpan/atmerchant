@@ -29,7 +29,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     cartItems: [],
   })
   const [doc, setDoc] = useState<DocHandle<Cart> | null>(null)
-  const { catalogs } = useCatalog()
+  // const { catalogs } = useCatalog()
+  // temp
+  const catalogs = {
+    catalogs: {},
+    collections: {},
+    items: {},
+    modifierGroups: {},
+    modifiers: {},
+  }
 
   useEffect(() => {
     const cartUrl = localStorage.getItem('xyz.noshdelivery.cart:cartUrl')

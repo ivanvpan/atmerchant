@@ -19,8 +19,11 @@
     "lodash.clonedeep": "^4.5.0",
     "lodash.memoize": "^4.1.2",
     "object-hash": "^3.0.0",
+    "ox": "^0.7.0",
+    "porto": "^0.0.22",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "wagmi": "^2.15.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
