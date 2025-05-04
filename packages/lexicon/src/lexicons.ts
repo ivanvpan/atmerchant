@@ -352,6 +352,7 @@ export const schemaDict = {
       },
       availabilityPeriod: {
         type: 'object',
+        required: ['dayOfWeek', 'start', 'end'],
         properties: {
           start: {
             type: 'ref',
@@ -377,6 +378,7 @@ export const schemaDict = {
       },
       availabilityTimeOfDay: {
         type: 'object',
+        required: ['localHour', 'localMinute'],
         properties: {
           localHour: {
             type: 'integer',
@@ -426,6 +428,84 @@ export const schemaDict = {
               merchantLocation: {
                 type: 'string',
                 format: 'at-uri',
+              },
+              items: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#itemView',
+                },
+              },
+              modifierGroups: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#modifierGroupView',
+                },
+              },
+              modifiers: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#modifierView',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  XyzNoshdeliveryV0CatalogGetObjects: {
+    lexicon: 1,
+    id: 'xyz.noshdelivery.v0.catalog.getObjects',
+    defs: {
+      main: {
+        type: 'query',
+        description:
+          'Get a view of all catalogs with categories and items, but no modifiers. This is a reasonable call only on smaller catalogs such as restaurant menus.',
+        parameters: {
+          type: 'params',
+          required: [],
+          properties: {
+            objectIds: {
+              type: 'array',
+              items: {
+                type: 'string',
+                format: 'tid',
+              },
+            },
+            includeRelationTypes: {
+              type: 'string',
+              enum: [
+                'catalog',
+                'collection',
+                'item',
+                'modifierGroup',
+                'modifier',
+              ],
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['catalogs', 'collections', 'items'],
+            properties: {
+              catalogs: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#catalogView',
+                },
+              },
+              collections: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:xyz.noshdelivery.v0.catalog.defs#collectionView',
+                },
               },
               items: {
                 type: 'array',
@@ -2434,6 +2514,7 @@ export const ids = {
   XyzNoshdeliveryV0CatalogDefs: 'xyz.noshdelivery.v0.catalog.defs',
   XyzNoshdeliveryV0CatalogGetItemsDetails:
     'xyz.noshdelivery.v0.catalog.getItemsDetails',
+  XyzNoshdeliveryV0CatalogGetObjects: 'xyz.noshdelivery.v0.catalog.getObjects',
   XyzNoshdeliveryV0CatalogGetShallowCatalogView:
     'xyz.noshdelivery.v0.catalog.getShallowCatalogView',
   XyzNoshdeliveryV0CatalogItem: 'xyz.noshdelivery.v0.catalog.item',

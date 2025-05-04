@@ -10,6 +10,7 @@ import {
 } from '@atproto/xrpc-server'
 import { schemas } from './lexicons.js'
 import * as XyzNoshdeliveryV0CatalogGetItemsDetails from './types/xyz/noshdelivery/v0/catalog/getItemsDetails.js'
+import * as XyzNoshdeliveryV0CatalogGetObjects from './types/xyz/noshdelivery/v0/catalog/getObjects.js'
 import * as XyzNoshdeliveryV0CatalogGetShallowCatalogView from './types/xyz/noshdelivery/v0/catalog/getShallowCatalogView.js'
 import * as XyzNoshdeliveryV0CatalogPutCatalogObject from './types/xyz/noshdelivery/v0/catalog/putCatalogObject.js'
 import * as XyzNoshdeliveryV0MerchantGetGroup from './types/xyz/noshdelivery/v0/merchant/getGroup.js'
@@ -95,6 +96,17 @@ export class XyzNoshdeliveryV0CatalogNS {
     >,
   ) {
     const nsid = 'xyz.noshdelivery.v0.catalog.getItemsDetails' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getObjects<AV extends AuthVerifier>(
+    cfg: ConfigOf<
+      AV,
+      XyzNoshdeliveryV0CatalogGetObjects.Handler<ExtractAuth<AV>>,
+      XyzNoshdeliveryV0CatalogGetObjects.HandlerReqCtx<ExtractAuth<AV>>
+    >,
+  ) {
+    const nsid = 'xyz.noshdelivery.v0.catalog.getObjects' // @ts-ignore
     return this._server.xrpc.method(nsid, cfg)
   }
 

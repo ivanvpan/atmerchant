@@ -29,42 +29,45 @@
         }
       },
       "output": {
-        "type": "object",
-        "required": ["catalogs", "collections", "items"],
-        "properties": {
-          "catalogs": {
-            "type": "array",
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["catalogs", "collections", "items"],
+          "properties": {
+            "catalogs": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "xyz.noshdelivery.v0.catalog.defs#catalogView"
+              }
+            },
+            "collections": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "xyz.noshdelivery.v0.catalog.defs#collectionView"
+              }
+            },
             "items": {
-              "type": "ref",
-              "ref": "xyz.noshdelivery.v0.catalog.defs#catalogView"
-            }
-          },
-          "collections": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "xyz.noshdelivery.v0.catalog.defs#collectionView"
-            }
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "xyz.noshdelivery.v0.catalog.defs#itemView"
-            }
-          },
-          "modifierGroups": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "xyz.noshdelivery.v0.catalog.defs#modifierGroupView"
-            }
-          },
-          "modifiers": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "xyz.noshdelivery.v0.catalog.defs#modifierView"
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "xyz.noshdelivery.v0.catalog.defs#itemView"
+              }
+            },
+            "modifierGroups": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "xyz.noshdelivery.v0.catalog.defs#modifierGroupView"
+              }
+            },
+            "modifiers": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "xyz.noshdelivery.v0.catalog.defs#modifierView"
+              }
             }
           }
         }
