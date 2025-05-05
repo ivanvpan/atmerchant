@@ -96,35 +96,70 @@ export default function PortoAuth() {
             <pre>{Json.stringify(requestKeyMutation.data, undefined, 2)}</pre>
           </div>
         ) : null}
-        {/* {requestKeyMutation.data ? (
-          <details>
-            <summary style={{ marginTop: '1rem' }}>
-              {truncateHexString({
-                address: requestKeyMutation.data?.publicKey,
-                length: 12,
-              })}{' '}
-              - expires: {new Date(requestKeyMutation.data.expiry * 1_000).toLocaleString()} (local time)
-            </summary>
-            <pre>{Json.stringify(requestKeyMutation.data, undefined, 2)}</pre>
-          </details>
-        ) : null} */}
       </div>
-      <button
-        disabled={connect.status === 'pending'}
-        onClick={async () => {
-          connect.mutate({
-            connector,
-            createAccount: { label },
-            grantPermissions: permissions(),
-          })
-        }}
-        type="button"
-      >
-        Register
-      </button>
-      <p>{connect.error?.message}</p>
+      <GrantPermissions />
+      <div>
+        <button
+          disabled={connect.status === 'pending'}
+          onClick={async () => {
+            connect.mutate({
+              connector,
+              createAccount: { label },
+              grantPermissions: permissions(),
+            })
+          }}
+          type="button"
+        >
+          Register
+        </button>
+        <p>{connect.error?.message}</p>
+      </div>
       <Account />
       <Events />
+    </div>
+  )
+}
+
+function GrantPermissions() {
+  const { address } = useAccount()
+  const grantPermissions = Hooks.useGrantPermissions()
+  return (
+    <div>
+      <form
+        onSubmit={async (event) => {
+          event.preventDefault()
+          if (!address) return
+
+          const key = Json.parse((await wagmiConfig.storage?.getItem(`${address.toLowerCase()}-keys`)) || '{}') as Key
+
+          // if `expry` is present in both `key` and `permissions`, pick the lower value
+          const expiry = Math.min(key.expiry, permissions().expiry)
+
+          grantPermissions.mutate({
+            key,
+            expiry,
+            address,
+            permissions: permissions().permissions,
+          })
+        }}
+      >
+        <button type="submit" style={{ marginBottom: '5px' }} disabled={grantPermissions.status === 'pending'}>
+          {grantPermissions.status === 'pending' ? 'Authorizing…' : 'Grant Permissions'}
+        </button>
+        {grantPermissions.status === 'error' && <p>{grantPermissions.error?.message}</p>}
+      </form>
+      {grantPermissions.data ? (
+        <details>
+          <summary style={{ marginTop: '1rem' }}>
+            Permissions:{' '}
+            {truncateHexString({
+              address: grantPermissions.data?.key.publicKey,
+              length: 12,
+            })}
+          </summary>
+          <pre>{Json.stringify(grantPermissions.data, undefined, 2)}</pre>
+        </details>
+      ) : null}
     </div>
   )
 }
