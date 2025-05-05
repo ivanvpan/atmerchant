@@ -6,6 +6,7 @@ import { Hex, Json, Value } from 'ox'
 import { http, createConfig, createStorage } from 'wagmi'
 import { useEffect, useState } from 'react'
 import { Porto } from 'porto'
+import { useMutation } from 'wagmi/query'
 
 export const wagmiConfig = createConfig({
   chains: [baseSepolia],
@@ -15,6 +16,10 @@ export const wagmiConfig = createConfig({
     [baseSepolia.id]: http(),
   },
 })
+
+export function truncateHexString({ address, length = 6 }: { address: string; length?: number }) {
+  return length > 0 ? `${address.slice(0, length)}...${address.slice(-length)}` : address
+}
 
 console.log(wagmiConfig.chains)
 const testErc20Addresses = ['0x706aa5c8e5cc2c67da21ee220718f6f6b154e75c']
@@ -42,14 +47,63 @@ export const permissions = () =>
     },
   }) as const
 
+interface Key {
+  type: 'p256'
+  expiry: number
+  publicKey: Hex.Hex
+  role: 'session' | 'admin'
+}
+
 export default function PortoAuth() {
   const label = 'ivan-account-001'
   const connectors = useConnectors()
   const connector = connectors.find((x) => x.id === 'xyz.ithaca.porto')
   const connect = Hooks.useConnect()
+  const { address } = useAccount()
+
+  const requestKeyMutation = useMutation<Key>({
+    mutationFn: async () => {
+      if (!address) return
+      const searchParams = new URLSearchParams({
+        expiry: permissions().expiry.toString(),
+      })
+      console.log('Requesting ========')
+      const response = await fetch(`/api/keys/${address.toLowerCase()}?${searchParams.toString()}`)
+      const result = await Json.parse(await response.text())
+      await wagmiConfig.storage?.setItem(`${address.toLowerCase()}-keys`, Json.stringify(result))
+      return result
+    },
+  })
+
+  useEffect(() => {
+    requestKeyMutation.mutate()
+  }, [])
 
   return (
     <div>
+      <div>
+        {address ? (
+          <button
+            type="button"
+            onClick={() => requestKeyMutation.mutate()}
+            disabled={requestKeyMutation.status === 'pending'}
+          >
+            {requestKeyMutation.status === 'pending' ? 'Requesting key…' : 'Request Key'}
+          </button>
+        ) : null}
+        {requestKeyMutation.data ? (
+          <details>
+            <summary style={{ marginTop: '1rem' }}>
+              {truncateHexString({
+                address: requestKeyMutation.data?.publicKey,
+                length: 12,
+              })}{' '}
+              - expires: {new Date(requestKeyMutation.data.expiry * 1_000).toLocaleString()} (local time)
+            </summary>
+            <pre>{Json.stringify(requestKeyMutation.data, undefined, 2)}</pre>
+          </details>
+        ) : null}
+      </div>
       <button
         disabled={connect.status === 'pending'}
         onClick={async () => {

@@ -8,5 +8,12 @@ export default defineConfig({
   server: {
     // allowedHosts: ['0.0.0.0'],
     allowedHosts: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3033',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
   },
 })
