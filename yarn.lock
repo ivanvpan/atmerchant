@@ -3470,6 +3470,7 @@ __metadata:
     kysely: "npm:^0.27.6"
     ox: "npm:^0.7.0"
     pino: "npm:^9.6.0"
+    pino-http: "npm:^10.4.0"
     pino-pretty: "npm:^13.0.0"
     porto: "npm:^0.0.22"
     tsx: "npm:^4.19.3"
@@ -11297,6 +11298,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pino-http@npm:^10.4.0":
+  version: 10.4.0
+  resolution: "pino-http@npm:10.4.0"
+  dependencies:
+    get-caller-file: "npm:^2.0.5"
+    pino: "npm:^9.0.0"
+    pino-std-serializers: "npm:^7.0.0"
+    process-warning: "npm:^4.0.0"
+  checksum: 10c0/64144e2c94e939070f56ad82dfb012b6a98d21582e0660cf821e7cee64d4e06f7724aa40bc5bf9cd1254d58ab7cbd972dec287b7989eba647d384f6edd8d95fd
+  languageName: node
+  linkType: hard
+
 "pino-http@npm:^8.2.1, pino-http@npm:^8.3.3":
   version: 8.6.1
   resolution: "pino-http@npm:8.6.1"
@@ -11395,7 +11408,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino@npm:^9.6.0":
+"pino@npm:^9.0.0, pino@npm:^9.6.0":
   version: 9.6.0
   resolution: "pino@npm:9.6.0"
   dependencies:

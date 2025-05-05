@@ -6,6 +6,7 @@ import compression from 'compression'
 import cors from 'cors'
 import express from 'express'
 import { pino } from 'pino'
+import { Request, Response, NextFunction } from 'express'
 
 import API, { health } from '#/api'
 import type { AppContext } from '#/context'
@@ -38,6 +39,11 @@ export class Server {
     app.use(compression())
     app.use(express.json())
     app.use(express.urlencoded({ extended: true }))
+    app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+      console.error('Error:', err)
+      res.status(500).json({ error: 'Internal server error' })
+    })
+    // app.use(pinoHttp({ logger }))
 
     API(app, ctx)
 

@@ -20,6 +20,7 @@ export default function (app: Express, ctx: AppContext) {
     const expired = storedKey?.expiry && storedKey.expiry < Math.floor(Date.now() / 1_000)
 
     if (!expired && storedKey) {
+      console.log('found key', storedKey)
       res.json({
         type: storedKey.type,
         publicKey: storedKey.public_key,
@@ -34,6 +35,7 @@ export default function (app: Express, ctx: AppContext) {
       res.status(500).json({ error: 'Failed to create key pair' })
       return
     }
+    console.log('keypair', keyPair)
 
     console.info(`Key stored for ${address}`)
 
@@ -42,7 +44,7 @@ export default function (app: Express, ctx: AppContext) {
     res.json({ type, publicKey: public_key, expiry, role })
   }
 
-  app.get('/key/:address', handler)
+  app.get('/keys/:address', handler)
 
   return app
 }
