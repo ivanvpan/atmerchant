@@ -1,46 +1,80 @@
-import type { Address, Hex } from 'ox'
-import type { Params as WorkflowParams } from './workflow.ts'
+import {
+  XyzNoshdeliveryV0CatalogCatalog,
+  XyzNoshdeliveryV0CatalogCollection,
+  XyzNoshdeliveryV0CatalogItem,
+  XyzNoshdeliveryV0CatalogModifierGroup,
+  XyzNoshdeliveryV0CatalogModifier,
+} from '@nosh/lexicon'
+import { schemaDict } from './lexicon/lexicons'
 
-export interface Env {
-  ADMIN_USERNAME: string
-  ADMIN_PASSWORD: string
-  ENVIRONMENT: 'development' | 'production'
-  DB: D1Database
-  WORKFLOW_01: Workflow<WorkflowParams>
+export type CatalogObjectType =
+  | 'catalog'
+  | 'collection'
+  | 'item'
+  | 'modifierGroup'
+  | 'modifier'
+
+export type BaseCatalogObject = {
+  type: CatalogObjectType
+  tid: string
+  uri: string
+  name: string
+  externalId?: string
 }
 
-interface BaseAttributes {
-  id: number
-  created_at: string
+export type CatalogObject =
+  | (BaseCatalogObject & {
+      type: 'catalog'
+      data: XyzNoshdeliveryV0CatalogCatalog.Record
+    })
+  | (BaseCatalogObject & {
+      type: 'collection'
+      data: XyzNoshdeliveryV0CatalogCollection.Record
+    })
+  | (BaseCatalogObject & {
+      type: 'item'
+      data: XyzNoshdeliveryV0CatalogItem.Record
+    })
+  | (BaseCatalogObject & {
+      type: 'modifierGroup'
+      data: XyzNoshdeliveryV0CatalogModifierGroup.Record
+    })
+  | (BaseCatalogObject & {
+      type: 'modifier'
+      data: XyzNoshdeliveryV0CatalogModifier.Record
+    })
+
+export type CatalogObjectData =
+  | XyzNoshdeliveryV0CatalogCatalog.Record
+  | XyzNoshdeliveryV0CatalogCollection.Record
+  | XyzNoshdeliveryV0CatalogItem.Record
+  | XyzNoshdeliveryV0CatalogModifierGroup.Record
+  | XyzNoshdeliveryV0CatalogModifier.Record
+
+export type LexiconType =
+  | XyzNoshdeliveryV0CatalogCatalog.Record['$type']
+  | XyzNoshdeliveryV0CatalogCollection.Record['$type']
+  | XyzNoshdeliveryV0CatalogItem.Record['$type']
+  | XyzNoshdeliveryV0CatalogModifierGroup.Record['$type']
+  | XyzNoshdeliveryV0CatalogModifier.Record['$type']
+
+// Is this sane?
+export const typeToLexiconType: Record<CatalogObjectType, LexiconType> = {
+  catalog: schemaDict.XyzNoshdeliveryV0CatalogCatalog.id,
+  collection: schemaDict.XyzNoshdeliveryV0CatalogCollection.id,
+  item: schemaDict.XyzNoshdeliveryV0CatalogItem.id,
+  modifierGroup: schemaDict.XyzNoshdeliveryV0CatalogModifierGroup.id,
+  modifier: schemaDict.XyzNoshdeliveryV0CatalogModifier.id,
 }
 
-export type Transaction = Pretty<
-  BaseAttributes & {
-    address: string
-    hash: Hex.Hex
-    public_key: Hex.Hex
-    role: 'session' | 'admin'
-  }
->
-
-export type Schedule = Pretty<
-  BaseAttributes & {
-    address: Address.Address
-    schedule: string
-    action: string
-    calls: string
-  }
->
-
-export type KeyPair = Pretty<
-  BaseAttributes & {
-    address: string
-    public_key: Hex.Hex
-    private_key: Hex.Hex
-    expiry: number
-    type: 'p256'
-    role: 'session' | 'admin'
-  }
->
-
-export type Pretty<T> = { [K in keyof T]: T[K] } & {}
+// TODO this a many-to-one mapping
+export const lexiconTypeToCatalogObjectType: Record<
+  LexiconType,
+  CatalogObjectType
+> = {
+  [schemaDict.XyzNoshdeliveryV0CatalogCatalog.id]: 'catalog',
+  [schemaDict.XyzNoshdeliveryV0CatalogCollection.id]: 'collection',
+  [schemaDict.XyzNoshdeliveryV0CatalogItem.id]: 'item',
+  [schemaDict.XyzNoshdeliveryV0CatalogModifierGroup.id]: 'modifierGroup',
+  [schemaDict.XyzNoshdeliveryV0CatalogModifier.id]: 'modifier',
+}

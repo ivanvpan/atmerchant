@@ -92,6 +92,11 @@ export default function PortoAuth() {
           </button>
         ) : null}
         {requestKeyMutation.data ? (
+          <div>
+            <pre>{Json.stringify(requestKeyMutation.data, undefined, 2)}</pre>
+          </div>
+        ) : null}
+        {/* {requestKeyMutation.data ? (
           <details>
             <summary style={{ marginTop: '1rem' }}>
               {truncateHexString({
@@ -102,7 +107,7 @@ export default function PortoAuth() {
             </summary>
             <pre>{Json.stringify(requestKeyMutation.data, undefined, 2)}</pre>
           </details>
-        ) : null}
+        ) : null} */}
       </div>
       <button
         disabled={connect.status === 'pending'}
