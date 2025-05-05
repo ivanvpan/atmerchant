@@ -9,16 +9,15 @@ import {
   SqliteDialect,
   // ParseJSONResultsPlugin
 } from 'kysely'
+import { P256, PublicKey } from 'ox'
 
 export interface Keypair {
-  id: number
-  created_at: string
   address: string
   public_key: string
   private_key: string
   role: 'session' | 'admin'
   type: 'p256'
-  expiry?: number
+  expiry: number
 }
 interface DatabaseSchema {
   keypairs: Keypair
@@ -39,9 +38,7 @@ migrations['001'] = {
     await db.schema
       .createTable('keypairs')
       .ifNotExists()
-      .addColumn('id', 'integer', (col) => col.autoIncrement())
-      .addColumn('created_at', 'timestamp', (col) => col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull())
-      .addColumn('address', 'text', (col) => col.unique().notNull())
+      .addColumn('address', 'text', (col) => col.primaryKey().notNull())
       .addColumn('public_key', 'text', (col) => col.notNull())
       .addColumn('private_key', 'text', (col) => col.notNull())
       .addColumn('role', 'text', (col) => col.notNull())
@@ -71,7 +68,61 @@ export const migrateToLatest = async (db: Database) => {
 
 export type Database = Kysely<DatabaseSchema>
 
-export function getKeypair(db: Database, address: string) {
-  return db.selectFrom('keypairs').where('address', '=', address).selectAll().executeTakeFirst()
+export async function getKeypair(db: Database, address: string) {
+  const result = await db.selectFrom('keypairs').where('address', '=', address).selectAll().executeTakeFirst()
+  if (!result) {
+    console.error('No keypair found for address', address)
+    return null
+  }
+  return result
 }
-export function createKeypair(db: Database, keypair: Pick<Keypair, 'address' | 'expiry'>): Promise<Keypair> {}
+
+type GeneratedKeyPair = Pick<Keypair, 'public_key' | 'role' | 'expiry' | 'type'>
+
+export async function createKeypair(
+  db: Database,
+  address: string,
+  expiry = Math.floor(Date.now() / 1_000) + 60 * 2, // 2 minutes by default
+): Promise<GeneratedKeyPair | undefined> {
+  const role = 'session'
+  const privateKey = P256.randomPrivateKey()
+  const publicKey = PublicKey.toHex(P256.getPublicKey({ privateKey }), {
+    includePrefix: false,
+  })
+
+  /**
+   * you can have a setup where an address can have multiple keys
+   * we are just doing 1 per address in this demo for simplicity
+   */
+
+  try {
+    await db.deleteFrom('keypairs').where('address', '=', address).execute()
+
+    const result = await db
+      .insertInto('keypairs')
+      .values({
+        address,
+        public_key: publicKey,
+        private_key: privateKey,
+        role,
+        type: 'p256',
+        expiry,
+      })
+      .returningAll()
+      .executeTakeFirst()
+
+    if (!result) {
+      return undefined
+    }
+
+    return {
+      public_key: result.public_key,
+      role: result.role,
+      expiry: result.expiry,
+      type: result.type,
+    }
+  } catch (error) {
+    console.error('Error creating keypair:', error)
+    return undefined
+  }
+}
