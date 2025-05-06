@@ -10,6 +10,7 @@ import {
   BaseError,
   useCallsStatus,
   useSendCalls,
+  useWatchContractEvent,
 } from 'wagmi'
 import { Hex, Json, Value } from 'ox'
 import { useEffect, useState } from 'react'
@@ -64,6 +65,7 @@ export default function PortoAuth() {
   return (
     <div>
       <Register />
+      <RequestKey />
       <GrantPermissions />
       <CreateEscrow />
       <Account />
@@ -113,7 +115,7 @@ function RequestKey() {
 }
 
 function Register() {
-  const label = 'ivan-account-002'
+  const label = 'ivan-account-003'
   const connectors = useConnectors()
   const connector = connectors.find((x) => x.id === 'xyz.ithaca.porto')
   const connect = Hooks.useConnect()
@@ -126,7 +128,7 @@ function Register() {
           connect.mutate({
             connector,
             createAccount: { label },
-            grantPermissions: permissions(),
+            // grantPermissions: permissions(),
           })
         }}
         type="button"
@@ -153,26 +155,40 @@ function Clear() {
 
 function CreateEscrow() {
   const { address } = useAccount()
-  const { data, error, isPending, sendCalls } = useSendCalls()
-  // const { isLoading: isConfirming, isSuccess: isConfirmed } = useCallsStatus({
-  //   id: data?.id || 'disabled',
-  //   query: {
-  //     enabled: !!data?.id,
-  //     refetchInterval: ({ state }) => {
-  //       if (state.data?.status === 'success') return false
-  //       return 1_000
-  //     },
-  //   },
-  // })
+  const { data, error, isPending, sendCalls } = useSendCalls({
+    mutation: {
+      onSuccess: (data) => {
+        // 0x8cd4ff1a921f41a5f8962c8072840dcc777acd93612030a6a6a7fc5c65c271e6
+        console.log('onSuccess data', data)
+      },
+    },
+  })
+  useWatchContractEvent({
+    address: EscrowFactory.address as `0x${string}`,
+    eventName: 'EscrowCreated',
+    onLogs: (logs) => {
+      console.log('logs', logs)
+    },
+  })
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useCallsStatus({
+    id: data?.id || 'disabled',
+    query: {
+      enabled: !!data?.id,
+      refetchInterval: ({ state }) => {
+        if (state.data?.status === 'success') return false
+        return 1_000
+      },
+    },
+  })
 
-  // const [transactions, setTransactions] = useState<Set<string>>(new Set())
+  const [transactions, setTransactions] = useState<Set<string>>(new Set())
 
-  // useEffect(() => {
-  //   if (data?.id) {
-  //     setTransactions((prev) => new Set([...prev, data.id]))
-  //     console.log('data', data)
-  //   }
-  // }, [data])
+  useEffect(() => {
+    if (data?.id) {
+      setTransactions((prev) => new Set([...prev, data.id]))
+      console.log('data', data)
+    }
+  }, [data])
 
   return (
     <div>
@@ -195,7 +211,7 @@ function CreateEscrow() {
           {isPending ? 'Confirming...' : 'Create Escrow'}
         </button>
       </form>
-      {/* <ul style={{ listStyleType: 'none', padding: 0 }}>
+      <ul style={{ listStyleType: 'none', padding: 0 }}>
         {Array.from(transactions).map((tx) => (
           <li key={tx}>
             <a target="_blank" rel="noopener noreferrer" href={`https://sepolia.basescan.org/tx/${tx}`}>
@@ -205,7 +221,7 @@ function CreateEscrow() {
         ))}
       </ul>
       <p>{isConfirming && 'Waiting for confirmation...'}</p>
-      <p>{isConfirmed && 'Transaction confirmed.'}</p> */}
+      <p>{isConfirmed && 'Transaction confirmed.'}</p>
       {error && (
         <div>
           Error: {(error as BaseError).shortMessage} {error.message} <br />

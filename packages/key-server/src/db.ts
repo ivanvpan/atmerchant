@@ -19,8 +19,22 @@ export interface Keypair {
   type: 'p256'
   expiry: number
 }
+
+export interface Escrow {
+  address: string
+  payer: string
+  payee: string
+  arbiter: string
+}
+
+export interface LastProcessedBlock {
+  blockNumber: number
+}
+
 interface DatabaseSchema {
   keypairs: Keypair
+  escrows: Escrow
+  lastProcessedBlock: LastProcessedBlock
 }
 
 // Migrations
@@ -36,6 +50,15 @@ const migrationProvider: MigrationProvider = {
 migrations['001'] = {
   async up(db: Kysely<unknown>) {
     await db.schema
+      .createTable('escrows')
+      .ifNotExists()
+      .addColumn('address', 'text', (col) => col.primaryKey().notNull())
+      .addColumn('payer', 'text', (col) => col.notNull())
+      .addColumn('payee', 'text', (col) => col.notNull())
+      .addColumn('arbiter', 'text', (col) => col.notNull())
+      .execute()
+
+    await db.schema
       .createTable('keypairs')
       .ifNotExists()
       .addColumn('address', 'text', (col) => col.primaryKey().notNull())
@@ -44,6 +67,12 @@ migrations['001'] = {
       .addColumn('role', 'text', (col) => col.notNull())
       .addColumn('type', 'text', (col) => col.notNull())
       .addColumn('expiry', 'integer', (col) => col.notNull())
+      .execute()
+
+    await db.schema
+      .createTable('lastProcessedBlock')
+      .ifNotExists()
+      .addColumn('blockNumber', 'integer', (col) => col.notNull())
       .execute()
   },
   async down(db: Kysely<unknown>) {},

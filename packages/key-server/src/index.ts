@@ -13,6 +13,10 @@ import type { AppContext } from '#/context'
 import * as error from '#/error'
 import { env } from '#/env'
 import { createDb, migrateToLatest } from './db'
+import { listenToEscrowCreated } from './blockchain'
+import { createPublicClient, http as viemHttp } from 'viem'
+import type { PublicClient } from 'viem'
+import { baseSepolia } from 'viem/chains'
 
 export class Server {
   constructor(
@@ -29,10 +33,18 @@ export class Server {
     const db = createDb('./db.sqlite')
     await migrateToLatest(db)
 
+    const client = createPublicClient({
+      chain: baseSepolia,
+      transport: viemHttp(),
+    }) as PublicClient
+
     const ctx = {
       db,
       logger,
+      client,
     }
+
+    listenToEscrowCreated(ctx)
 
     const app = express()
     app.use(cors({ maxAge: 1000 * 60 * 60 * 24 }))
