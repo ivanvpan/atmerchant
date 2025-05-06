@@ -35,7 +35,7 @@ export class Server {
 
     const client = createPublicClient({
       chain: baseSepolia,
-      transport: viemHttp(),
+      transport: viemHttp('https://base-sepolia.g.alchemy.com/v2/alcht_Va64Bg4LImclXeKet6ltyISGpaRKAg'),
     }) as PublicClient
 
     const ctx = {

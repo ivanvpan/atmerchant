@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { Hooks } from 'porto/wagmi'
 import { baseSepolia } from 'wagmi/chains'
 import { porto } from 'porto/wagmi'
@@ -71,9 +72,48 @@ export default function PortoAuth() {
       <Account />
       <Events />
       <Clear />
+      <Orders />
     </div>
   )
 }
+
+function Orders() {
+  const { address } = useAccount()
+
+  const queryOrders = useQuery<
+    {
+      address: string
+      payer: string
+      payee: string
+      arbiter: string
+    }[]
+  >({
+    queryKey: ['orders', address],
+    queryFn: async () => {
+      if (!address) return
+      const response = await fetch(`/api/orders/customer/${address}`)
+      const result = await Json.parse(await response.text())
+      return result
+    },
+  })
+
+  return (
+    <div>
+      <h2>Orders</h2>
+      <div>
+        {queryOrders.data?.map((order) => (
+          <div key={order.address}>
+            <h3>{order.address}</h3>
+            <p>Payer: {order.payer}</p>
+            <p>Payee: {order.payee}</p>
+            <p>Arbiter: {order.arbiter}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function RequestKey() {
   const { address } = useAccount()
 

@@ -1,8 +1,10 @@
 import EscrowFactory from './contracts/EscrowFactory'
 import { getKeypair } from './db'
 import { AppContext } from './context'
-
+import type { AbiEvent } from 'abitype'
 export function listenToEscrowCreated(ctx: AppContext) {
+  console.log('Listening to blockchain events...')
+
   ctx.client.watchContractEvent<typeof EscrowFactory.abi, 'EscrowCreated'>({
     abi: EscrowFactory.abi,
     address: EscrowFactory.address as `0x${string}`,
@@ -15,9 +17,18 @@ export function listenToEscrowCreated(ctx: AppContext) {
       })
     },
   })
+
+  updateSinceLastProcessedBlock(ctx)
+  setInterval(
+    () => {
+      updateSinceLastProcessedBlock(ctx)
+    },
+    1000 * 60 * 10,
+  )
 }
 
 async function updateSinceLastProcessedBlock(ctx: AppContext) {
+  console.log('Catching up since last processed block')
   let lastProcessedBlock = await ctx.db.selectFrom('lastProcessedBlock').selectAll().executeTakeFirst()
   const START_BLOCK = 25324505
   if (!lastProcessedBlock) {
@@ -32,31 +43,33 @@ async function updateSinceLastProcessedBlock(ctx: AppContext) {
     }
   }
 
-  const blockNumber = await ctx.client.getBlockNumber()
+  const currentBlockNumber = await ctx.client.getBlockNumber()
 
   const logs = await ctx.client.getLogs({
     address: EscrowFactory.address as `0x${string}`,
-    events: ['EscrowCreated'],
+    event: EscrowFactory.abi.find((abi) => abi.name === 'EscrowCreated') as AbiEvent,
     fromBlock: BigInt(lastProcessedBlock.blockNumber),
-    toBlock: blockNumber,
+    toBlock: currentBlockNumber,
   })
 
   logs.forEach((log) => {
     const args = (log as any).args
     processEscrowCreated(args.payee, args.escrowAddress, ctx)
   })
+
+  await ctx.db
+    .updateTable('lastProcessedBlock')
+    .set({
+      blockNumber: Number(currentBlockNumber),
+    })
+    .execute()
 }
 
 async function processEscrowCreated(payee: `0x${string}`, escrowAddress: `0x${string}`, ctx: AppContext) {
+  console.log('Processing escrow created', escrowAddress)
   const escrow = await ctx.db.selectFrom('escrows').where('address', '=', escrowAddress).selectAll().executeTakeFirst()
   if (escrow) {
     console.log('Escrow already exists', escrowAddress)
-    return
-  }
-
-  const keypair = await getKeypair(ctx.db, payee)
-  if (!keypair) {
-    console.error('No keypair found for address', payee)
     return
   }
 
@@ -70,7 +83,11 @@ async function processEscrowCreated(payee: `0x${string}`, escrowAddress: `0x${st
     })
     .execute()
 
-  // notify parties
+  const keypair = await getKeypair(ctx.db, payee)
+  if (!keypair) {
+    console.error('No keypair found for address', payee)
+    return
+  }
 }
 
 /*
