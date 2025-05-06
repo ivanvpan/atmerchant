@@ -1,12 +1,23 @@
 import { Hooks } from 'porto/wagmi'
 import { baseSepolia } from 'wagmi/chains'
 import { porto } from 'porto/wagmi'
-import { useAccount, useConnectors } from 'wagmi'
+import {
+  useAccount,
+  useConnectors,
+  http,
+  createConfig,
+  createStorage,
+  BaseError,
+  useCallsStatus,
+  useSendCalls,
+} from 'wagmi'
 import { Hex, Json, Value } from 'ox'
-import { http, createConfig, createStorage } from 'wagmi'
 import { useEffect, useState } from 'react'
 import { Porto } from 'porto'
 import { useMutation } from 'wagmi/query'
+import EscrowFactory from '../contracts/EscrowFactory'
+import { queryClient } from '../queryClient'
+// import SimpleEscrow from '../contracts/SimpleEscrow'
 
 export const wagmiConfig = createConfig({
   chains: [baseSepolia],
@@ -22,25 +33,20 @@ export function truncateHexString({ address, length = 6 }: { address: string; le
 }
 
 console.log(wagmiConfig.chains)
-const testErc20Addresses = ['0x706aa5c8e5cc2c67da21ee220718f6f6b154e75c']
 export const permissions = () =>
   ({
     expiry: Math.floor(Date.now() / 1_000) + 60 * 60, // 1 hour
     permissions: {
       calls: [
         {
-          signature: 'approve(address,uint256)',
-          to: testErc20Addresses[0],
-        },
-        {
-          signature: 'transfer(address,uint256)',
-          to: testErc20Addresses[0],
+          signature: 'createEscrow(address,address,address)',
+          to: EscrowFactory.address,
         },
       ],
       spend: [
         {
           period: 'minute',
-          token: testErc20Addresses[0],
+          token: EscrowFactory.address,
           limit: Hex.fromNumber(Value.fromEther('1000')),
         },
       ],
@@ -55,10 +61,18 @@ interface Key {
 }
 
 export default function PortoAuth() {
-  const label = 'ivan-account-001'
-  const connectors = useConnectors()
-  const connector = connectors.find((x) => x.id === 'xyz.ithaca.porto')
-  const connect = Hooks.useConnect()
+  return (
+    <div>
+      <Register />
+      <GrantPermissions />
+      <CreateEscrow />
+      <Account />
+      <Events />
+      <Clear />
+    </div>
+  )
+}
+function RequestKey() {
   const { address } = useAccount()
 
   const requestKeyMutation = useMutation<Key>({
@@ -78,44 +92,126 @@ export default function PortoAuth() {
   useEffect(() => {
     requestKeyMutation.mutate()
   }, [])
+  return (
+    <div>
+      {address ? (
+        <button
+          type="button"
+          onClick={() => requestKeyMutation.mutate()}
+          disabled={requestKeyMutation.status === 'pending'}
+        >
+          {requestKeyMutation.status === 'pending' ? 'Requesting key…' : 'Request Key'}
+        </button>
+      ) : null}
+      {requestKeyMutation.data ? (
+        <div>
+          <pre>{Json.stringify(requestKeyMutation.data, undefined, 2)}</pre>
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
+function Register() {
+  const label = 'ivan-account-002'
+  const connectors = useConnectors()
+  const connector = connectors.find((x) => x.id === 'xyz.ithaca.porto')
+  const connect = Hooks.useConnect()
 
   return (
     <div>
-      <div>
-        {address ? (
-          <button
-            type="button"
-            onClick={() => requestKeyMutation.mutate()}
-            disabled={requestKeyMutation.status === 'pending'}
-          >
-            {requestKeyMutation.status === 'pending' ? 'Requesting key…' : 'Request Key'}
-          </button>
-        ) : null}
-        {requestKeyMutation.data ? (
-          <div>
-            <pre>{Json.stringify(requestKeyMutation.data, undefined, 2)}</pre>
-          </div>
-        ) : null}
-      </div>
-      <GrantPermissions />
-      <div>
-        <button
-          disabled={connect.status === 'pending'}
-          onClick={async () => {
-            connect.mutate({
-              connector,
-              createAccount: { label },
-              grantPermissions: permissions(),
-            })
-          }}
-          type="button"
-        >
-          Register
+      <button
+        disabled={connect.status === 'pending'}
+        onClick={async () => {
+          connect.mutate({
+            connector,
+            createAccount: { label },
+            grantPermissions: permissions(),
+          })
+        }}
+        type="button"
+      >
+        Register
+      </button>
+      <p>{connect.error?.message}</p>
+    </div>
+  )
+}
+
+function Clear() {
+  const clear = () => {
+    queryClient.clear()
+    queryClient.resetQueries()
+    queryClient.removeQueries()
+    queryClient.invalidateQueries()
+    queryClient.unmount()
+    window.localStorage.clear()
+    window.sessionStorage.clear()
+  }
+  return <button onClick={clear}>Clear</button>
+}
+
+function CreateEscrow() {
+  const { address } = useAccount()
+  const { data, error, isPending, sendCalls } = useSendCalls()
+  // const { isLoading: isConfirming, isSuccess: isConfirmed } = useCallsStatus({
+  //   id: data?.id || 'disabled',
+  //   query: {
+  //     enabled: !!data?.id,
+  //     refetchInterval: ({ state }) => {
+  //       if (state.data?.status === 'success') return false
+  //       return 1_000
+  //     },
+  //   },
+  // })
+
+  // const [transactions, setTransactions] = useState<Set<string>>(new Set())
+
+  // useEffect(() => {
+  //   if (data?.id) {
+  //     setTransactions((prev) => new Set([...prev, data.id]))
+  //     console.log('data', data)
+  //   }
+  // }, [data])
+
+  return (
+    <div>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault()
+          sendCalls({
+            calls: [
+              {
+                functionName: 'createEscrow',
+                abi: EscrowFactory.abi,
+                to: EscrowFactory.address,
+                args: [address, address, address],
+              },
+            ],
+          })
+        }}
+      >
+        <button type="submit" disabled={isPending} style={{ marginBottom: '5px' }}>
+          {isPending ? 'Confirming...' : 'Create Escrow'}
         </button>
-        <p>{connect.error?.message}</p>
-      </div>
-      <Account />
-      <Events />
+      </form>
+      {/* <ul style={{ listStyleType: 'none', padding: 0 }}>
+        {Array.from(transactions).map((tx) => (
+          <li key={tx}>
+            <a target="_blank" rel="noopener noreferrer" href={`https://sepolia.basescan.org/tx/${tx}`}>
+              {tx}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p>{isConfirming && 'Waiting for confirmation...'}</p>
+      <p>{isConfirmed && 'Transaction confirmed.'}</p> */}
+      {error && (
+        <div>
+          Error: {(error as BaseError).shortMessage} {error.message} <br />
+          {error.stack}
+        </div>
+      )}
     </div>
   )
 }

@@ -13,8 +13,8 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <CartProvider>
           <PortoAuth />
-          <CartView />
-          <MerchantView />
+          {/* <CartView />
+          <MerchantView /> */}
         </CartProvider>
       </QueryClientProvider>
     </WagmiProvider>
