@@ -2,6 +2,9 @@ import EscrowFactory from './contracts/EscrowFactory'
 import { getKeypair } from './db'
 import { AppContext } from './context'
 import type { AbiEvent } from 'abitype'
+import { Porto } from 'porto'
+import SimpleEscrow from './contracts/SimpleEscrow'
+
 export function listenToEscrowCreated(ctx: AppContext) {
   console.log('Listening to blockchain events...')
 
@@ -88,6 +91,28 @@ async function processEscrowCreated(payee: `0x${string}`, escrowAddress: `0x${st
     console.error('No keypair found for address', payee)
     return
   }
+}
+
+export async function disputeEscrow(payer: `0x${string}`, escrowAddress: `0x${string}`, ctx: AppContext) {
+  console.log('Processing escrow disputed', escrowAddress)
+  const escrow = await ctx.db.selectFrom('escrows').where('address', '=', escrowAddress).selectAll().executeTakeFirst()
+  if (!escrow) {
+    console.log('Escrow does not exist', escrowAddress)
+    return
+  }
+  const keypair = await getKeypair(ctx.db, payer)
+  if (!keypair) {
+    console.error('No keypair found for address', payer, keypair)
+    return
+  }
+
+  console.log('Processing dispute for escrow', escrowAddress)
+  const porto = Porto.create()
+  porto.provider.request({
+    abi: SimpleEscrow.abi,
+    method: 'dispute',
+    params: {},
+  })
 }
 
 /*

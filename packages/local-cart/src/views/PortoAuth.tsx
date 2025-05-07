@@ -88,10 +88,22 @@ function Orders() {
       arbiter: string
     }[]
   >({
+    refetchInterval: 1000 * 60, // 1 minute
     queryKey: ['orders', address],
     queryFn: async () => {
       if (!address) return
       const response = await fetch(`/api/orders/customer/${address}`)
+      const result = await Json.parse(await response.text())
+      return result
+    },
+  })
+
+  const disputeEscrowMutation = useMutation({
+    mutationFn: async (escrowAddress: string) => {
+      if (!address) return
+      const response = await fetch(`/api/orders/customer/${address}/dispute/${escrowAddress}`, {
+        method: 'POST',
+      })
       const result = await Json.parse(await response.text())
       return result
     },
@@ -104,9 +116,10 @@ function Orders() {
         {queryOrders.data?.map((order) => (
           <div key={order.address}>
             <h3>{order.address}</h3>
-            <p>Payer: {order.payer}</p>
-            <p>Payee: {order.payee}</p>
-            <p>Arbiter: {order.arbiter}</p>
+            <button onClick={() => disputeEscrowMutation.mutate(order.address)}>Dispute</button>
+            <div>Payer: {order.payer}</div>
+            <div>Payee: {order.payee}</div>
+            <div>Arbiter: {order.arbiter}</div>
           </div>
         ))}
       </div>

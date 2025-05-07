@@ -3472,7 +3472,7 @@ __metadata:
     pino: "npm:^9.6.0"
     pino-http: "npm:^10.4.0"
     pino-pretty: "npm:^13.0.0"
-    porto: "npm:0.0.22"
+    porto: "npm:^0.0.22"
     tsx: "npm:^4.19.3"
     typescript: "npm:^5.8.2"
     viem: "npm:^2.29.0"
@@ -11460,7 +11460,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"porto@npm:0.0.22, porto@npm:^0.0.22":
+"porto@npm:^0.0.22":
   version: 0.0.22
   resolution: "porto@npm:0.0.22"
   dependencies:

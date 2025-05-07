@@ -98,7 +98,11 @@ export const migrateToLatest = async (db: Database) => {
 export type Database = Kysely<DatabaseSchema>
 
 export async function getKeypair(db: Database, address: string) {
-  const result = await db.selectFrom('keypairs').where('address', '=', address).selectAll().executeTakeFirst()
+  const result = await db
+    .selectFrom('keypairs')
+    .where('address', '=', address.toLowerCase())
+    .selectAll()
+    .executeTakeFirst()
   if (!result) {
     console.error('No keypair found for address', address)
     return null
