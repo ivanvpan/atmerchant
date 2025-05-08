@@ -2,8 +2,42 @@ import EscrowFactory from './contracts/EscrowFactory'
 import { getKeypair } from './db'
 import { AppContext } from './context'
 import type { AbiEvent } from 'abitype'
-import { Porto } from 'porto'
+import { Mode, Porto, Chains } from 'porto'
+import { AbiFunction, Hex, P256, Signature } from 'ox'
 import SimpleEscrow from './contracts/SimpleEscrow'
+import { baseSepolia } from 'viem/chains'
+import { http, Chain as Chain_viem, ChainContract } from 'viem'
+
+// export const envs = ['anvil', 'dev', 'prod', 'stg'] as const
+// export type Env = 'anvil' | 'dev' | 'prod' | 'stg'
+
+// export type Chain = Chain_viem & {
+//   contracts: Chain_viem['contracts'] & {
+//     delegation?: ChainContract | undefined
+//   }
+// }
+
+// const portoDev: Chain = {
+//   blockExplorers: {
+//     default: {
+//       apiUrl: '',
+//       name: '',
+//       url: '',
+//     },
+//   },
+//   contracts: {
+//     delegation: {
+//       address: '0x1bd84b4584a60cbcc1b3153694a69315f795c1ba',
+//     },
+//   },
+//   id: 28_404,
+//   name: 'Porto Dev',
+//   nativeCurrency: { decimals: 18, name: 'Ether', symbol: 'ETH' },
+//   rpcUrls: {
+//     default: { http: ['https://porto-dev.ithaca.xyz'] },
+//   },
+//   testnet: true,
+// }
 
 export function listenToEscrowCreated(ctx: AppContext) {
   console.log('Listening to blockchain events...')
@@ -106,13 +140,97 @@ export async function disputeEscrow(payer: `0x${string}`, escrowAddress: `0x${st
     return
   }
 
-  console.log('Processing dispute for escrow', escrowAddress)
-  const porto = Porto.create()
-  porto.provider.request({
-    abi: SimpleEscrow.abi,
-    method: 'dispute',
-    params: {},
+  const porto = Porto.create({
+    chains: [baseSepolia],
+    // mode: Mode.relay(),
   })
+
+  console.log('Processing dispute for escrow', escrowAddress)
+
+  const call = {
+    to: escrowAddress,
+    data: AbiFunction.encodeData(AbiFunction.fromAbi(SimpleEscrow.abi, 'dispute'), []),
+  }
+
+  console.log('public key', keypair.public_key)
+  const { digest, ...request } = await porto.provider.request({
+    method: 'wallet_prepareCalls',
+    params: [
+      {
+        from: keypair.address,
+        calls: [call],
+        chainId: Hex.fromNumber(baseSepolia.id),
+        key: {
+          publicKey: keypair.public_key,
+          type: 'p256',
+        },
+      },
+    ],
+  })
+
+  const signature = Signature.toHex(
+    P256.sign({
+      payload: digest,
+      privateKey: keypair.private_key as `0x${string}`,
+    }),
+  )
+
+  const [sendPreparedCallsResult] = await porto.provider.request({
+    method: 'wallet_sendPreparedCalls',
+    params: [
+      {
+        ...request,
+        signature: {
+          value: signature,
+          type: keypair.type,
+          publicKey: keypair.public_key,
+        },
+      },
+    ],
+  })
+
+  // const signature = Signature.toHex(
+  //   P256.sign({
+  //     payload: digest,
+  //     privateKey: keypair.private_key as `0x${string}`,
+  //   }),
+  // )
+  // await porto.provider.request({
+  //   method: 'wallet_connect',
+  //   params: [
+  //     {
+  //       capabilities: {
+  //         createAccount: true,
+  //       },
+  //     },
+  //   ],
+  // })
+
+  // const [sendPreparedCallsResult] = await porto.provider.request({
+  //   method: 'wallet_sendCalls',
+  //   params: [
+  //     {
+  //       calls: [
+  //         {
+  //           data: AbiFunction.encodeData(AbiFunction.fromAbi(SimpleEscrow.abi, 'dispute'), []),
+  //           to: escrowAddress,
+  //         },
+  //       ],
+  //       from: payer,
+  //       // signature: {
+  //       //   value: signature,
+  //       //   type: keypair.type,
+  //       //   publicKey: keypair.public_key,
+  //       // },
+  //     },
+  //   ],
+  // })
+
+  const hash = sendPreparedCallsResult?.id
+  if (!hash) {
+    console.error(`failed to send prepared calls for ${payer}. No hash returned from wallet_sendPreparedCalls`)
+    throw new Error('failed to send prepared calls')
+  }
 }
 
 /*

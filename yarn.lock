@@ -3467,6 +3467,7 @@ __metadata:
     dotenv: "npm:^16.4.7"
     envalid: "npm:^8.0.0"
     express: "npm:^4.21.2"
+    fake-indexeddb: "npm:^6.0.0"
     kysely: "npm:^0.27.6"
     ox: "npm:^0.7.0"
     pino: "npm:^9.6.0"
@@ -8191,6 +8192,13 @@ __metadata:
     readable-stream: "npm:^3.6.2 || ^4.4.2"
     webextension-polyfill: "npm:>=0.10.0 <1.0"
   checksum: 10c0/5645ba63b8e77996b75a5aae5a37d169fef13b65d575fa72b0cf9199c7ecd46df7ef76fbf7d6384b375544e48eb2c8912b62200320ed2a5ef9526a00fcc148d9
+  languageName: node
+  linkType: hard
+
+"fake-indexeddb@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "fake-indexeddb@npm:6.0.0"
+  checksum: 10c0/551ddada98f6d8b1c159698ff82570d06c8959f8e98616d872305dee3d857795dd62dd32094779e7b325397103364dcb0e24b6447992c0464ae13d19fbe57315
   languageName: node
   linkType: hard
 

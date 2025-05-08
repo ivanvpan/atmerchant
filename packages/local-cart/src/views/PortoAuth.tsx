@@ -1,32 +1,80 @@
 import { useQuery } from '@tanstack/react-query'
-import { Hooks } from 'porto/wagmi'
+import { Hooks, porto } from 'porto/wagmi'
 import { baseSepolia } from 'wagmi/chains'
-import { porto } from 'porto/wagmi'
 import {
   useAccount,
   useConnectors,
   http,
   createConfig,
-  createStorage,
   BaseError,
   useCallsStatus,
   useSendCalls,
   useWatchContractEvent,
+  Connector,
+  injected,
+  createStorage,
 } from 'wagmi'
 import { Hex, Json, Value } from 'ox'
 import { useEffect, useState } from 'react'
-import { Porto } from 'porto'
+import { Mode, Storage } from 'porto'
 import { useMutation } from 'wagmi/query'
 import EscrowFactory from '../contracts/EscrowFactory'
 import { queryClient } from '../queryClient'
+import { Chain as Chain_viem, ChainContract, Transport } from 'viem'
+import { Porto } from 'porto/remote'
+import { odysseyTestnet } from 'porto/Chains'
 // import SimpleEscrow from '../contracts/SimpleEscrow'
 
+// export type Chain = Chain_viem & {
+//   contracts: Chain_viem['contracts'] & {
+//     delegation?: ChainContract | undefined
+//   }
+// }
+
+// const portoDev: Chain = {
+//   blockExplorers: {
+//     default: {
+//       apiUrl: '',
+//       name: '',
+//       url: '',
+//     },
+//   },
+//   contracts: {
+//     delegation: {
+//       address: '0x1bd84b4584a60cbcc1b3153694a69315f795c1ba',
+//     },
+//   },
+//   id: 28_404,
+//   name: 'Porto Dev',
+//   nativeCurrency: { decimals: 18, name: 'Ether', symbol: 'ETH' },
+//   rpcUrls: {
+//     default: { http: ['https://porto-dev.ithaca.xyz'] },
+//   },
+//   testnet: true,
+// }
+
+// const devConfig = {
+//   chains: [portoDev],
+//   mode: Mode.relay({
+//     feeToken: 'EXP',
+//   }),
+//   transports: {
+//     [portoDev.id]: {
+//       default: http(),
+//       relay: http('https://relay-dev.ithaca.xyz'),
+//     },
+//   },
+// } as const satisfies Partial<Porto.Config>
+
+const theChain = baseSepolia
+
 export const wagmiConfig = createConfig({
-  chains: [baseSepolia],
+  chains: [theChain],
   connectors: [porto()],
   storage: createStorage({ storage: window.localStorage }),
   transports: {
-    [baseSepolia.id]: http(),
+    // [portoDev.id]: http(),
+    [theChain.id]: http(),
   },
 })
 
@@ -42,13 +90,17 @@ export const permissions = () =>
       calls: [
         {
           signature: 'createEscrow(address,address,address)',
-          to: EscrowFactory.address,
+          to: EscrowFactory.address as `0x${string}`,
+        },
+        {
+          signature: 'dispute()',
+          to: '0xa4C5d46bE1D81d3743f829b1D84b858b3792da8f' as `0x${string}`,
         },
       ],
       spend: [
         {
           period: 'minute',
-          token: EscrowFactory.address,
+          token: EscrowFactory.address as `0x${string}`,
           limit: Hex.fromNumber(Value.fromEther('1000')),
         },
       ],
@@ -68,7 +120,8 @@ export default function PortoAuth() {
       <Register />
       <RequestKey />
       <GrantPermissions />
-      <CreateEscrow />
+      <GetPermissions />
+      {/* <CreateEscrow /> */}
       <Account />
       <Events />
       <Clear />
@@ -172,6 +225,14 @@ function Register() {
   const connectors = useConnectors()
   const connector = connectors.find((x) => x.id === 'xyz.ithaca.porto')
   const connect = Hooks.useConnect()
+  const [chainId, setChainId] = useState<number | undefined>(undefined)
+  useEffect(() => {
+    if (connector) {
+      if (connector) {
+        connector.getChainId().then((id) => setChainId(id))
+      }
+    }
+  }, [connector])
 
   return (
     <div>
@@ -179,7 +240,7 @@ function Register() {
         disabled={connect.status === 'pending'}
         onClick={async () => {
           connect.mutate({
-            connector,
+            connector: connector as Connector,
             createAccount: { label },
             // grantPermissions: permissions(),
           })
@@ -188,7 +249,8 @@ function Register() {
       >
         Register
       </button>
-      <p>{connect.error?.message}</p>
+      <p>{String(connect.error?.stack)}</p>
+      <p>{chainId}</p>
     </div>
   )
 }
@@ -202,6 +264,7 @@ function Clear() {
     queryClient.unmount()
     window.localStorage.clear()
     window.sessionStorage.clear()
+    localStorage.removeItem('wagmi.store')
   }
   return <button onClick={clear}>Clear</button>
 }
@@ -288,6 +351,8 @@ function CreateEscrow() {
 function GrantPermissions() {
   const { address } = useAccount()
   const grantPermissions = Hooks.useGrantPermissions()
+  const [key, setKey] = useState<string>('')
+
   return (
     <div>
       <form
@@ -296,6 +361,11 @@ function GrantPermissions() {
           if (!address) return
 
           const key = Json.parse((await wagmiConfig.storage?.getItem(`${address.toLowerCase()}-keys`)) || '{}') as Key
+          {
+            JSON.stringify(key)
+          }
+
+          setKey(JSON.stringify(key))
 
           // if `expry` is present in both `key` and `permissions`, pick the lower value
           const expiry = Math.min(key.expiry, permissions().expiry)
@@ -313,6 +383,7 @@ function GrantPermissions() {
         </button>
         {grantPermissions.status === 'error' && <p>{grantPermissions.error?.message}</p>}
       </form>
+      <div>Key: {key}</div>
       {grantPermissions.data ? (
         <details>
           <summary style={{ marginTop: '1rem' }}>
@@ -323,6 +394,19 @@ function GrantPermissions() {
             })}
           </summary>
           <pre>{Json.stringify(grantPermissions.data, undefined, 2)}</pre>
+        </details>
+      ) : null}
+    </div>
+  )
+}
+
+function GetPermissions() {
+  const getPermissions = Hooks.usePermissions()
+  return (
+    <div>
+      {getPermissions.data ? (
+        <details>
+          <pre>{Json.stringify(getPermissions.data, undefined, 2)}</pre>
         </details>
       ) : null}
     </div>
@@ -361,10 +445,11 @@ function Events() {
   useEffect(() => {
     portoConnector
       ?.getProvider({
-        chainId: baseSepolia.id,
+        chainId: theChain.id,
       })
       .then((provider: unknown) => {
         const castedProvider = provider as ReturnType<typeof Porto.create>['provider']
+        castedProvider.request({})
         const handleResponse = (event: string) => (response: unknown) =>
           setResponses((responses) => ({
             ...responses,

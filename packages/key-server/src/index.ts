@@ -16,6 +16,7 @@ import { createDb, migrateToLatest } from './db'
 import { listenToEscrowCreated } from './blockchain'
 import { createPublicClient, http as viemHttp } from 'viem'
 import type { PublicClient } from 'viem'
+import 'fake-indexeddb/auto'
 import { baseSepolia } from 'viem/chains'
 
 export class Server {

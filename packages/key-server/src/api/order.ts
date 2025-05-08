@@ -15,7 +15,13 @@ export default function registerApi(app: Express, ctx: AppContext) {
       return
     }
 
-    await disputeEscrow(address as `0x${string}`, escrowAddress as `0x${string}`, ctx)
+    try {
+      await disputeEscrow(address as `0x${string}`, escrowAddress as `0x${string}`, ctx)
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ error: 'Failed to dispute escrow' })
+      return
+    }
 
     const escrows = await ctx.db.selectFrom('escrows').where('payer', '=', address).selectAll().execute()
     res.json(escrows)
